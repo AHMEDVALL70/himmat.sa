@@ -109,6 +109,25 @@ function parsePriceAndCount(rawHtml: string): ParsedPrice | null {
   return null;
 }
 
+/** ===== 2026-09-20: استخراج من بيانات JSON مضمَّنة (Next.js RSC payload) =====
+ *  اكتُشف بفحص صفحة "حي الوزيرية" (جدة) مباشرة: بعض صفحات الأحياء تعرض
+ *  السعر برسم بياني تفاعلي فقط (JavaScript)، بدون أي جملة نصية عادية —
+ *  النمطين أعلاه صفر فرصة يطابقونها مهما عدّلنا صياغتهم. البيانات الخام
+ *  نفسها موجودة كمصفوفة JSON مضمَّنة بمصدر الصفحة (داخل <script>، تُحذف
+ *  بدالة stripTags قبل ما توصل لهذي الدالة — لازم نبحث بـ HTML الخام
+ *  مباشرة، قبل أي تنظيف). نبحث تحديداً عن سنة اليوم الحالية (مو "آخر
+ *  تطابق" عشوائي بالمصفوفة) — لو موجودة، هذا هو السعر الفعلي المعروض
+ *  بالرسم البياني (تأكّدنا بمطابقة مباشرة: ٣١٧٥ بالبيانات = ٣١٧٥ بتلميح
+ *  الرسم البياني المرئي). النمط مرن يقبل علامات تنصيص عادية أو مهرَّبة
+ *  (\") لأن صيغة الترميز بالسكربت قد تختلف حسب موضع الاقتباس بالصفحة. */
+function extractCurrentYearJsonPrice(rawHtml: string, year: number): number | null {
+  const re = new RegExp(`\\\\?"year\\\\?":\\\\?"${year}\\\\?",\\\\?"avgPrice\\\\?":(\\d+)`);
+  const m = rawHtml.match(re);
+  if (!m) return null;
+  const price = parseInt(m[1], 10);
+  return Number.isFinite(price) && price > 0 ? price : null;
+}
+
 /** تكشف تحديداً هل الصفحة رجعت "ملخّص المدينة" بدل صفحة الحي المطلوب — بعض
  *  الأحياء عندنا مو مسجَّلة عند رغدان كوحدة مستقلة، فيرجّع لك السيرفر صفحة
  *  المدينة العامة (كود 200 ناجح، مو 404) بهدوء. تأكدنا من هذا فعلياً
@@ -137,6 +156,14 @@ async function fetchDistrictPrice(citySlug: string, districtName: string, cityNa
         const text = normalizeDigits(stripTags(html));
         if (isRedirectedToCityPage(text, cityName)) {
           return { ok: false as const, reason: "الحي غير مسجَّل عند رغدان كوحدة مستقلة (الصفحة ترجع لملخّص المدينة)", url };
+        }
+        // النمط 3: بيانات JSON مضمَّنة (Next.js) — راجع تعليق الدالة أعلاه.
+        // نجرّبها هنا بس (بعد فشل النمطين النصيين + استبعاد إعادة التوجيه)،
+        // صفر تأثير على أي حي ناجح أصلاً بالنمطين الأولين.
+        const currentYear = new Date().getFullYear();
+        const jsonPrice = extractCurrentYearJsonPrice(html, currentYear);
+        if (jsonPrice !== null) {
+          return { ok: true as const, price: jsonPrice, count: null, url };
         }
         // ===== تشخيص مؤقت 2026-09-14 — يُزال بعد ما نحسم السبب =====
         // نفس الأسلوب اللي حسم مشكلة متوسط المدينة المنورة بدليل فعلي —
