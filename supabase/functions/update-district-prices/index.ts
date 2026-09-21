@@ -164,19 +164,27 @@ async function fetchDistrictPrice(citySlug: string, districtName: string, cityNa
       const parsed = parsePriceAndCount(html);
       if (!parsed) {
         const text = normalizeDigits(stripTags(html));
-        if (hasInsufficientDataBadge(text)) {
-          return { ok: false as const, reason: "بيانات غير كافية عند رغدان (أقل من 5 صفقات صالحة خلال آخر 36 شهراً) — مؤكَّد من نص الصفحة الحية", url };
-        }
         if (isRedirectedToCityPage(text, cityName)) {
           return { ok: false as const, reason: "الحي غير مسجَّل عند رغدان كوحدة مستقلة (الصفحة ترجع لملخّص المدينة)", url };
         }
         // النمط 3: بيانات JSON مضمَّنة (Next.js) — راجع تعليق الدالة أعلاه.
         // نجرّبها هنا بس (بعد فشل النمطين النصيين + استبعاد إعادة التوجيه)،
         // صفر تأثير على أي حي ناجح أصلاً بالنمطين الأولين.
+        // ===== تصحيح 2026-09-21: هذا النمط لازم يُجرَّب *قبل* فحص شارة "بيانات
+        // غير كافية" أدناه، لا بعده — اكتشفنا فعلياً (حي "الوزيرية" بجدة) إن
+        // بعض الصفحات تعرض شارة "بيانات غير كافية" على مستوى ملخّص الحي، لكن
+        // لسا فيها بيانات JSON صالحة وقابلة للاستخراج بالرسم البياني (سنة
+        // جزئية بس، لا يعني عدم وجودها). وضع فحص الشارة قبل هذا النمط (خطأ
+        // ارتكبناه بنفس اليوم) كان يعترض ٩ أحياء كانت ناجحة فعلياً ويحوّلها
+        // لفشل بدون داعٍ — رجعنا التصحيح فوراً بعد ما رصدنا الانخفاض
+        // (٢٥٢→٢٤٣ نجاح) بتشغيلة تحقّق فعلية.
         const currentYear = new Date().getFullYear();
         const jsonPrice = extractCurrentYearJsonPrice(html, currentYear);
         if (jsonPrice !== null) {
           return { ok: true as const, price: jsonPrice, count: null, url };
+        }
+        if (hasInsufficientDataBadge(text)) {
+          return { ok: false as const, reason: "بيانات غير كافية عند رغدان (أقل من 5 صفقات صالحة خلال آخر 36 شهراً) — مؤكَّد من نص الصفحة الحية", url };
         }
         // ===== تشخيص مؤقت 2026-09-14 — يُزال بعد ما نحسم السبب =====
         // نفس الأسلوب اللي حسم مشكلة متوسط المدينة المنورة بدليل فعلي —
