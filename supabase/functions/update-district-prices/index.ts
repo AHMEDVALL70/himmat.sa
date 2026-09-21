@@ -140,6 +140,16 @@ function isRedirectedToCityPage(text: string, cityName: string): boolean {
   return cityPattern.test(text);
 }
 
+/** ===== إضافة 2026-09-21: كشف صريح لعلامة "بيانات غير كافية" اللي تنشرها
+ *  رغدان نفسها على الصفحة الحية (أقل من 5 صفقات صالحة خلال آخر 36 شهر) —
+ *  تحقّقنا منها فعلياً على 8 أحياء مختلفة (فحص مباشر لكل صفحة حية، لا تخمين)
+ *  قبل إضافة هذا الكشف. العدد الإجمالي التاريخي المعروض بالصفحة (حتى لو كبير،
+ *  زي 23 صفقة) لا يعني الكفاية بالضرورة — العلامة نفسها هي المصدر الوحيد
+ *  الموثوق لمعرفة قرار رغدان الداخلي. */
+function hasInsufficientDataBadge(text: string): boolean {
+  return text.includes("بيانات غير كافية");
+}
+
 async function fetchDistrictPrice(citySlug: string, districtName: string, cityName: string) {
   const url = `https://raghdan.sa/ar/market/${encodeURIComponent(citySlug)}/${encodeURIComponent(districtName)}/`;
   // محاولتان بس (مو أكثر): الأولى، وإعادة واحدة لو صار خطأ اتصال حقيقي (مو
@@ -154,6 +164,9 @@ async function fetchDistrictPrice(citySlug: string, districtName: string, cityNa
       const parsed = parsePriceAndCount(html);
       if (!parsed) {
         const text = normalizeDigits(stripTags(html));
+        if (hasInsufficientDataBadge(text)) {
+          return { ok: false as const, reason: "بيانات غير كافية عند رغدان (أقل من 5 صفقات صالحة خلال آخر 36 شهراً) — مؤكَّد من نص الصفحة الحية", url };
+        }
         if (isRedirectedToCityPage(text, cityName)) {
           return { ok: false as const, reason: "الحي غير مسجَّل عند رغدان كوحدة مستقلة (الصفحة ترجع لملخّص المدينة)", url };
         }
