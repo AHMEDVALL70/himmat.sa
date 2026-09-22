@@ -2988,7 +2988,8 @@ function showPage(id){
   document.querySelectorAll('.links a[href^="#"]').forEach(a=>{
     a.classList.toggle('active', a.getAttribute('href') === '#' + id);
   });
-  if (location.hash !== '#' + id) history.pushState(null, '', '#' + id);
+  const newPath = id === 'home' ? '/' : '/' + id;
+  if (location.pathname !== newPath) history.pushState(null, '', newPath);
   window.scrollTo({ top: 0, behavior: 'auto' });
   if (id === 'home') animateCounters();
   if (id === 'analytics' && !analyticsLoaded){
@@ -2999,17 +3000,33 @@ function showPage(id){
 }
 
 document.addEventListener('click', (e)=>{
-  const a = e.target.closest('a[href^="#"]');
-  if (!a) return;
-  const id = a.getAttribute('href').slice(1);
+  // مسارات حقيقية (2026-09-22): روابط التنقّل الداخلية صارت "/offers" بدل
+  // "#offers" لأجل السيو (جوجل ما يتابع روابط # كصفحات منفصلة). نفحص
+  // "/" أول، وبعدها "#" احتياطياً (روابط قديمة محفوظة/مشارَكة سابقاً بصيغة
+  // #offers لسا لازم تشتغل بدون كسر).
+  const pathA = e.target.closest('a[href^="/"]');
+  if (pathA){
+    const id = pathA.getAttribute('href').replace(/^\//, '') || 'home';
+    if (PAGES.includes(id)){
+      e.preventDefault();
+      showPage(id);
+      if (id === 'offers') renderOffers(); // يضمن القائمة الكاملة دائماً، مو نتائج اختبار "دوّر عليه" عالقة من زيارة سابقة
+      return;
+    }
+  }
+  const hashA = e.target.closest('a[href^="#"]');
+  if (!hashA) return;
+  const id = hashA.getAttribute('href').slice(1);
   if (PAGES.includes(id)){
     e.preventDefault();
     showPage(id);
-    if (id === 'offers') renderOffers(); // يضمن القائمة الكاملة دائماً، مو نتائج اختبار "دوّر عليه" عالقة من زيارة سابقة
+    if (id === 'offers') renderOffers();
   }
 });
 window.addEventListener('popstate', ()=>{
-  const id = location.hash.slice(1) || 'home';
+  const fromPath = location.pathname.replace(/^\//, '') || 'home';
+  const fromHash = location.hash.slice(1);
+  const id = PAGES.includes(fromPath) ? fromPath : (PAGES.includes(fromHash) ? fromHash : 'home');
   showPage(id);
   if (id === 'offers') renderOffers();
 });
@@ -3650,7 +3667,13 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   try { runValuation(); } catch(e){}
   await heroAndLiveCounterPromise; // غالباً خلصت أصلاً بهالنقطة — ما تضيف انتظار حقيقي
   typewriterHeroDesc();
-  showPage(location.hash.slice(1) || 'home');
+  // مسارات حقيقية (2026-09-22): أول أولوية لمسار الرابط الحقيقي (يجي من
+  // تحميل مباشر عبر 404.html، أو تحديث الصفحة)، وبعدها احتياطياً رابط
+  // "#offers" قديم محفوظ/مشارَك من قبل — بدون ما ينكسر أي رابط سابق.
+  const initialPath = location.pathname.replace(/^\//, '') || 'home';
+  const initialHash = location.hash.slice(1);
+  const initialPage = PAGES.includes(initialPath) ? initialPath : (PAGES.includes(initialHash) ? initialHash : 'home');
+  showPage(initialPage);
   renderCompareBar();
   handleDeepLinkOffer();
 });
