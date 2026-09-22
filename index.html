@@ -2,6 +2,22 @@
 <html lang="ar" dir="rtl" data-theme="dark">
 <head>
 <meta charset="UTF-8">
+<!-- استعادة المسار الحقيقي (2026-09-22) — الطرف المقابل لسكربت 404.html.
+     لو الزائر وصل عبر تحميل مباشر لمسار زي /offers (أو تحديث الصفحة)،
+     GitHub Pages يمرّ عبر 404.html اللي يحوّل الرابط مؤقتاً لصيغة
+     "/?/offers". هذا السطر يعيد بناءه لشكله الصحيح "/offers" بالعنوان،
+     قبل ما أي كود ثاني (site.js) يشتغل ويقرأ location.pathname. صفر أثر
+     على زائر دخل الرئيسية مباشرة (location.search فاضي أصلاً وقتها). -->
+<script>
+(function(l){
+  if (l.search[1] === '/'){
+    var decoded = l.search.slice(1).split('&').map(function(s){
+      return s.replace(/~and~/g, '&');
+    }).join('?');
+    window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
+  }
+}(window.location));
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" href="icons/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32x32.png">
@@ -159,19 +175,19 @@
       <span data-i18n="brand">همة المدينة العقارية</span>
     </div>
     <nav class="links">
-      <a href="#home" class="active" data-i18n="nav_home">الرئيسية</a>
-      <a href="#valuation" data-i18n="nav_valuation">المؤشر</a>
-      <a href="#offers" data-i18n="nav_offers">العروض</a>
-      <a href="#services" data-i18n="nav_services">الخدمات</a>
-      <a href="#contracts" data-i18n="nav_contracts">العقود</a>
-      <a href="#add-property" data-i18n="nav_add">أضف عقارك</a>
+      <a href="/" class="active" data-i18n="nav_home">الرئيسية</a>
+      <a href="/valuation" data-i18n="nav_valuation">المؤشر</a>
+      <a href="/offers" data-i18n="nav_offers">العروض</a>
+      <a href="/services" data-i18n="nav_services">الخدمات</a>
+      <a href="/contracts" data-i18n="nav_contracts">العقود</a>
+      <a href="/add-property" data-i18n="nav_add">أضف عقارك</a>
       <div class="nav-more" id="nav-more">
         <button type="button" class="nav-more-btn" id="nav-more-btn" data-i18n="nav_more">المزيد ▾</button>
         <div class="nav-more-panel links" id="nav-more-panel">
-          <a href="#analytics" data-i18n="nav_analytics">التحليلات</a>
-          <a href="#faq" data-i18n="nav_faq">الأسئلة</a>
-          <a href="#about" data-i18n="nav_about">عنّا</a>
-          <a href="#contact" data-i18n="nav_contact">تواصل</a>
+          <a href="/analytics" data-i18n="nav_analytics">التحليلات</a>
+          <a href="/faq" data-i18n="nav_faq">الأسئلة</a>
+          <a href="/about" data-i18n="nav_about">عنّا</a>
+          <a href="/contact" data-i18n="nav_contact">تواصل</a>
           <a href="admin.html" data-i18n="nav_admin" style="border-top:1px solid var(--line);margin-top:4px;padding-top:12px">🔐 لوحة التحكم</a>
         </div>
       </div>
@@ -192,16 +208,16 @@
     </div>
   </div>
   <nav class="links" id="mobile-menu">
-    <a href="#home" data-i18n="nav_home">الرئيسية</a>
-    <a href="#valuation" data-i18n="nav_valuation">المؤشر</a>
-    <a href="#offers" data-i18n="nav_offers">العروض</a>
-    <a href="#contracts" data-i18n="nav_contracts">العقود</a>
-    <a href="#add-property" data-i18n="nav_add">أضف عقارك</a>
-    <a href="#analytics" data-i18n="nav_analytics">التحليلات</a>
-    <a href="#services" data-i18n="nav_services">الخدمات</a>
-    <a href="#faq" data-i18n="nav_faq">الأسئلة</a>
-    <a href="#about" data-i18n="nav_about">عنّا</a>
-    <a href="#contact" data-i18n="nav_contact">تواصل</a>
+    <a href="/" data-i18n="nav_home">الرئيسية</a>
+    <a href="/valuation" data-i18n="nav_valuation">المؤشر</a>
+    <a href="/offers" data-i18n="nav_offers">العروض</a>
+    <a href="/contracts" data-i18n="nav_contracts">العقود</a>
+    <a href="/add-property" data-i18n="nav_add">أضف عقارك</a>
+    <a href="/analytics" data-i18n="nav_analytics">التحليلات</a>
+    <a href="/services" data-i18n="nav_services">الخدمات</a>
+    <a href="/faq" data-i18n="nav_faq">الأسئلة</a>
+    <a href="/about" data-i18n="nav_about">عنّا</a>
+    <a href="/contact" data-i18n="nav_contact">تواصل</a>
     <a href="admin.html" data-i18n="nav_admin">🔐 لوحة التحكم</a>
   </nav>
 </header>
@@ -217,8 +233,8 @@
       <p class="hero-tagline" data-i18n="hero_tagline">خبرة محلية… لقرار عقاري أكثر ثقة</p>
       <p class="desc" data-i18n="hero_desc" id="hero-desc">نقدم في همة المدينة العقارية خدمات عقارية مبنية على معرفة السوق، ودقة المعلومات، والوضوح في التعامل. نرافق عملاءنا في رحلة البيع والشراء والتسويق والاستثمار العقاري، ونسعى لأن تكون كل خطوة واضحة ومدروسة.</p>
       <div class="hero-cta">
-        <a href="#offers" class="btn btn-primary" data-i18n="hero_cta_browse">تصفح العقارات</a>
-        <a href="#add-property" class="btn btn-outline" data-i18n="hero_cta_list">أضف عقارك</a>
+        <a href="/offers" class="btn btn-primary" data-i18n="hero_cta_browse">تصفح العقارات</a>
+        <a href="/add-property" class="btn btn-outline" data-i18n="hero_cta_list">أضف عقارك</a>
       </div>
       <div class="license-badge"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg> <span data-i18n="license_badge">مرخّصة من الهيئة العامة للعقار — رخصة فال: 1200030428 — سجل تجاري: 7042103650</span></div>
       <div class="stats-row">
@@ -304,7 +320,7 @@
     </div>
     <div id="featured-grid" class="grid grid-3"></div>
     <div style="text-align:center;margin-top:22px">
-      <a href="#offers" class="btn btn-ghost" data-i18n="featured_see_all">شاهد كل العروض ←</a>
+      <a href="/offers" class="btn btn-ghost" data-i18n="featured_see_all">شاهد كل العروض ←</a>
     </div>
   </div>
 </section>
@@ -827,24 +843,24 @@
       </div>
       <div>
         <h4 data-i18n="footer_quicklinks_title">روابط سريعة</h4>
-        <p style="font-size:13px"><a href="#home" data-i18n="nav_home">الرئيسية</a></p>
-        <p style="font-size:13px"><a href="#offers" data-i18n="nav_offers">العروض</a></p>
-        <p style="font-size:13px"><a href="#valuation" data-i18n="nav_valuation">المؤشر</a></p>
-        <p style="font-size:13px"><a href="#contracts" data-i18n="nav_contracts">العقود</a></p>
+        <p style="font-size:13px"><a href="/" data-i18n="nav_home">الرئيسية</a></p>
+        <p style="font-size:13px"><a href="/offers" data-i18n="nav_offers">العروض</a></p>
+        <p style="font-size:13px"><a href="/valuation" data-i18n="nav_valuation">المؤشر</a></p>
+        <p style="font-size:13px"><a href="/contracts" data-i18n="nav_contracts">العقود</a></p>
       </div>
       <div>
         <h4 data-i18n="footer_services_title">الخدمات</h4>
-        <p style="font-size:13px"><a href="#offers" data-i18n="footer_svc_1">البيع والشراء</a></p>
-        <p style="font-size:13px"><a href="#valuation" data-i18n="footer_svc_2">مؤشر الأسعار العقارية</a></p>
-        <p style="font-size:13px"><a href="#contracts" data-i18n="footer_svc_3">كتابة العقود</a></p>
-        <p style="font-size:13px"><a href="#services" data-i18n="footer_svc_4">إدارة الأملاك</a></p>
+        <p style="font-size:13px"><a href="/offers" data-i18n="footer_svc_1">البيع والشراء</a></p>
+        <p style="font-size:13px"><a href="/valuation" data-i18n="footer_svc_2">مؤشر الأسعار العقارية</a></p>
+        <p style="font-size:13px"><a href="/contracts" data-i18n="footer_svc_3">كتابة العقود</a></p>
+        <p style="font-size:13px"><a href="/services" data-i18n="footer_svc_4">إدارة الأملاك</a></p>
       </div>
       <div>
         <h4 data-i18n="footer_contact_title">تواصل سريع</h4>
         <p style="font-size:13px"><a href="tel:+966530500906">+966 530 500 906</a></p>
         <p style="font-size:13px"><a href="mailto:Fadhel-906@hotmail.com">Fadhel-906@hotmail.com</a></p>
-        <p style="font-size:13px"><a href="#privacy" data-i18n="footer_privacy">سياسة الخصوصية</a></p>
-        <p style="font-size:13px"><a href="#terms" data-i18n="footer_terms">شروط الاستخدام</a></p>
+        <p style="font-size:13px"><a href="/privacy" data-i18n="footer_privacy">سياسة الخصوصية</a></p>
+        <p style="font-size:13px"><a href="/terms" data-i18n="footer_terms">شروط الاستخدام</a></p>
       </div>
     </div>
     <div class="bottom">
@@ -929,7 +945,7 @@
 </div>
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script src="js/site.js?v=20260920a"></script>
+<script src="js/site.js?v=20260922a"></script>
 <div id="contract-print-view" class="hide">
   <div class="print-header">
     <picture>

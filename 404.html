@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<title>همة المدينة العقارية</title>
+<!-- ============================================================================
+     404.html — دعم المسارات الحقيقية (SPA) على GitHub Pages
+     ============================================================================
+     أُضيف 2026-09-22 كجزء من إصلاح روابط السيو (تحويل من #hash لمسارات حقيقية
+     زي /offers, /contracts). GitHub Pages خادم ملفات ثابت بحت — ما يقدر يرجّع
+     محتوى فعلي لمسار زي /offers من نفسه، فيرجّع هذا الملف كاستجابة 404 حقيقية.
+
+     هذا نمط "spa-github-pages" القياسي والمُختبَر على نطاق واسع (مو اختراع
+     خاص بنا): يحوّل المسار المطلوب لصيغة استعلام (?/offers) ويعيد التوجيه
+     فوراً لـ index.html، اللي بدوره (عبر سكربت "استعادة المسار الحقيقي"
+     بأعلى index.html) يبني المسار الصحيح بالعنوان مرة ثانية قبل ما site.js
+     يبدأ يشتغل — الزائر ما يلاحظ أي وميض أو تأخير محسوس عملياً.
+
+     pathSegmentsToKeep = 0 لأن الموقع منشور على جذر نطاق مخصَّص (himmat.sa)
+     مباشرة، مو تحت مسار فرعي (زي username.github.io/repo-name).
+-->
+<script>
+  var pathSegmentsToKeep = 0;
+  var l = window.location;
+  l.replace(
+    l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+    l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+    l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+    (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+    l.hash
+  );
+</script>
+</head>
+<body>
+</body>
+</html>
