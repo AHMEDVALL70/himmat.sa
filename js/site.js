@@ -1035,6 +1035,7 @@ function openImageLightbox(imgEl){
    المدخل (مفتاح مسجَّل بـOFFER_REGISTRY)، تصميم شبكي جديد بعرض الصفحة. */
 let currentDetailOfferId = null;
 async function showOfferDetail(key){
+  console.log('[تشخيص رابط عرض] دخلنا showOfferDetail بمفتاح=', key, 'موجود بالسجل=', !!OFFER_REGISTRY[key]);
   const cached = OFFER_REGISTRY[key];
   if (!cached) return;
   currentDetailOfferId = cached.id || key;
@@ -1187,12 +1188,15 @@ async function handleDeepLinkOffer(){
   const hashMatch = location.hash.match(/^#offer-(.+)$/);
   const pathMatch = location.pathname.match(/^\/offer\/([^\/]+)\/?$/);
   const offerId = hashMatch ? hashMatch[1] : (pathMatch ? decodeURIComponent(pathMatch[1]) : null);
+  console.log('[تشخيص رابط عرض] offerId=', offerId, 'dbReady=', dbReady);
   if (!offerId || !dbReady) return;
   try {
     const { data, error } = await withTimeout(supa.from('offers').select('*').eq('id', offerId).eq('is_published', true).maybeSingle());
+    console.log('[تشخيص رابط عرض] نتيجة الجلب — error=', error, 'data موجودة=', !!data);
     if (error || !data) return;
     showPage('offers');
     const key = registerOffer(data);
+    console.log('[تشخيص رابط عرض] استدعاء openDetailModal بمفتاح=', key);
     openDetailModal(key);
   } catch (e) {
     console.error('handleDeepLinkOffer failed', e);
