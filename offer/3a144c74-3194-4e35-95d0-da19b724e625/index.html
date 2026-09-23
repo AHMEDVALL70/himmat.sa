@@ -90,6 +90,36 @@
 <link rel="stylesheet" href="css/site.css?v=20260915g">
 </head>
 <body>
+<script>
+(function(){
+  // إخفاء الرئيسية وإظهار الصفحة الصحيحة فوراً أثناء تحليل الصفحة —
+  // قبل ما site.js نفسه يبدأ يشتغل، وقبل ما المتصفح يرسم أي قسم صفحة
+  // (2026-09-24). السبب: "الرئيسية" مكتوبة ظاهرة افتراضياً بالـHTML
+  // الخام، وsite.js بدون defer وبآخر الصفحة — يعني يمر وقت محسوس (تحميل
+  // المكتبات + تحليل بقية الصفحة) قبل ما أي منطق جافاسكربت يوصل دوره،
+  // بغض النظر كم بدري استدعينا showPage() بداخله. هذا السكربت وحده
+  // يتصرف بسرعة كافية لأنه Inline ومباشر بأول <body>.
+  // ⚠️ القائمة هنا نسخة مطابقة لمصفوفة PAGES بـjs/site.js — لازم تُحدَّث
+  // يدوياً بالاثنين مع بعض لو أُضيفت صفحة جديدة مستقبلاً (تجاهلها هنا
+  // بالغلط ما يكسر شي، بس يرجّع نفس "ومضة" الرئيسية القديمة لتلك
+  // الصفحة تحديداً بدل الاستفادة من هذا التسريع).
+  var PAGES = ['home','offers','offer-detail','services','valuation','add-property','analytics','contracts','faq','about','contact','privacy','terms'];
+  var isDeepLinkOffer = /^\/offer\/[^\/]+\/?$/.test(location.pathname) || /^#offer-/.test(location.hash);
+  var id;
+  if (isDeepLinkOffer) {
+    id = 'offer-detail';
+  } else {
+    var p = location.pathname.replace(/^\//, '') || 'home';
+    var h = location.hash.slice(1);
+    id = PAGES.indexOf(p) !== -1 ? p : (PAGES.indexOf(h) !== -1 ? h : 'home');
+  }
+  if (id !== 'home') {
+    var style = document.createElement('style');
+    style.textContent = '#home{display:none!important}#' + id + '{display:block!important}';
+    document.head.appendChild(style);
+  }
+})();
+</script>
 
 <!-- ==========================================================================
      لقطة محتوى جاهزة للزواحف الآلية (Crawler Snapshot) — 2026-09-18
