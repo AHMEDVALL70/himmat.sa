@@ -52,6 +52,7 @@ const I18N = {
     val_honesty_label:"ملاحظة مهمة حول الدقة: ",
     val_honesty_text:"هذا المؤشر ناتج عن معادلة حسابية شفافة (سعر المتر × المساحة مع معاملات تعديل) — مع نموذج ذكاء اصطناعي يخمّن، سعر المتر نفسه إما من صفقات حقيقية موثّقة (وزارة العدل عبر رغدان) لو متوفرة لهذا الحي تحديداً، أو متوسط عام للمدينة — النتيجة أدناه توضح أي الحالتين تنطبق. اعتبره نقطة انطلاق للنقاش، لا تقييماً معتمداً رسمياً.",
     val_run:"احسب المؤشر", res_low:"أدنى النطاق (ر.س)", res_high:"أعلى النطاق (ر.س)",
+    val_share:"📤 شارك النتيجة بواتساب",
     val_breakdown_hint:"ستظهر تفاصيل حساب المعادلة هنا بعد الضغط على \"احسب المؤشر\".",
     finance_title:"حاسبة التمويل العقاري", finance_result_label:"القسط الشهري التقريبي",
     finance_note:"حساب إرشادي، يختلف حسب جهة التمويل",
@@ -164,6 +165,7 @@ const I18N = {
     val_honesty_label:"Accuracy note: ",
     val_honesty_text:"This indicator comes from a transparent formula (price per sqm × area with adjustment factors) — not an AI model guessing. The per-sqm price itself is either based on real documented transactions (Ministry of Justice via Raghdan) when available for that specific district, or a general citywide average otherwise — the result below shows which applies. Consider it a starting point for discussion, not an officially certified valuation.",
     val_run:"Calculate Estimate", res_low:"Low range (SAR)", res_high:"High range (SAR)",
+    val_share:"📤 Share via WhatsApp",
     val_breakdown_hint:"The formula breakdown will appear here after you click \"Calculate Estimate\".",
     finance_title:"Mortgage Calculator", finance_result_label:"Approx. monthly payment",
     finance_note:"Indicative only, varies by lender",
@@ -1168,6 +1170,23 @@ function shareOffer(offerId, title){
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
 
+/* مشاركة نتيجة حاسبة المؤشر بواتساب (2026-09-23) — نفس نمط shareOffer
+   أعلاها بالضبط. النتيجة نفسها حساب حي بالمتصفح (مو سجل بقاعدة بيانات
+   له رقم دائم زي العروض)، فالمشاركة نص جاهز بالأرقام الفعلية + رابط
+   عام لصفحة المؤشر (يقدر يعيد الحساب بنفسه)، مو رابط لنتيجة محدَّدة. */
+function shareValuation(){
+  const low = document.getElementById('res-low').textContent;
+  const high = document.getElementById('res-high').textContent;
+  const districtText = document.getElementById('v-district').selectedOptions[0]?.textContent?.trim() || '';
+  const cityText = document.getElementById('v-city').selectedOptions[0]?.textContent?.trim() || '';
+  const typeText = document.getElementById('v-type').selectedOptions[0]?.textContent?.trim() || '';
+  const url = `${location.origin}/valuation`;
+  const text = currentLang === 'ar'
+    ? `قيّمت عقاري (${typeText} — ${districtText}، ${cityText}) عبر مؤشر همة المدينة العقارية، والسعر التقديري بين ${low} و${high} ريال سعودي!\nجرّب الحاسبة بنفسك: ${url}`
+    : `I estimated my property (${typeText} — ${districtText}, ${cityText}) using Himmat Al Madinah's valuation index — estimated price between ${low} and ${high} SAR!\nTry the calculator yourself: ${url}`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+}
+
 /* يجلب عرض بمعرّفه من قاعدة البيانات فعلياً ويفتح تفاصيله — يضمن بيانات
    كاملة وحديثة (مو بيانات جزئية مخزَّنة محلياً بـ"شفته مؤخراً"، اللي ممكن
    تكون قديمة أو ناقصة حقول). */
@@ -2150,6 +2169,7 @@ function runValuation(){
 
   document.getElementById('res-low').textContent = money(low);
   document.getElementById('res-high').textContent = money(high);
+  document.getElementById('btn-share-valuation').style.display = '';
 
   // بناء سطر التعديلات ديناميكياً — يعرض فقط العوامل الفعلية المطبّقة لهذا
   // النوع، بدل عرض "العمر 0% + الإضافات 0%" لعقار ما تنطبق عليه أصلاً
