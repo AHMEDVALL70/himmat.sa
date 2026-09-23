@@ -1177,9 +1177,12 @@ function shareOffer(offerId, title){
 function shareValuation(){
   const low = document.getElementById('res-low').textContent;
   const high = document.getElementById('res-high').textContent;
-  const districtText = document.getElementById('v-district').selectedOptions[0]?.textContent?.trim() || '';
+  // v-district وv-type حقول نصية بخاصية list (اقتراحات تلقائية)، مو
+  // <select> — القيمة تُقرأ من .value مباشرة، مو .selectedOptions (كانت
+  // غلطة سبّبت توقّف الدالة بالكامل بصمت قبل ما توصل لفتح واتساب أصلاً).
+  const districtText = document.getElementById('v-district').value.trim();
   const cityText = document.getElementById('v-city').selectedOptions[0]?.textContent?.trim() || '';
-  const typeText = document.getElementById('v-type').selectedOptions[0]?.textContent?.trim() || '';
+  const typeText = document.getElementById('v-type').value.trim();
   const url = `${location.origin}/valuation`;
   const text = currentLang === 'ar'
     ? `قيّمت عقاري (${typeText} — ${districtText}، ${cityText}) عبر مؤشر همة المدينة العقارية، والسعر التقديري بين ${low} و${high} ريال سعودي!\nجرّب الحاسبة بنفسك: ${url}`
