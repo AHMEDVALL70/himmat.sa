@@ -1158,7 +1158,7 @@ function openDetailModal(key){
    من قائمة مشاركة النظام (navigator.share)، لأنها ما تشمل واتساب دايماً
    بأجهزة الكمبيوتر (خصوصاً ماك)، بعكس الجوال. */
 function shareOffer(offerId, title){
-  const url = `${location.origin}${location.pathname}#offer-${offerId}`;
+  const url = `${location.origin}/offer/${offerId}/`;
   const text = (currentLang === 'ar' ? 'شوف هالعرض: ' : 'Check out this listing: ') + title + '\n' + url;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
 }
@@ -1178,12 +1178,16 @@ async function openOfferById(id){
   }
 }
 
-/* رابط مشاركة مباشر (#offer-<id>) يفتح تفاصيل نفس العرض تلقائياً — يُفحص
-   مرة عند تحميل الصفحة، بعد ما تجهز بيانات قاعدة البيانات. */
+/* رابط مشاركة مباشر يفتح تفاصيل نفس العرض تلقائياً — يُفحص مرة عند تحميل
+   الصفحة، بعد ما تجهز بيانات قاعدة البيانات. صيغتان مدعومتان: المسار
+   الحقيقي الجديد (/offer/<id>/، من صفحة مولَّدة تلقائياً بواسطة
+   generate-offer-pages.js — راجعها لتفاصيل السيو) والصيغة القديمة
+   (#offer-<id>) لأي رابط مشارَك سابقاً — صفر رابط منكسر (2026-09-23). */
 async function handleDeepLinkOffer(){
-  const m = location.hash.match(/^#offer-(.+)$/);
-  if (!m || !dbReady) return;
-  const offerId = m[1];
+  const hashMatch = location.hash.match(/^#offer-(.+)$/);
+  const pathMatch = location.pathname.match(/^\/offer\/([^\/]+)\/?$/);
+  const offerId = hashMatch ? hashMatch[1] : (pathMatch ? decodeURIComponent(pathMatch[1]) : null);
+  if (!offerId || !dbReady) return;
   try {
     const { data, error } = await withTimeout(supa.from('offers').select('*').eq('id', offerId).eq('is_published', true).maybeSingle());
     if (error || !data) return;

@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://himmat.sa/sitemap.xml
+Sitemap: https://himmat.sa/sitemap-offers.xml
