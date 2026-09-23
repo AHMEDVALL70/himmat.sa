@@ -91,6 +91,14 @@ function buildOfferHtml(template, offer) {
   const url = `${SITE_ORIGIN}/offer/${offer.id}/`;
 
   let html = template;
+  // الصفحة منسوخة داخل مجلد فرعي (offer/<id>/)، فالروابط النسبية
+  // بالملف الأصلي (style.css, js/site.js...) تنكسر بدون هذا السطر —
+  // <base> يخلي المتصفح يقرأها دايماً من جذر الموقع (2026-09-23،
+  // تصحيح فوري بعد اكتشاف الصفحة المولَّدة تطلع بدون تنسيق ولا جافاسكربت).
+  html = html.replace(
+    '<meta charset="UTF-8">',
+    '<meta charset="UTF-8">\n<base href="https://himmat.sa/">'
+  );
   html = html.replace(
     "<title>همة المدينة العقارية — Himmat Al Madinah Real Estate</title>",
     `<title>${escapeHtml(title)}</title>`
