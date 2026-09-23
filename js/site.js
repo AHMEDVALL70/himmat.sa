@@ -3633,6 +3633,25 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   dbReady = initSupabase();
   renderConfigBanner();
 
+  // ===== تسريع عرض الصفحة الصحيحة فوراً (2026-09-24) =====
+  // اكتُشف فعلياً: فتح أي رابط فرعي مباشرة (/services، /offer/<id>/...)
+  // كان يعرض الرئيسية أول لعدة ثوانٍ قبل ما يتحول للصفحة الصحيحة —
+  // السبب: عرض الصفحة الصحيحة كان مؤجَّل لآخر سلسلة تحميل بيانات خاصة
+  // بالرئيسية (مدن/أسعار/عروض/مميّزة...)، رغم إن صفحات ثانية ما تحتاجها
+  // إطلاقاً. نحسب الصفحة المطلوبة الآن ونعرضها فوراً. تغطّي رابطي عرض
+  // التفاصيل معاً (/offer/<id>/ الجديد و#offer-<id> القديم) بنفس الفحص،
+  // بدل الاعتماد بس على handleDeepLinkOffer بآخر الكود.
+  // الرئيسية استُثنيت عمداً — عدّاداتها المتحركة تعتمد بيانات تُحسب
+  // بأسفل بنفس هذا التحميل، فتُركت بمكانها الأصلي لتجنّب أي أثر جانبي.
+  const isDeepLinkOffer = /^\/offer\/[^\/]+\/?$/.test(location.pathname) || /^#offer-/.test(location.hash);
+  const initialPage = isDeepLinkOffer ? null : (() => {
+    const p = location.pathname.replace(/^\//, '') || 'home';
+    const h = location.hash.slice(1);
+    return PAGES.includes(p) ? p : (PAGES.includes(h) ? h : 'home');
+  })();
+  if (initialPage && initialPage !== 'home') showPage(initialPage);
+  if (isDeepLinkOffer) handleDeepLinkOffer();
+
   const safely = async (label, fn) => {
     try { await fn(); }
     catch (e) { console.error(`Boot step "${label}" failed — continuing with the rest of the page.`, e); }
@@ -3676,23 +3695,9 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   try { runValuation(); } catch(e){}
   await heroAndLiveCounterPromise; // غالباً خلصت أصلاً بهالنقطة — ما تضيف انتظار حقيقي
   typewriterHeroDesc();
-  // مسارات حقيقية (2026-09-22): أول أولوية لمسار الرابط الحقيقي (يجي من
-  // تحميل مباشر عبر 404.html، أو تحديث الصفحة)، وبعدها احتياطياً رابط
-  // "#offers" قديم محفوظ/مشارَك من قبل — بدون ما ينكسر أي رابط سابق.
-  // ===== تصحيح 2026-09-23: لو المسار /offer/<id>/ (صفحة عرض مولَّدة)،
-  // نتجاهل التحويل الافتراضي showPage(home) كلياً — لأنه يغيّر رابط
-  // العنوان فوراً لـ"/" (عبر history.pushState داخل showPage نفسها)
-  // *قبل* ما يوصل دور handleDeepLinkOffer بأسفل، فيلقى المسار انمسح
-  // خلاص ويفشل يطابقه، والنتيجة رجوع فعلي للرئيسية بدل فتح تفاصيل
-  // العرض. handleDeepLinkOffer نفسها تتكفّل بفتح صفحة العروض في وقتها
-  // الصحيح بعد ما تجيب بيانات العرض.
-  const isOfferPage = /^\/offer\/[^\/]+\/?$/.test(location.pathname);
-  if (!isOfferPage) {
-    const initialPath = location.pathname.replace(/^\//, '') || 'home';
-    const initialHash = location.hash.slice(1);
-    const initialPage = PAGES.includes(initialPath) ? initialPath : (PAGES.includes(initialHash) ? initialHash : 'home');
-    showPage(initialPage);
-  }
+  // الصفحات الثانية وصفحات العرض المباشر (deep link) اتعرضت فوراً أول
+  // هالدالة (راجع التعليق أعلاها) — هنا يبقى بس عرض الرئيسية تحديداً،
+  // بعد ما بياناتها (عدّادات، أسعار...) جاهزة بالكامل.
+  if (initialPage === 'home') showPage('home');
   renderCompareBar();
-  handleDeepLinkOffer();
 });
