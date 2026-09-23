@@ -3674,10 +3674,20 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   // مسارات حقيقية (2026-09-22): أول أولوية لمسار الرابط الحقيقي (يجي من
   // تحميل مباشر عبر 404.html، أو تحديث الصفحة)، وبعدها احتياطياً رابط
   // "#offers" قديم محفوظ/مشارَك من قبل — بدون ما ينكسر أي رابط سابق.
-  const initialPath = location.pathname.replace(/^\//, '') || 'home';
-  const initialHash = location.hash.slice(1);
-  const initialPage = PAGES.includes(initialPath) ? initialPath : (PAGES.includes(initialHash) ? initialHash : 'home');
-  showPage(initialPage);
+  // ===== تصحيح 2026-09-23: لو المسار /offer/<id>/ (صفحة عرض مولَّدة)،
+  // نتجاهل التحويل الافتراضي showPage(home) كلياً — لأنه يغيّر رابط
+  // العنوان فوراً لـ"/" (عبر history.pushState داخل showPage نفسها)
+  // *قبل* ما يوصل دور handleDeepLinkOffer بأسفل، فيلقى المسار انمسح
+  // خلاص ويفشل يطابقه، والنتيجة رجوع فعلي للرئيسية بدل فتح تفاصيل
+  // العرض. handleDeepLinkOffer نفسها تتكفّل بفتح صفحة العروض في وقتها
+  // الصحيح بعد ما تجيب بيانات العرض.
+  const isOfferPage = /^\/offer\/[^\/]+\/?$/.test(location.pathname);
+  if (!isOfferPage) {
+    const initialPath = location.pathname.replace(/^\//, '') || 'home';
+    const initialHash = location.hash.slice(1);
+    const initialPage = PAGES.includes(initialPath) ? initialPath : (PAGES.includes(initialHash) ? initialHash : 'home');
+    showPage(initialPage);
+  }
   renderCompareBar();
   handleDeepLinkOffer();
 });
