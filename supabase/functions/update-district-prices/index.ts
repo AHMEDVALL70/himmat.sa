@@ -291,7 +291,19 @@ async function runBatched<T, R>(items: T[], batchSize: number, fn: (item: T) => 
   return results;
 }
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  // حماية إضافية (2026-09-24): هذي الدالة مخصَّصة للتشغيل المجدول
+  // (pg_cron) بمفتاح service_role بس. المفتاح العام (anon/publishable)
+  // موجود أصلاً بكود الموقع العلني (مقصود، آمن لغرضه الأساسي) — بدون
+  // هذا الفحص، أي حد يملكه يقدر يستدعي هذي الدالة يدوياً وقت ما يبي.
+  // صفر تأثير على الجدولة التلقائية (ترسل service_role نفسه أصلاً).
+  const providedKey = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+  if (providedKey !== SERVICE_KEY) {
+    return new Response(JSON.stringify({ status: "error", message: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
   const startedAt = Date.now();
   try {
     return await handleRequest(startedAt);

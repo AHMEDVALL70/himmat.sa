@@ -268,6 +268,15 @@ async function handleEvictionNotices() {
 }
 
 Deno.serve(async (req) => {
+  // حماية إضافية (2026-09-24): نفس القاعدة المطبَّقة على باقي الدوال
+  // المجدولة — تشغيل مقصور على مفتاح service_role، صفر تأثير على الجدولة.
+  const providedKey = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+  if (providedKey !== SERVICE_KEY) {
+    return new Response(JSON.stringify({ status: "error", message: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
   const startedAt = Date.now();
   try {
     await Promise.all([handlePaymentReminders(), handleEvictionNotices()]);

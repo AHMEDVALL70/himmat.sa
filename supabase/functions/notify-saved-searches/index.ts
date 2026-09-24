@@ -125,7 +125,16 @@ async function handleOne(search: any) {
   return true;
 }
 
-Deno.serve(async () => {
+Deno.serve(async (req) => {
+  // حماية إضافية (2026-09-24): نفس القاعدة المطبَّقة على update-district-prices
+  // — تشغيل مقصور على مفتاح service_role (الجدولة التلقائية)، صفر تأثير عليها.
+  const providedKey = (req.headers.get("Authorization") || "").replace(/^Bearer\s+/i, "");
+  if (providedKey !== SERVICE_KEY) {
+    return new Response(JSON.stringify({ status: "error", message: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
   const startedAt = Date.now();
   try {
     const { data: searches, error } = await supabase
