@@ -1172,22 +1172,65 @@ function shareOffer(offerId, title){
 
 /* مشاركة نتيجة حاسبة المؤشر بواتساب (2026-09-23) — نفس نمط shareOffer
    أعلاها بالضبط. النتيجة نفسها حساب حي بالمتصفح (مو سجل بقاعدة بيانات
-   له رقم دائم زي العروض)، فالمشاركة نص جاهز بالأرقام الفعلية + رابط
-   عام لصفحة المؤشر (يقدر يعيد الحساب بنفسه)، مو رابط لنتيجة محدَّدة. */
+   له رقم دائم زي العروض)، فالمشاركة نص جاهز بالأرقام الفعلية.
+   ===== تحديث 2026-09-24: الرابط نفسه صار يحمل كل المدخلات مشفَّرة
+   بمعاملات الاستعلام (query params) — يفتحه المستلم فيعيد تعبئة نفس
+   الحقول ويحسب نفس النتيجة تلقائياً (راجع prefillValuationFromURL
+   بأسفل)، بدل ما يفتحله حاسبة فاضية يعبّيها من الصفر. */
 function shareValuation(){
   const low = document.getElementById('res-low').textContent;
   const high = document.getElementById('res-high').textContent;
   // v-district وv-type حقول نصية بخاصية list (اقتراحات تلقائية)، مو
   // <select> — القيمة تُقرأ من .value مباشرة، مو .selectedOptions (كانت
   // غلطة سبّبت توقّف الدالة بالكامل بصمت قبل ما توصل لفتح واتساب أصلاً).
-  const districtText = document.getElementById('v-district').value.trim();
+  const districtVal = document.getElementById('v-district').value.trim();
+  const districtText = districtVal;
+  const cityVal = document.getElementById('v-city').value;
   const cityText = document.getElementById('v-city').selectedOptions[0]?.textContent?.trim() || '';
-  const typeText = document.getElementById('v-type').value.trim();
-  const url = `${location.origin}/valuation`;
+  const typeVal = document.getElementById('v-type').value.trim();
+  const typeText = typeVal;
+  const { active: activeAmenities } = getAmenityAdj('v-amenities');
+  const params = new URLSearchParams({
+    city: cityVal, district: districtVal, type: typeVal,
+    area: document.getElementById('v-area').value,
+    rooms: document.getElementById('v-rooms').value,
+    age: document.getElementById('v-age').value,
+    facade: document.getElementById('v-facade').value,
+    grade: document.getElementById('v-grade').value,
+    amenities: activeAmenities.join(','),
+  });
+  const url = `${location.origin}/valuation?${params.toString()}`;
   const text = currentLang === 'ar'
-    ? `قيّمت عقاري (${typeText} — ${districtText}، ${cityText}) عبر مؤشر همة المدينة العقارية، والسعر التقديري بين ${low} و${high} ريال سعودي!\nجرّب الحاسبة بنفسك: ${url}`
-    : `I estimated my property (${typeText} — ${districtText}, ${cityText}) using Himmat Al Madinah's valuation index — estimated price between ${low} and ${high} SAR!\nTry the calculator yourself: ${url}`;
+    ? `قيّمت عقاري (${typeText} — ${districtText}، ${cityText}) عبر مؤشر همة المدينة العقارية، والسعر التقديري بين ${low} و${high} ريال سعودي!\nشوف نفس النتيجة بالتفصيل: ${url}`
+    : `I estimated my property (${typeText} — ${districtText}, ${cityText}) using Himmat Al Madinah's valuation index — estimated price between ${low} and ${high} SAR!\nSee the same result in detail: ${url}`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+/* استعادة نتيجة مؤشر مشارَكة من رابط يحمل معاملات الاستعلام (راجع
+   shareValuation أعلاها) — تعبئة كل الحقول بنفس القيم وإعادة الحساب
+   تلقائياً، بدل ما يفتح المستلم حاسبة فاضية. صفر أثر لو الرابط عادي
+   بدون معاملات (يرجع فوراً من أول سطر). */
+function prefillValuationFromURL(){
+  const params = new URLSearchParams(location.search);
+  if (!params.has('city') && !params.has('district')) return;
+  const citySel = document.getElementById('v-city');
+  if (params.get('city') && CITY_DISTRICTS[params.get('city')]) {
+    citySel.value = params.get('city');
+    populateDistrictSelectFor('v-city');
+  }
+  if (params.get('district')) document.getElementById('v-district').value = params.get('district');
+  if (params.get('type')) document.getElementById('v-type').value = params.get('type');
+  updateValuationFieldsForType();
+  if (params.get('area')) document.getElementById('v-area').value = params.get('area');
+  if (params.get('rooms')) document.getElementById('v-rooms').value = params.get('rooms');
+  if (params.get('age')) document.getElementById('v-age').value = params.get('age');
+  if (params.get('facade')) document.getElementById('v-facade').value = params.get('facade');
+  if (params.get('grade')) document.getElementById('v-grade').value = params.get('grade');
+  const amenitiesList = (params.get('amenities') || '').split(',').filter(Boolean);
+  document.querySelectorAll('#v-amenities .amenity-toggle').forEach(btn=>{
+    btn.classList.toggle('active', amenitiesList.includes(btn.dataset.amenity));
+  });
+  runValuation();
 }
 
 /* يجلب عرض بمعرّفه من قاعدة البيانات فعلياً ويفتح تفاصيله — يضمن بيانات
@@ -3694,6 +3737,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   populateTypeSelects();
   initCustomFilterDropdowns();
   updateValuationFieldsForType();
+  prefillValuationFromURL(); // يعيد تعبئة نتيجة مؤشر مشارَكة لو الرابط يحملها (2026-09-24)
   updateAddPropertyFieldsForType();
   populateFilterSelects();
   populateHeroSearch();
