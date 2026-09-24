@@ -2159,14 +2159,21 @@ function runValuation(){
   const cityVal = citySel.value;
   const districtSel = document.getElementById('v-district');
   const districtVal = districtSel.value;
+  const typeSel = document.getElementById('v-type');
+  const typeVal = typeSel.value;
+  const typeInfo = PROPERTY_TYPES.find(t => t.v === typeVal);
+  // حارس ضد حالات الكتابة الحيّة غير المكتملة (زي "شق" قبل اكتمال "شقة
+  // في برج") — نتجاهلها ونُبقي آخر نتيجة صحيحة ظاهرة، بدل حساب/عرض رقم
+  // مبني على نوع أو حي غير حقيقي (كان السبب الفعلي وراء تطابق نتائج
+  // أنواع مختلفة أحياناً — اكتُشف بالتشخيص المباشر 2026-09-24).
+  if (!typeInfo) return;
+  const districtsForCity = CITY_DISTRICTS[cityVal] || [];
+  if (districtVal !== '' && !districtsForCity.includes(districtVal)) return;
   const realPrice = realDistrictPrice(cityVal, districtVal);
   const usingRealPrice = !!realPrice;
   const pricePerSqm = usingRealPrice ? realPrice : parseFloat(citySel.selectedOptions[0].dataset.price);
-  const typeSel = document.getElementById('v-type');
-  const typeVal = typeSel.value;
   const group = propertyGroupFor(typeVal);
-  const typeMult = (PROPERTY_TYPES.find(t => t.v === typeSel.value) || {}).mult || 1;
-  console.log('[تشخيص المؤشر] ' + JSON.stringify({ cityVal, districtVal, usingRealPrice, pricePerSqm, typeVal, group, typeMult }));
+  const typeMult = typeInfo.mult || 1;
   const facadeSel = document.getElementById('v-facade');
   const facadeAdj = parseFloat(facadeSel.selectedOptions[0].dataset.adj);
   const gradeSel = document.getElementById('v-grade');
@@ -2209,7 +2216,6 @@ function runValuation(){
   const amenityAdj = (group === 'land') ? 0 : getAmenityAdj('v-amenities').adj;
 
   const totalAdj = 1 + facadeAdj + gradeAdj + ageAdj + amenityAdj + roomsAdj + unitsAdj;
-  console.log('[تشخيص المؤشر] التعديلات: ' + JSON.stringify({ facadeAdj, gradeAdj, ageAdj, amenityAdj, roomsAdj, unitsAdj, totalAdj }));
   const estimate = base * totalAdj;
 
   const low = estimate * 0.93;
@@ -2289,22 +2295,18 @@ document.getElementById('btn-run-valuation').addEventListener('click', runValuat
 
 // تحديث السعر تلقائياً فور تغيير أي عنصر — بدون حاجة لضغط زر "احسب" يدوياً
 // v-district وv-type حقول نصية باقتراح تلقائي (list/datalist)، مو قوائم
-// جاهزة — "input" يشتغل مع كل حرف، فأثناء الكتابة تمر بحالات ناقصة
-// (زي "ف"، "شق") ما تطابق أي نوع/حي حقيقي، فتاخذ قيمة احتياطية (معامل
-// النوع = 1) بدل الصحيحة مؤقتاً. اكتُشف فعلياً (2026-09-24): هذا كان
-// يسبّب نتيجة خاطئة تستقر أحياناً بعد الكتابة لو آخر لحظة ما طابقت
-// بدقة. الحل: هذين الحقلين بالذات يعيدون الحساب بـ"change" (بعد
-// الخروج من الحقل/اختيار من القائمة)، مو "input" — الحقول الرقمية
-// الباقية تبقى فورية زي ما هي، ما فيها نفس المشكلة (صفر اقتراح تلقائي).
-const VALUATION_LIVE_INPUT_IDS = ['v-area','v-rooms','v-age','v-floors','v-units-per-floor'];
-const VALUATION_LIVE_CHANGE_IDS = ['v-city','v-district','v-type','v-facade','v-grade'];
-VALUATION_LIVE_INPUT_IDS.forEach(id=>{
+// جاهزة — كل حرف يطلق 'input'، بما فيها حالات كتابة ناقصة (زي "ف"،
+// "شق") ما تطابق أي نوع/حي حقيقي بعد. الحل الصحيح (2026-09-24): نبقي
+// التحديث الفوري بكل حرف (بدون زر، بدون انتظار خروج من الحقل) — لكن
+// runValuation() نفسها تتجاهل عرض نتيجة جديدة لو النوع/الحي المكتوب
+// حالياً غير مطابق لشي حقيقي بعد، وتُبقي آخر نتيجة صحيحة ظاهرة بدل ما
+// تعرض رقماً مبنياً على قيمة ناقصة (كان السبب الفعلي وراء تطابق نتائج
+// أنواع مختلفة أحياناً).
+const VALUATION_LIVE_IDS = ['v-city','v-district','v-type','v-area','v-rooms','v-age',
+  'v-floors','v-units-per-floor','v-facade','v-grade'];
+VALUATION_LIVE_IDS.forEach(id=>{
   const el = document.getElementById(id);
   if (el) el.addEventListener('input', ()=>{ try { runValuation(); } catch(e){} });
-});
-VALUATION_LIVE_CHANGE_IDS.forEach(id=>{
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('change', ()=>{ try { runValuation(); } catch(e){} });
 });
 document.getElementById('v-amenities').addEventListener('click', ()=>{
   setTimeout(()=>{ try { runValuation(); } catch(e){} }, 0);
