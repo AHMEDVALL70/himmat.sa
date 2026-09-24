@@ -2288,11 +2288,23 @@ function runValuation(){
 document.getElementById('btn-run-valuation').addEventListener('click', runValuation);
 
 // تحديث السعر تلقائياً فور تغيير أي عنصر — بدون حاجة لضغط زر "احسب" يدوياً
-const VALUATION_LIVE_IDS = ['v-city','v-district','v-type','v-area','v-rooms','v-age',
-  'v-floors','v-units-per-floor','v-facade','v-grade'];
-VALUATION_LIVE_IDS.forEach(id=>{
+// v-district وv-type حقول نصية باقتراح تلقائي (list/datalist)، مو قوائم
+// جاهزة — "input" يشتغل مع كل حرف، فأثناء الكتابة تمر بحالات ناقصة
+// (زي "ف"، "شق") ما تطابق أي نوع/حي حقيقي، فتاخذ قيمة احتياطية (معامل
+// النوع = 1) بدل الصحيحة مؤقتاً. اكتُشف فعلياً (2026-09-24): هذا كان
+// يسبّب نتيجة خاطئة تستقر أحياناً بعد الكتابة لو آخر لحظة ما طابقت
+// بدقة. الحل: هذين الحقلين بالذات يعيدون الحساب بـ"change" (بعد
+// الخروج من الحقل/اختيار من القائمة)، مو "input" — الحقول الرقمية
+// الباقية تبقى فورية زي ما هي، ما فيها نفس المشكلة (صفر اقتراح تلقائي).
+const VALUATION_LIVE_INPUT_IDS = ['v-area','v-rooms','v-age','v-floors','v-units-per-floor'];
+const VALUATION_LIVE_CHANGE_IDS = ['v-city','v-district','v-type','v-facade','v-grade'];
+VALUATION_LIVE_INPUT_IDS.forEach(id=>{
   const el = document.getElementById(id);
   if (el) el.addEventListener('input', ()=>{ try { runValuation(); } catch(e){} });
+});
+VALUATION_LIVE_CHANGE_IDS.forEach(id=>{
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', ()=>{ try { runValuation(); } catch(e){} });
 });
 document.getElementById('v-amenities').addEventListener('click', ()=>{
   setTimeout(()=>{ try { runValuation(); } catch(e){} }, 0);
