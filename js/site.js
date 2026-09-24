@@ -2164,10 +2164,6 @@ function runValuation(){
   const typeSel = document.getElementById('v-type');
   const typeVal = typeSel.value;
   const typeInfo = PROPERTY_TYPES.find(t => t.v === typeVal);
-  // [تشخيص مؤقت 2026-09-24] يظهر بعنوان تبويب المتصفح فوراً، قبل أي
-  // شرط/return — يوضّح هل الدالة استُدعيت أصلاً، وبأي قيمة نوع بالضبط
-  // (بما فيها مسافات خفية قد تمنع التطابق رغم تطابق النص ظاهرياً).
-  document.title = `[تشخيص] type="${typeVal}"(${typeVal.length}) match=${!!typeInfo}`;
   // حارس ضد حالات الكتابة الحيّة غير المكتملة (زي "شق" قبل اكتمال "شقة
   // في برج") — نتجاهلها ونُبقي آخر نتيجة صحيحة ظاهرة، بدل حساب/عرض رقم
   // مبني على نوع أو حي غير حقيقي (كان السبب الفعلي وراء تطابق نتائج
