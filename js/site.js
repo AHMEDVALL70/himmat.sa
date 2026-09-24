@@ -139,6 +139,7 @@ const I18N = {
     type_residential:"سكني", type_commercial:"تجاري",
     opt_east:"شرقية (+5%)", opt_north:"شمالية (+4%)", opt_south:"جنوبية", opt_west:"غربية (-2%)",
     opt_upscale:"حي راقي (+25%)", opt_investment:"حي استثماري (+15%)", opt_mid:"حي متوسط",
+    opt_choose_facade:"اختر الواجهة", opt_choose_grade:"اختر تصنيف الحي",
     opt_buy:"شراء عقار", opt_sell:"بيع عقار", opt_valuation_inq:"مؤشر سعر عقار",
     opt_contract_inq:"كتابة عقد", opt_general:"استفسار عام"
   },
@@ -252,6 +253,7 @@ const I18N = {
     type_residential:"Residential", type_commercial:"Commercial",
     opt_east:"East (+5%)", opt_north:"North (+4%)", opt_south:"South", opt_west:"West (-2%)",
     opt_upscale:"Upscale district (+25%)", opt_investment:"Investment district (+15%)", opt_mid:"Mid-range district",
+    opt_choose_facade:"Choose facade", opt_choose_grade:"Choose district grade",
     opt_buy:"Buy property", opt_sell:"Sell property", opt_valuation_inq:"Property price index",
     opt_contract_inq:"Contract drafting", opt_general:"General inquiry"
   }
@@ -2175,12 +2177,22 @@ function runValuation(){
   const group = propertyGroupFor(typeVal);
   const typeMult = typeInfo.mult || 1;
   const facadeSel = document.getElementById('v-facade');
+  // صفر اختيار افتراضي بعد الآن (2026-09-24) — لو المستخدم ما اختار
+  // واجهة بعد، أو ما فيه سعر حي حقيقي وما اختار تصنيف الحي بعد، النتيجة
+  // تبقى مخفية بدل ما تُحسب باختيار افتراضي (كان أول عنصر بكل قائمة)
+  // ما اختاره المستخدم فعلياً.
+  if (facadeSel.value === '') return;
   const facadeAdj = parseFloat(facadeSel.selectedOptions[0].dataset.adj);
   const gradeSel = document.getElementById('v-grade');
+  if (!usingRealPrice && gradeSel.value === '') return;
   // لو عندنا سعر حي حقيقي موثّق، ما نضيف تصنيف الحي التقديري فوقه (يكرر
   // نفس الأثر مرتين) — السعر الحقيقي أصلاً يعكس خصوصية الحي بدقة أكبر.
   const gradeAdj = usingRealPrice ? 0 : parseFloat(gradeSel.selectedOptions[0].dataset.adj);
-  const area = parseFloat(document.getElementById('v-area').value) || 0;
+  const areaRaw = document.getElementById('v-area').value;
+  const area = parseFloat(areaRaw);
+  // مساحة فاضية/غير صالحة = ما فيه أساس نحسب عليه إطلاقاً — نُبقي
+  // النتيجة مخفية بدل عرض صفر أو رقم بلا معنى.
+  if (!areaRaw || isNaN(area) || area <= 0) return;
 
   const base = pricePerSqm * area * typeMult;
 
