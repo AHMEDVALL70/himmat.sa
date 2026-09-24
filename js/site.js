@@ -2325,6 +2325,13 @@ VALUATION_LIVE_IDS.forEach(id=>{
   const el = document.getElementById(id);
   if (el) el.addEventListener('input', ()=>{ try { runValuation(); } catch(e){} });
 });
+// حارس إضافي (2026-09-24): اختيار اقتراح من datalist لا يُطلق 'input'
+// دايماً بكل الحالات — 'change' احتياطي إضافي (مو بديل) لـv-district
+// وv-type تحديداً، يضمن إعادة الحساب حتى لو 'input' ما اشتغل هالمرة.
+['v-district','v-type'].forEach(id=>{
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('change', ()=>{ try { runValuation(); } catch(e){} });
+});
 document.getElementById('v-amenities').addEventListener('click', ()=>{
   setTimeout(()=>{ try { runValuation(); } catch(e){} }, 0);
 });
