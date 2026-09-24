@@ -2166,7 +2166,7 @@ function runValuation(){
   const typeVal = typeSel.value;
   const group = propertyGroupFor(typeVal);
   const typeMult = (PROPERTY_TYPES.find(t => t.v === typeSel.value) || {}).mult || 1;
-  console.log('[تشخيص المؤشر]', { cityVal, districtVal, usingRealPrice, pricePerSqm, typeVal, group, typeMult });
+  console.log('[تشخيص المؤشر] ' + JSON.stringify({ cityVal, districtVal, usingRealPrice, pricePerSqm, typeVal, group, typeMult }));
   const facadeSel = document.getElementById('v-facade');
   const facadeAdj = parseFloat(facadeSel.selectedOptions[0].dataset.adj);
   const gradeSel = document.getElementById('v-grade');
@@ -2209,7 +2209,7 @@ function runValuation(){
   const amenityAdj = (group === 'land') ? 0 : getAmenityAdj('v-amenities').adj;
 
   const totalAdj = 1 + facadeAdj + gradeAdj + ageAdj + amenityAdj + roomsAdj + unitsAdj;
-  console.log('[تشخيص المؤشر] التعديلات:', { facadeAdj, gradeAdj, ageAdj, amenityAdj, roomsAdj, unitsAdj, totalAdj });
+  console.log('[تشخيص المؤشر] التعديلات: ' + JSON.stringify({ facadeAdj, gradeAdj, ageAdj, amenityAdj, roomsAdj, unitsAdj, totalAdj }));
   const estimate = base * totalAdj;
 
   const low = estimate * 0.93;
