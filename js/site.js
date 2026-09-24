@@ -2177,21 +2177,22 @@ function runValuation(){
   const group = propertyGroupFor(typeVal);
   const typeMult = typeInfo.mult || 1;
   const facadeSel = document.getElementById('v-facade');
-  // صفر اختيار افتراضي بعد الآن (2026-09-24) — لو المستخدم ما اختار
-  // واجهة بعد، أو ما فيه سعر حي حقيقي وما اختار تصنيف الحي بعد، النتيجة
-  // تبقى مخفية بدل ما تُحسب باختيار افتراضي (كان أول عنصر بكل قائمة)
-  // ما اختاره المستخدم فعلياً.
-  if (facadeSel.value === '') return;
-  const facadeAdj = parseFloat(facadeSel.selectedOptions[0].dataset.adj);
+  // صفر اختيار افتراضي (2026-09-24) — لو المستخدم ما اختار واجهة/تصنيف
+  // حي بعد، نحسب أثرهم كـ٠٪ مؤقتاً (ما نوقف النتيجة كاملة)، وبمجرد ما
+  // يختار، يدخل أثره الحقيقي فوراً بنفس التحديث الفوري. هذا يخلي النتيجة
+  // تظهر أول ما المساحة تتعبّى (مع مدينة/حي/نوع)، وتتحسّن تدريجياً مع
+  // كل تفصيل إضافي (غرف، عمر، واجهة، إضافات...) بدون ما تنتظر أي حقل
+  // معيّن يُختار أول.
+  const facadeAdj = facadeSel.value === '' ? 0 : parseFloat(facadeSel.selectedOptions[0].dataset.adj);
   const gradeSel = document.getElementById('v-grade');
-  if (!usingRealPrice && gradeSel.value === '') return;
   // لو عندنا سعر حي حقيقي موثّق، ما نضيف تصنيف الحي التقديري فوقه (يكرر
   // نفس الأثر مرتين) — السعر الحقيقي أصلاً يعكس خصوصية الحي بدقة أكبر.
-  const gradeAdj = usingRealPrice ? 0 : parseFloat(gradeSel.selectedOptions[0].dataset.adj);
+  const gradeAdj = (usingRealPrice || gradeSel.value === '') ? 0 : parseFloat(gradeSel.selectedOptions[0].dataset.adj);
   const areaRaw = document.getElementById('v-area').value;
   const area = parseFloat(areaRaw);
   // مساحة فاضية/غير صالحة = ما فيه أساس نحسب عليه إطلاقاً — نُبقي
-  // النتيجة مخفية بدل عرض صفر أو رقم بلا معنى.
+  // النتيجة مخفية بدل عرض صفر أو رقم بلا معنى. هذا هو الحقل الوحيد اللي
+  // يوقف ظهور النتيجة (مع المدينة/الحي/النوع)، حسب طلب المستخدم بالضبط.
   if (!areaRaw || isNaN(area) || area <= 0) return;
 
   const base = pricePerSqm * area * typeMult;
