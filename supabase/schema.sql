@@ -1125,6 +1125,19 @@ create policy districts_admin_update on districts
 --     $$
 -- );
 
+-- مطابقة البحث المحفوظ بالعروض الجديدة يومياً (ميزة "نبّهني" — انظر
+-- supabase/functions/notify-saved-searches). 2026-09-24.
+-- select cron.schedule(
+--     'daily-notify-saved-searches',
+--     '0 7 * * *',  -- 7 صباحاً بتوقيت السيرفر يومياً
+--     $$
+--     select net.http_post(
+--         url := 'https://wlebcvwsleoieodjtrcf.supabase.co/functions/v1/notify-saved-searches',
+--         headers := jsonb_build_object('Authorization', 'Bearer <service_role_key>')
+--     );
+--     $$
+-- );
+
 -- ============================================================================
 -- 11) مخزن الصور (Storage) — رفع صور العقارات/العروض مباشرة من الجهاز
 -- ============================================================================
