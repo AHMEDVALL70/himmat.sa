@@ -53,6 +53,8 @@ const I18N = {
     val_honesty_text:"هذا المؤشر ناتج عن معادلة حسابية شفافة (سعر المتر × المساحة مع معاملات تعديل) — مع نموذج ذكاء اصطناعي يخمّن، سعر المتر نفسه إما من صفقات حقيقية موثّقة (وزارة العدل عبر رغدان) لو متوفرة لهذا الحي تحديداً، أو متوسط عام للمدينة — النتيجة أدناه توضح أي الحالتين تنطبق. اعتبره نقطة انطلاق للنقاش، لا تقييماً معتمداً رسمياً.",
     val_run:"احسب المؤشر", res_low:"أدنى النطاق (ر.س)", res_high:"أعلى النطاق (ر.س)",
     val_share:"📤 شارك النتيجة بواتساب",
+    cmp_title:"مقارنة الأحياء", cmp_desc:"قارن سعر المتر بين حيين بنفس المدينة.",
+    cmp_district_a:"الحي الأول", cmp_district_b:"الحي الثاني",
     val_breakdown_hint:"ستظهر تفاصيل حساب المعادلة هنا بعد الضغط على \"احسب المؤشر\".",
     finance_title:"حاسبة التمويل العقاري", finance_result_label:"القسط الشهري التقريبي",
     finance_note:"حساب إرشادي، يختلف حسب جهة التمويل",
@@ -167,6 +169,8 @@ const I18N = {
     val_honesty_text:"This indicator comes from a transparent formula (price per sqm × area with adjustment factors) — not an AI model guessing. The per-sqm price itself is either based on real documented transactions (Ministry of Justice via Raghdan) when available for that specific district, or a general citywide average otherwise — the result below shows which applies. Consider it a starting point for discussion, not an officially certified valuation.",
     val_run:"Calculate Estimate", res_low:"Low range (SAR)", res_high:"High range (SAR)",
     val_share:"📤 Share via WhatsApp",
+    cmp_title:"Compare Districts", cmp_desc:"Compare the price per sqm between two districts in the same city.",
+    cmp_district_a:"First district", cmp_district_b:"Second district",
     val_breakdown_hint:"The formula breakdown will appear here after you click \"Calculate Estimate\".",
     finance_title:"Mortgage Calculator", finance_result_label:"Approx. monthly payment",
     finance_note:"Indicative only, varies by lender",
@@ -2306,7 +2310,120 @@ function runValuation(){
 }
 document.getElementById('btn-run-valuation').addEventListener('click', runValuation);
 
-// تحديث السعر تلقائياً فور تغيير أي عنصر — بدون حاجة لضغط زر "احسب" يدوياً
+/* ============================================================================
+   مقارنة الأحياء التفاعلية (2026-09-25) — تعتمد كلياً على البيانات
+   المحمَّلة أصلاً بالمتصفح (DISTRICT_PRICES وDISTRICT_PRICE_META، من
+   loadDistrictPricesFromDb أعلاه) — صفر استعلام إضافي لقاعدة البيانات
+   إلا لجلب اتجاه السعر التاريخي (اختياري، نفس منطق updatePriceTrend).
+   ============================================================================ */
+
+// يملأ قائمتي اقتراح الحي معاً (مو حي واحد بس) عند تغيير المدينة —
+// populateDistrictSelectFor العامة تكتفي بأول عنصر مطابق فقط، فما
+// تصلح هنا لوجود حقلين بنفس data-city-of.
+function populateCompareDistricts(){
+  const citySel = document.getElementById('cmp-city');
+  if (!citySel) return;
+  const list = CITY_DISTRICTS[citySel.value] || [];
+  ['cmp-district-a', 'cmp-district-b'].forEach(id => {
+    const input = document.getElementById(id);
+    const datalist = document.getElementById(input.getAttribute('list'));
+    datalist.innerHTML = list.map(d => `<option value="${d}" label="${districtLabel(d)}">`).join('');
+    if (!list.includes(input.value)) input.value = '';
+  });
+  runCompare();
+}
+
+async function fetchCompareTrend(slot, districtId, currentPrice){
+  const el = document.getElementById(`cmp-trend-${slot}`);
+  if (!el || !districtId || !dbReady || !currentPrice) return;
+  try {
+    const { data, error } = await withTimeout(
+      supa.from('district_price_history')
+        .select('price_per_sqm, recorded_at')
+        .eq('district_id', districtId)
+        .order('recorded_at', { ascending: true })
+        .limit(1),
+      3000
+    );
+    if (error || !data || !data.length || !data[0].price_per_sqm) return;
+    const oldest = data[0];
+    const daysAgo = Math.max(1, Math.round((Date.now() - new Date(oldest.recorded_at).getTime()) / 86400000));
+    const pct = ((currentPrice - oldest.price_per_sqm) / oldest.price_per_sqm) * 100;
+    if (Math.abs(pct) < 0.5) return; // فرق ضئيل جداً — ما يستاهل عرض اتجاه (نفس منطق updatePriceTrend)
+    const rounded = Math.abs(pct).toFixed(1);
+    const isUp = pct > 0;
+    const text = currentLang === 'ar'
+      ? `${isUp ? '📈' : '📉'} ${isUp ? '+' : '-'}${rounded}% خلال آخر ${daysAgo} يوم`
+      : `${isUp ? '📈' : '📉'} ${isUp ? '+' : '-'}${rounded}% over the last ${daysAgo} days`;
+    el.style.color = isUp ? 'var(--ok, #4fae76)' : 'var(--danger, #e5484d)';
+    el.textContent = text;
+  } catch (e) {
+    console.error('fetchCompareTrend failed', e);
+  }
+}
+
+function buildCompareCardHtml(slot, district, price, meta){
+  const countText = meta?.count
+    ? `${meta.count} ${currentLang === 'ar' ? 'صفقة' : 'transactions'} (${meta.periodNote || ''})`
+    : '';
+  return `
+    <h4 style="margin-bottom:8px">${districtLabel(district)}</h4>
+    <div style="font-size:24px;font-weight:900;color:var(--gold-500)">${money(price)}
+      <span style="font-size:13px;font-weight:400">${currentLang === 'ar' ? 'ر.س/م²' : 'SAR/sqm'}</span>
+    </div>
+    ${countText ? `<div style="font-size:12px;color:var(--text-600);margin-top:4px">${countText}</div>` : ''}
+    <div id="cmp-trend-${slot}" style="font-size:13px;font-weight:700;margin-top:8px"></div>`;
+}
+
+// حارس ضد كتابة ناقصة أثناء الاقتراح التلقائي — نفس درس حاسبة المؤشر
+// بالأمس بالضبط: لو الحي المكتوب حالياً غير مطابق تماماً لشي حقيقي،
+// نخفي النتيجة كلياً بدل عرض رقم مبني على قيمة غير صحيحة.
+function runCompare(){
+  const results = document.getElementById('cmp-results');
+  const cityVal = document.getElementById('cmp-city').value;
+  const distA = document.getElementById('cmp-district-a').value;
+  const distB = document.getElementById('cmp-district-b').value;
+  const districtsForCity = CITY_DISTRICTS[cityVal] || [];
+
+  if (!distA || !distB || distA === distB ||
+      !districtsForCity.includes(distA) || !districtsForCity.includes(distB)) {
+    results.style.display = 'none';
+    return;
+  }
+
+  const priceA = realDistrictPrice(cityVal, distA);
+  const priceB = realDistrictPrice(cityVal, distB);
+  if (!priceA || !priceB) { results.style.display = 'none'; return; }
+
+  const metaA = DISTRICT_PRICE_META[cityVal]?.[distA];
+  const metaB = DISTRICT_PRICE_META[cityVal]?.[distB];
+
+  const cheaper = priceA < priceB ? distA : distB;
+  const pricier = priceA < priceB ? distB : distA;
+  const diffPct = Math.abs(((priceA - priceB) / Math.max(priceA, priceB)) * 100).toFixed(0);
+  document.getElementById('cmp-summary').textContent = currentLang === 'ar'
+    ? `${districtLabel(cheaper)} أرخص بحوالي ${diffPct}% من ${districtLabel(pricier)}`
+    : `${districtLabel(cheaper)} is about ${diffPct}% cheaper than ${districtLabel(pricier)}`;
+
+  document.getElementById('cmp-card-a').innerHTML = buildCompareCardHtml('a', distA, priceA, metaA);
+  document.getElementById('cmp-card-b').innerHTML = buildCompareCardHtml('b', distB, priceB, metaB);
+  results.style.display = '';
+
+  fetchCompareTrend('a', metaA?.districtId, priceA);
+  fetchCompareTrend('b', metaB?.districtId, priceB);
+}
+
+document.getElementById('cmp-city')?.addEventListener('change', populateCompareDistricts);
+['cmp-district-a', 'cmp-district-b'].forEach(id => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', runCompare);
+  // احتياطي إضافي — اختيار من القائمة المنسدلة لا يُطلق 'input' دايماً
+  // بكل المتصفحات (درس مؤكَّد بالأمس بحاسبة المؤشر).
+  el.addEventListener('change', runCompare);
+});
+
+
 // v-district وv-type حقول نصية باقتراح تلقائي (list/datalist)، مو قوائم
 // جاهزة — كل حرف يطلق 'input'، بما فيها حالات كتابة ناقصة (زي "ف"،
 // "شق") ما تطابق أي نوع/حي حقيقي بعد. الحل الصحيح (2026-09-24): نبقي
@@ -3770,6 +3887,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   ]);
   renderPriceDbFreshness();
   populateCitySelects();
+  populateCompareDistricts(); // تعبئة أول مرة لقوائم مقارنة الأحياء (2026-09-25)
   populateTypeSelects();
   initCustomFilterDropdowns();
   updateValuationFieldsForType();
