@@ -467,15 +467,15 @@
           </div>
           <div class="field">
             <label data-i18n="f_area" for="v-area">المساحة (م²)</label>
-            <input id="v-area" type="text" inputmode="decimal" min="10" value="200">
+            <input id="v-area" type="text" inputmode="decimal" min="10" placeholder="مثال: 250">
           </div>
           <div class="field" id="v-rooms-wrap">
             <label data-i18n="f_rooms" for="v-rooms">عدد الغرف</label>
-            <input id="v-rooms" type="text" inputmode="decimal" min="0" value="4">
+            <input id="v-rooms" type="text" inputmode="decimal" min="0" placeholder="مثال: 4">
           </div>
           <div class="field" id="v-age-wrap">
             <label data-i18n="f_age" for="v-age">عمر العقار (سنوات)</label>
-            <input id="v-age" type="text" inputmode="decimal" min="0" value="3">
+            <input id="v-age" type="text" inputmode="decimal" min="0" placeholder="مثال: 3">
           </div>
           <div class="field" id="v-floors-wrap" style="display:none">
             <label data-i18n="f_floors" for="v-floors">عدد الأدوار</label>
@@ -488,6 +488,7 @@
           <div class="field">
             <label data-i18n="f_facade" for="v-facade">الواجهة</label>
             <select id="v-facade">
+              <option value="" selected data-i18n="opt_choose_facade">اختر الواجهة</option>
               <option value="شرقية" data-adj="0.05" data-i18n="opt_east">شرقية (+5%)</option>
               <option value="شمالية" data-adj="0.04" data-i18n="opt_north">شمالية (+4%)</option>
               <option value="جنوبية" data-adj="0" data-i18n="opt_south">جنوبية</option>
@@ -497,6 +498,7 @@
           <div class="field" id="v-grade-wrap">
             <label data-i18n="f_grade" for="v-grade">تصنيف الحي</label>
             <select id="v-grade">
+              <option value="" selected data-i18n="opt_choose_grade">اختر تصنيف الحي</option>
               <option value="راقي" data-adj="0.25" data-i18n="opt_upscale">حي راقي (+25%)</option>
               <option value="استثماري" data-adj="0.15" data-i18n="opt_investment">حي استثماري (+15%)</option>
               <option value="متوسط" data-adj="0" data-i18n="opt_mid">حي متوسط</option>
@@ -977,7 +979,7 @@
 </div>
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script src="js/site.js?v=20260924c"></script>
+<script src="js/site.js?v=20260924m"></script>
 <div id="contract-print-view" class="hide">
   <div class="print-header">
     <picture>
