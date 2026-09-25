@@ -338,6 +338,15 @@ nav.links a.active::after{content:"";position:absolute;right:0;left:0;bottom:-16
    نطاقها #val-tabs بس، صفر تأثير على تبويبات صفحة العقود. */
 #val-tabs button{padding:13px 26px;font-size:15px}
 #val-tabs button.active{background:var(--gold-500);color:var(--navy-900);border-color:var(--gold-500);box-shadow:0 6px 16px rgba(192,161,107,.35)}
+
+/* مقارنة الأحياء — تحسينات بصرية (2026-09-25) */
+.cmp-summary-banner{font-size:19px;font-weight:900;text-align:center;background:rgba(79,174,118,.12);border:1.5px solid var(--ok);color:var(--ok);border-radius:12px;padding:16px 20px;margin-bottom:14px}
+.cmp-meta{font-size:13px;color:var(--text-900);opacity:.7;margin-top:4px}
+.cmp-bar-track{background:var(--line);border-radius:6px;height:10px;overflow:hidden;margin-top:10px}
+.cmp-bar-fill{height:100%;border-radius:6px;background:var(--gold-500);transition:width .3s ease}
+/* مساحة كافية أسفل نتيجة المقارنة عشان الزر العائم الثابت (اسأل المساعد)
+   ما يحجب آخر محتوى بالصفحة — محصورة بهذا القسم فقط. */
+#cmp-results{padding-bottom:90px}
 .tab-panel{display:none}
 .tab-panel.active{display:block}
 
