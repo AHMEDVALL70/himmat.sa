@@ -440,6 +440,18 @@
       <h2 data-i18n="val_title">استشارات ودراسات عقارية استرشادية</h2>
       <p data-i18n="val_desc">أدخل بيانات العقار للحصول على مؤشر سعري استرشادي.</p>
     </div>
+
+    <!-- تبويبات صفحة المؤشر (2026-09-25) — منطق منفصل عن .tabs العام
+         (data-val-tab بدل data-tab) عمداً: الوايرنج العام بـsite.js يشيل
+         active من كل ".tabs button" بالصفحة كاملة بدون تحديد نطاق، فلو
+         استخدمنا نفس data-tab كان بيأثر غلط على تبويبات صفحة العقود. -->
+    <div class="tabs" id="val-tabs">
+      <button type="button" class="active" data-val-tab="instant" data-i18n="val_eyebrow">مؤشر فوري</button>
+      <button type="button" data-val-tab="finance" data-i18n="finance_title">حاسبة التمويل العقاري</button>
+      <button type="button" data-val-tab="compare" data-i18n="cmp_title">مقارنة الأحياء</button>
+    </div>
+
+    <div id="val-tab-instant">
     <div class="notice notice-info" style="margin-bottom:22px">
       <b data-i18n="val_honesty_label">ملاحظة مهمة حول الدقة: </b>
       <span data-i18n="val_honesty_text">هذا المؤشر ناتج عن معادلة حسابية شفافة (سعر المتر × المساحة مع معاملات تعديل) — مع نموذج ذكاء اصطناعي يخمّن، سعر المتر نفسه إما من صفقات حقيقية موثّقة (وزارة العدل عبر رغدان) لو متوفرة لهذا الحي تحديداً، أو متوسط عام للمدينة — النتيجة أدناه توضح أي الحالتين تنطبق. اعتبره نقطة انطلاق للنقاش، لا تقييماً معتمداً رسمياً.</span>
@@ -534,9 +546,9 @@
         </div>
       </div>
     </div>
+    </div><!-- /val-tab-instant -->
 
-    <hr style="border:none;border-top:1px solid var(--line);margin:40px 0">
-
+    <div id="val-tab-finance" style="display:none">
     <h3 data-i18n="finance_title">حاسبة التمويل العقاري</h3>
     <div class="grid grid-4" style="margin-top:14px">
       <div class="field"><label data-i18n="f_price" for="fin-price">قيمة العقار (ر.س)</label><input id="fin-price" type="text" inputmode="decimal" value="900000"></div>
@@ -552,7 +564,9 @@
       <span class="badge badge-info" data-i18n="finance_note">حساب إرشادي، يختلف حسب جهة التمويل</span>
     </div>
   </div>
+  </div><!-- /val-tab-finance -->
 
+  <div id="val-tab-compare" style="display:none">
   <!-- مقارنة الأحياء التفاعلية (2026-09-25) — تعتمد على district_prices/
        district_price_history الموجودة أصلاً، صفر علاقة بعدد العروض المنشورة. -->
   <div class="card" style="padding:22px;margin-top:22px">
@@ -582,6 +596,7 @@
       </div>
     </div>
   </div>
+  </div><!-- /val-tab-compare -->
 </section>
 
 <!-- ==========================================================================
@@ -1008,7 +1023,7 @@
 </div>
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script src="js/site.js?v=20260925a"></script>
+<script src="js/site.js?v=20260925b"></script>
 <div id="contract-print-view" class="hide">
   <div class="print-header">
     <picture>
