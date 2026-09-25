@@ -334,6 +334,10 @@ nav.links a.active::after{content:"";position:absolute;right:0;left:0;bottom:-16
 .tabs{display:flex;gap:8px;margin-bottom:20px}
 .tabs button{padding:10px 20px;border-radius:10px;background:var(--surface);border:1.5px solid var(--line);font-weight:700;font-size:14px;color:var(--text-600)}
 .tabs button.active{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
+/* تبويبات صفحة المؤشر (2026-09-25) — شكل أرقى (ذهبي بدل الكحلي العام)
+   نطاقها #val-tabs بس، صفر تأثير على تبويبات صفحة العقود. */
+#val-tabs button{padding:13px 26px;font-size:15px}
+#val-tabs button.active{background:var(--gold-500);color:var(--navy-900);border-color:var(--gold-500);box-shadow:0 6px 16px rgba(192,161,107,.35)}
 .tab-panel{display:none}
 .tab-panel.active{display:block}
 
