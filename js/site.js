@@ -3235,8 +3235,13 @@ function showPage(id){
     void active.offsetWidth; // force reflow so the animation restarts every visit
     active.classList.add('page-enter');
   }
-  document.querySelectorAll('.links a[href^="#"]').forEach(a=>{
-    a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+  // تحديث تمييز الرابط النشط بالقائمة — كان يبحث عن روابط #hash القديمة
+  // (بلا أثر منذ إصلاح المسارات لمسارات حقيقية 2026-09-22)، صار يتحقق
+  // من href الحقيقي بدلاً منه (2026-09-25).
+  document.querySelectorAll('.links a[href^="/"]').forEach(a=>{
+    const href = a.getAttribute('href');
+    const linkId = href === '/' ? 'home' : href.replace(/^\//, '');
+    a.classList.toggle('active', linkId === id);
   });
   const newPath = id === 'home' ? '/' : '/' + id;
   if (location.pathname !== newPath) history.pushState(null, '', newPath);
