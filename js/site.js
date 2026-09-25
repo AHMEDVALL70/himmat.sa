@@ -3216,7 +3216,6 @@ function logOfferView(offerId){
 }
 
 function showPage(id){
-  console.log('[تشخيص] showPage استُدعيت بـ:', id);
   if (!PAGES.includes(id)) id = 'home';
   logPageView(id);
   PAGES.forEach(p=>{
@@ -3251,7 +3250,6 @@ document.addEventListener('click', (e)=>{
   const pathA = e.target.closest('a[href^="/"]');
   if (pathA){
     const id = pathA.getAttribute('href').replace(/^\//, '') || 'home';
-    console.log('[تشخيص] كليك على رابط مسار:', JSON.stringify({ href: pathA.getAttribute('href'), id, isValidPage: PAGES.includes(id) }));
     if (PAGES.includes(id)){
       e.preventDefault();
       showPage(id);
