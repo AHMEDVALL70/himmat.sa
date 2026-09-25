@@ -54,7 +54,7 @@ const I18N = {
     val_run:"احسب المؤشر", res_low:"أدنى النطاق (ر.س)", res_high:"أعلى النطاق (ر.س)",
     val_share:"📤 شارك النتيجة بواتساب",
     cmp_title:"مقارنة الأحياء", cmp_desc:"قارن سعر المتر بين حيين بنفس المدينة.",
-    cmp_district_a:"الحي الأول", cmp_district_b:"الحي الثاني",
+    cmp_district_a:"الحي الأول", cmp_district_b:"الحي الثاني", cmp_reset:"🔄 إعادة ضبط المقارنة",
     val_breakdown_hint:"ستظهر تفاصيل حساب المعادلة هنا بعد الضغط على \"احسب المؤشر\".",
     finance_title:"حاسبة التمويل العقاري", finance_result_label:"القسط الشهري التقريبي",
     finance_note:"حساب إرشادي، يختلف حسب جهة التمويل",
@@ -170,7 +170,7 @@ const I18N = {
     val_run:"Calculate Estimate", res_low:"Low range (SAR)", res_high:"High range (SAR)",
     val_share:"📤 Share via WhatsApp",
     cmp_title:"Compare Districts", cmp_desc:"Compare the price per sqm between two districts in the same city.",
-    cmp_district_a:"First district", cmp_district_b:"Second district",
+    cmp_district_a:"First district", cmp_district_b:"Second district", cmp_reset:"🔄 Reset comparison",
     val_breakdown_hint:"The formula breakdown will appear here after you click \"Calculate Estimate\".",
     finance_title:"Mortgage Calculator", finance_result_label:"Approx. monthly payment",
     finance_note:"Indicative only, varies by lender",
@@ -2362,7 +2362,7 @@ async function fetchCompareTrend(slot, districtId, currentPrice){
   }
 }
 
-function buildCompareCardHtml(slot, district, price, meta){
+function buildCompareCardHtml(slot, district, price, meta, barWidthPct){
   const countText = meta?.count
     ? `${meta.count} ${currentLang === 'ar' ? 'صفقة' : 'transactions'} (${meta.periodNote || ''})`
     : '';
@@ -2371,7 +2371,8 @@ function buildCompareCardHtml(slot, district, price, meta){
     <div style="font-size:24px;font-weight:900;color:var(--gold-500)">${money(price)}
       <span style="font-size:13px;font-weight:400">${currentLang === 'ar' ? 'ر.س/م²' : 'SAR/sqm'}</span>
     </div>
-    ${countText ? `<div style="font-size:12px;color:var(--text-600);margin-top:4px">${countText}</div>` : ''}
+    <div class="cmp-bar-track"><div class="cmp-bar-fill" style="width:${barWidthPct}%"></div></div>
+    ${countText ? `<div class="cmp-meta">${countText}</div>` : ''}
     <div id="cmp-trend-${slot}" style="font-size:13px;font-weight:700;margin-top:8px"></div>`;
 }
 
@@ -2405,8 +2406,9 @@ function runCompare(){
     ? `${districtLabel(cheaper)} أرخص بحوالي ${diffPct}% من ${districtLabel(pricier)}`
     : `${districtLabel(cheaper)} is about ${diffPct}% cheaper than ${districtLabel(pricier)}`;
 
-  document.getElementById('cmp-card-a').innerHTML = buildCompareCardHtml('a', distA, priceA, metaA);
-  document.getElementById('cmp-card-b').innerHTML = buildCompareCardHtml('b', distB, priceB, metaB);
+  const maxPrice = Math.max(priceA, priceB);
+  document.getElementById('cmp-card-a').innerHTML = buildCompareCardHtml('a', distA, priceA, metaA, (priceA / maxPrice) * 100);
+  document.getElementById('cmp-card-b').innerHTML = buildCompareCardHtml('b', distB, priceB, metaB, (priceB / maxPrice) * 100);
   results.style.display = '';
 
   fetchCompareTrend('a', metaA?.districtId, priceA);
@@ -2421,6 +2423,11 @@ document.getElementById('cmp-city')?.addEventListener('change', populateCompareD
   // احتياطي إضافي — اختيار من القائمة المنسدلة لا يُطلق 'input' دايماً
   // بكل المتصفحات (درس مؤكَّد بالأمس بحاسبة المؤشر).
   el.addEventListener('change', runCompare);
+});
+document.getElementById('btn-cmp-reset')?.addEventListener('click', ()=>{
+  document.getElementById('cmp-district-a').value = '';
+  document.getElementById('cmp-district-b').value = '';
+  document.getElementById('cmp-results').style.display = 'none';
 });
 
 // تبويبات صفحة المؤشر (2026-09-25) — منطق مستقل عن ".tabs button" العام

@@ -86,7 +86,7 @@
 
 
 <link rel="canonical" href="https://himmat.sa/">
-<link rel="stylesheet" href="css/site.css?v=20260925a">
+<link rel="stylesheet" href="css/site.css?v=20260925b">
 </head>
 <body>
 <script>
@@ -588,8 +588,9 @@
         <datalist id="cmp-district-b-datalist"></datalist>
       </div>
     </div>
+    <button type="button" class="btn btn-ghost" id="btn-cmp-reset" style="margin-top:10px" data-i18n="cmp_reset">🔄 إعادة ضبط المقارنة</button>
     <div id="cmp-results" style="margin-top:18px;display:none">
-      <div class="notice notice-info" id="cmp-summary" style="margin-bottom:14px;font-weight:700"></div>
+      <div id="cmp-summary" class="cmp-summary-banner"></div>
       <div class="grid grid-2">
         <div class="card" id="cmp-card-a" style="padding:18px"></div>
         <div class="card" id="cmp-card-b" style="padding:18px"></div>
@@ -1023,7 +1024,7 @@
 </div>
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script src="js/site.js?v=20260925d"></script>
+<script src="js/site.js?v=20260925e"></script>
 <div id="contract-print-view" class="hide">
   <div class="print-header">
     <picture>
