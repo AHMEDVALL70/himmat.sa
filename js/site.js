@@ -2364,7 +2364,7 @@ async function fetchCompareTrend(slot, districtId, currentPrice){
 
 function buildCompareCardHtml(slot, district, price, meta, barWidthPct){
   const countText = meta?.count
-    ? `${meta.count} ${currentLang === 'ar' ? 'صفقة' : 'transactions'} (${meta.periodNote || ''})`
+    ? `${meta.count} ${currentLang === 'ar' ? 'صفقة' : 'transactions'} — ${meta.periodNote || ''}`
     : '';
   return `
     <h4 style="margin-bottom:8px">${districtLabel(district)}</h4>
