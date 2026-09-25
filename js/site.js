@@ -2423,6 +2423,21 @@ document.getElementById('cmp-city')?.addEventListener('change', populateCompareD
   el.addEventListener('change', runCompare);
 });
 
+// تبويبات صفحة المؤشر (2026-09-25) — منطق مستقل عن ".tabs button" العام
+// أعلاه عمداً (يستخدم data-val-tab بدل data-tab)، لأن ذاك الوايرنج يشيل
+// active من كل ".tabs button" بالصفحة كاملة بدون تحديد نطاق — لو استخدمنا
+// نفس data-tab هنا كان بيأثر غلط على تبويبات صفحة العقود (وبالعكس).
+document.querySelectorAll('#val-tabs button[data-val-tab]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#val-tabs button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    ['instant','finance','compare'].forEach(name=>{
+      const panel = document.getElementById('val-tab-' + name);
+      if (panel) panel.style.display = (name === btn.dataset.valTab) ? '' : 'none';
+    });
+  });
+});
+
 
 // v-district وv-type حقول نصية باقتراح تلقائي (list/datalist)، مو قوائم
 // جاهزة — كل حرف يطلق 'input'، بما فيها حالات كتابة ناقصة (زي "ف"،
