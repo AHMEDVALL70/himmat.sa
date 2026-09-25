@@ -552,6 +552,36 @@
       <span class="badge badge-info" data-i18n="finance_note">حساب إرشادي، يختلف حسب جهة التمويل</span>
     </div>
   </div>
+
+  <!-- مقارنة الأحياء التفاعلية (2026-09-25) — تعتمد على district_prices/
+       district_price_history الموجودة أصلاً، صفر علاقة بعدد العروض المنشورة. -->
+  <div class="card" style="padding:22px;margin-top:22px">
+    <h3 data-i18n="cmp_title">مقارنة الأحياء</h3>
+    <p style="color:var(--text-600);font-size:13px;margin-bottom:14px" data-i18n="cmp_desc">قارن سعر المتر بين حيين بنفس المدينة.</p>
+    <div class="field" style="margin-bottom:14px">
+      <label data-i18n="f_city" for="cmp-city">المدينة</label>
+      <select id="cmp-city" class="city-select"></select>
+    </div>
+    <div class="grid grid-2">
+      <div class="field">
+        <label data-i18n="cmp_district_a" for="cmp-district-a">الحي الأول</label>
+        <input id="cmp-district-a" type="text" list="cmp-district-a-datalist" autocomplete="off" placeholder="اكتب لبحث سريع...">
+        <datalist id="cmp-district-a-datalist"></datalist>
+      </div>
+      <div class="field">
+        <label data-i18n="cmp_district_b" for="cmp-district-b">الحي الثاني</label>
+        <input id="cmp-district-b" type="text" list="cmp-district-b-datalist" autocomplete="off" placeholder="اكتب لبحث سريع...">
+        <datalist id="cmp-district-b-datalist"></datalist>
+      </div>
+    </div>
+    <div id="cmp-results" style="margin-top:18px;display:none">
+      <div class="notice notice-info" id="cmp-summary" style="margin-bottom:14px;font-weight:700"></div>
+      <div class="grid grid-2">
+        <div class="card" id="cmp-card-a" style="padding:18px"></div>
+        <div class="card" id="cmp-card-b" style="padding:18px"></div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- ==========================================================================
@@ -978,7 +1008,7 @@
 </div>
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script src="js/site.js?v=20260924m"></script>
+<script src="js/site.js?v=20260925a"></script>
 <div id="contract-print-view" class="hide">
   <div class="print-header">
     <picture>
