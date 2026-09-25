@@ -3875,6 +3875,19 @@ document.getElementById('newsletter-form')?.addEventListener('submit', async (e)
   }
 });
 
+// تسجيل Service Worker (2026-09-25) — راجع تعليق sw.js نفسه: صفر تخزين
+// مؤقت، هدفه الوحيد تفعيل "أضف للشاشة الرئيسية". يُسجَّل بحدث 'load'
+// (بعد اكتمال تحميل كل موارد الصفحة) — ممارسة قياسية تمنع تنافسه مع
+// تحميل باقي الموقع، ولا علاقة له بمشاكل تخزين ملفات JS/CSS المعتادة
+// (تلك تُدار عبر رقم الإصدار ?v=، مختلف كلياً عن هذا الملف).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(err => {
+      console.error('فشل تسجيل Service Worker:', err);
+    });
+  });
+}
+
 document.addEventListener('DOMContentLoaded', async ()=>{
   dbReady = initSupabase();
   renderConfigBanner();
