@@ -10,6 +10,25 @@ on:
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch: {}
+  # 2026-09-26: تشغيل فوري عند أي تعديل على index.html أو الكود أو السكربتات،
+  # عشان النسخ المولَّدة (صفحات الأقسام + العروض) ما تبقى على نسخة قديمة
+  # لين الساعة ٣ فجراً. آمن من الحلقة اللانهائية: تعديلات هذا الـAction نفسه
+  # (بـGITHUB_TOKEN) ما تطلق أي workflow جديد — قاعدة GitHub الثابتة.
+  # push على main فقط (مو pull_request) — يتطلب صلاحية كتابة على المستودع أصلاً.
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "js/**"
+      - "css/**"
+      - "scripts/**"
+      - ".github/workflows/generate-snapshot.yml"
+
+# تشغيل واحد بس بنفس الوقت (المجدول + الفوري ما يتصادمون بالدفع) — اللاحق
+# ينتظر السابق يخلص بدل ما يلغيه.
+concurrency:
+  group: generate-snapshot
+  cancel-in-progress: false
 
 # صلاحية الكتابة على المستودع لازمة عشان يقدر يحفظ الملفات المحدَّثة —
 # هذي صلاحية GITHUB_TOKEN المدمجة تلقائياً بكل مستودع (تنتهي فور انتهاء
@@ -35,14 +54,22 @@ jobs:
       - name: تشغيل سكربت توليد صفحات العروض
         run: node scripts/generate-offer-pages.js
 
+      # 2026-09-26: صفحات الأقسام التسعة — لازم بعد سكربت اللقطة (يعدّل
+      # index.html نفسه) عشان النسخ تكون من آخر نسخة. لو فشل، الـAction كله
+      # يتوقف قبل الحفظ (صفر ملفات ناقصة تنشر).
+      - name: تشغيل سكربت توليد صفحات الأقسام
+        run: node scripts/generate-section-pages.js
+
       - name: حفظ التحديث (لو فيه تغيير فعلي بس)
         run: |
           git config user.name "himmat-snapshot-bot"
           git config user.email "actions@github.com"
-          git add index.html offer/ sitemap-offers.xml
+          git add index.html offer/ sitemap-offers.xml offers.html valuation.html contracts.html add-property.html services.html about.html contact.html faq.html analytics.html
           if git diff --cached --quiet; then
             echo "لا تغيير بالبيانات — تخطي الحفظ."
           else
             git commit -m "🤖 تحديث تلقائي: لقطة المحتوى + صفحات العروض"
+            # لو انضاف كوميت على main أثناء التشغيل، نركّب فوقه بدل ما يفشل الدفع
+            git pull --rebase origin main
             git push
           fi
