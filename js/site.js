@@ -1125,7 +1125,7 @@ function renderOfferDetailPage(o){
     <div class="detail-desc">${descHtml}</div>
     ${metaHtml}
     <div class="detail-actions">
-      <a href="${waLink}" target="_blank" rel="noopener" class="btn btn-primary">${t.detail_whatsapp}</a>
+      <a href="${waLink}" target="_blank" rel="noopener" class="btn btn-primary" data-offer-id="${escapeHtml(String(o.id))}">${t.detail_whatsapp}</a>
       ${mapButton}
       <button type="button" class="btn btn-ghost" onclick="shareOffer('${o.id}','${escapeHtml(o.title).replace(/'/g,"\\'")}')">📤 ${currentLang==='ar' ? 'مشاركة عبر واتساب' : 'Share via WhatsApp'}</button>
       <button type="button" class="btn btn-ghost compare-btn-inline${isInCompare(key) ? ' active' : ''}" id="cmp-page-${key}" onclick="toggleCompare('${key}')">⇄ ${currentLang==='ar' ? 'أضف للمقارنة' : 'Add to compare'}</button>
@@ -1166,6 +1166,43 @@ function openDetailModal(key){
   showOfferDetail(key);
 }
 
+/* ============================================================================
+   أحداث التحويل لـGoogle Analytics (2026-09-27)
+   ----------------------------------------------------------------------------
+   تسجّل كل تواصل فعلي من زبون: ضغطة واتساب/اتصال/بريد (مستمع عام واحد لكل
+   الموقع)، ونجاح النماذج الأربعة (استفسار، أضف عقارك، نبّهني، العقد).
+   ⚠️ صفر بيانات شخصية: بس اسم الحدث ومكانه (+ رقم العرض لو من تفاصيل عرض) —
+   لا أسماء ولا أرقام جوالات ولا نصوص رسائل (شروط Google Analytics تمنعها أصلاً).
+   لو Analytics ما تحمّل (مانع إعلانات)، gtag المعرَّفة بـindex.html تضيف
+   للطابور بصمت، وأي خطأ غير متوقع يُتجاهل — التتبّع ما يعطّل أي زر إطلاقاً.
+   ========================================================================== */
+function trackEvent(name, params){
+  try {
+    if (typeof window.gtag === 'function') window.gtag('event', name, params || {});
+  } catch (e) { /* التتبّع إضافي — لا يوقف أي شي */ }
+}
+
+// مستمع عام بمرحلة الالتقاط (true) — يشتغل قبل أي معالج ثاني، حتى لو أوقف
+// الانتشار. روابط "شارك العرض/النتيجة" (wa.me/?text بدون رقم) ما تنحسب هنا
+// (الشرط يتطلب رقم بعد wa.me/) — لها حدث share منفصل بدوالها.
+document.addEventListener('click', (e)=>{
+  const a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+  if (!a) return;
+  const href = a.getAttribute('href') || '';
+  let name = null;
+  if (/^https:\/\/wa\.me\/\d/.test(href)) name = 'whatsapp_click';
+  else if (href.startsWith('tel:')) name = 'phone_click';
+  else if (href.startsWith('mailto:')) name = 'email_click';
+  if (!name) return;
+  const sec = a.closest('section[id]');
+  const location = a.id === 'whatsapp-float' ? 'float'
+    : a.closest('footer') ? 'footer'
+    : (sec ? sec.id : 'other');
+  const params = { link_location: location };
+  if (a.dataset && a.dataset.offerId) params.offer_id = a.dataset.offerId;
+  trackEvent(name, params);
+}, true);
+
 /* مشاركة رابط مباشر لعرض معيّن — يفتح تفاصيل نفس العرض تلقائياً عند فتحه
    (راجع handleDeepLinkOffer بأسفل). يفتح واتساب مباشرة بنص جاهز — أوثق
    من قائمة مشاركة النظام (navigator.share)، لأنها ما تشمل واتساب دايماً
@@ -1174,6 +1211,7 @@ function shareOffer(offerId, title){
   const url = `${location.origin}/offer/${offerId}/`;
   const text = (currentLang === 'ar' ? 'شوف هالعرض: ' : 'Check out this listing: ') + title + '\n' + url;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  trackEvent('share', { method: 'whatsapp', content_type: 'offer' });
 }
 
 /* مشاركة نتيجة حاسبة المؤشر بواتساب (2026-09-23) — نفس نمط shareOffer
@@ -1210,6 +1248,7 @@ function shareValuation(){
     ? `قيّمت عقاري (${typeText} — ${districtText}، ${cityText}) عبر مؤشر همة المدينة العقارية، والسعر التقديري بين ${low} و${high} ريال سعودي!\nشوف نفس النتيجة بالتفصيل: ${url}`
     : `I estimated my property (${typeText} — ${districtText}, ${cityText}) using Himmat Al Madinah's valuation index — estimated price between ${low} and ${high} SAR!\nSee the same result in detail: ${url}`;
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  trackEvent('share', { method: 'whatsapp', content_type: 'valuation' });
 }
 
 /* استعادة نتيجة مؤشر مشارَكة من رابط يحمل معاملات الاستعلام (راجع
@@ -1763,6 +1802,7 @@ async function submitNotifyMe(){
     }
     msg.style.color = 'var(--ok)';
     msg.textContent = currentLang==='ar' ? '✅ تم — بنتواصل معك أول ما يطلع عرض يناسبك.' : "✅ Saved — we'll reach out once a matching offer is available.";
+    trackEvent('generate_lead', { form: 'notify_me' });
   } catch (e) {
     console.error('submitNotifyMe failed', e);
     msg.style.color = 'var(--danger)';
@@ -2658,6 +2698,7 @@ document.getElementById('btn-add-property').addEventListener('click', async ()=>
       msg.style.color = 'var(--danger)';
     } else {
       msg.textContent = '✅ تم الإرسال — سيظهر عقارك في التحليلات بعد المراجعة.';
+      trackEvent('generate_lead', { form: 'add_property' });
       msg.style.color = 'var(--ok)';
       addPropertySelectedFiles = [];
       renderAddPropertyThumbs();
@@ -2954,6 +2995,7 @@ ${t.contract_frequency_label}: ${frequencyDisplay}`;
 document.getElementById('btn-print-contract').addEventListener('click', ()=>{
   if (lastContractWhatsAppText){
     window.open(`https://wa.me/966530500906?text=${encodeURIComponent(lastContractWhatsAppText)}`, '_blank');
+    trackEvent('generate_lead', { form: 'contract' });
     // إشعار بريدي إضافي بنفس اللحظة (بالخلفية) — ما يأخّر فتح واتساب ولا
     // الطباعة، وما يوقف أي شي لو فشل (إشعار إضافي مو جزء أساسي من العملية)
     (async ()=>{
@@ -3025,6 +3067,8 @@ document.getElementById('btn-send-contact').addEventListener('click', async ()=>
 
   const text = encodeURIComponent(`${t.f_name}: ${name}\n${t.f_reach}: ${reach}\n${t.f_inquiry_type}: ${type}\n${t.f_message}: ${message}`);
   window.open(`https://wa.me/966530500906?text=${text}`, '_blank');
+  // يُحسب حتى لو فشل حفظ قاعدة البيانات أعلاه — واتساب يفتح بالرسالة كاملة بكل الأحوال
+  trackEvent('generate_lead', { form: 'contact' });
 });
 
 /* ============================================================================
