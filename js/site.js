@@ -299,6 +299,8 @@ function applyLang(lang){
   try { runValuation(); } catch(e){}
   if (analyticsLoaded) renderAnalytics();
   renderPriceDbFreshness();
+  // عنوان التبويب بلغة الواجهة الجديدة (القسم الحالي من المسار نفسه)
+  updateDocTitle(location.pathname.replace(/^\//, '') || 'home');
 }
 document.getElementById('lang-switch').addEventListener('click', e=>{
   const btn = e.target.closest('button[data-lang]');
@@ -1047,6 +1049,7 @@ async function showOfferDetail(key){
   if (!cached) return;
   currentDetailOfferId = cached.id || key;
   showPage('offer-detail');
+  if (cached.title) document.title = `${cached.title} | همة المدينة العقارية`;
   // showPage تدفع الرابط العام "/offer-detail" — نصحّحه هنا ليحمل رقم
   // العرض المحدَّد (استبدال، لا دفعة جديدة، عشان زر رجوع المتصفح ما يعلق
   // بمحطة وسيطة زائدة). يضمن الرابط يبقى صحيح وقابل للمشاركة/التحديث
@@ -3266,9 +3269,52 @@ function logOfferView(offerId){
   }).catch(err => console.error('logOfferView: تعذّر التسجيل.', err.message));
 }
 
+/* ============================================================================
+   عنوان التبويب أثناء التنقّل الداخلي (2026-09-27)
+   ----------------------------------------------------------------------------
+   قبل: العنوان يتحدّد مرة وحدة من الملف اللي فُتح أول (index.html أو
+   offers.html...) ويبقى ثابت مهما تنقّل الزائر بين الأقسام.
+   ⚠️ النصوص العربية أدناه لازم تطابق حرفياً SECTIONS بـ
+   scripts/generate-section-pages.js — السكربت يتحقق من التطابق ويوقف
+   الـAction لو اختلفت (مصدر حقيقة واحد فعلياً، بدون تكرار صامت).
+   الكائن يُنشأ داخل الدالة (مو ثابت أعلى الملف) عمداً: showPage تُستدعى
+   مبكراً عند التحميل، وأي let/const خارجي معرَّف بعدها يسبب خطأ TDZ.
+   ========================================================================== */
+function updateDocTitle(id){
+  try {
+    const HOME_TITLE = 'همة المدينة العقارية — Himmat Al Madinah Real Estate';
+    if (id === 'home'){ document.title = HOME_TITLE; return; }
+    // تفاصيل عرض: العنوان يحدّده showOfferDetail من اسم العرض نفسه
+    if (id === 'offer-detail') return;
+    const AR = {
+      offers: 'عروض عقارية في المدينة المنورة | همة المدينة العقارية',
+      valuation: 'سعر المتر ومؤشر أسعار العقار في المدينة المنورة | همة',
+      contracts: 'كتابة عقود الإيجار السكنية والتجارية | همة المدينة العقارية',
+      'add-property': 'اعرض عقارك في المدينة المنورة | همة المدينة العقارية',
+      services: 'خدماتنا العقارية: تسويق، إدارة أملاك، عقود | همة',
+      about: 'عن همة المدينة العقارية — مكتب عقاري مرخّص',
+      contact: 'تواصل مع همة المدينة العقارية — المدينة المنورة',
+      faq: 'الأسئلة الشائعة | همة المدينة العقارية',
+      analytics: 'العقارات المسجّلة ومتوسط سعر المتر حسب المدينة | همة',
+    };
+    const NAV_KEY = {
+      offers: 'nav_offers', valuation: 'nav_valuation', contracts: 'nav_contracts',
+      'add-property': 'nav_add', services: 'nav_services', about: 'nav_about',
+      contact: 'nav_contact', faq: 'nav_faq', analytics: 'nav_analytics',
+    };
+    if (currentLang === 'en'){
+      const label = NAV_KEY[id] && I18N.en[NAV_KEY[id]];
+      document.title = label ? `${label} | Himmat Al Madinah Real Estate` : HOME_TITLE;
+    } else {
+      document.title = AR[id] || HOME_TITLE; // privacy/terms: العنوان العام
+    }
+  } catch (e) { /* عنوان التبويب تحسين شكلي — لا يوقف التنقّل أبداً */ }
+}
+
 function showPage(id){
   if (!PAGES.includes(id)) id = 'home';
   logPageView(id);
+  updateDocTitle(id);
   PAGES.forEach(p=>{
     const el = document.getElementById(p);
     if (el) el.style.display = (p === id) ? '' : 'none';

@@ -107,6 +107,15 @@ function buildSectionHtml(template, slug, { title, description }) {
 
 function main() {
   const template = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+  // 2026-09-27: نفس العناوين مكتوبة بـupdateDocTitle() بـjs/site.js (عنوان التبويب
+  // أثناء التنقّل الداخلي). نتحقق إنها متطابقة حرفياً — لو عُدّل عنوان بمكان
+  // واحد بس، نوقف قبل كتابة أي ملف بدل ما يختلف العنوان بصمت بين الحالتين.
+  const siteJs = fs.readFileSync(path.join(ROOT, "js", "site.js"), "utf8");
+  for (const [slug, meta] of Object.entries(SECTIONS)) {
+    if (!siteJs.includes(`'${meta.title}'`)) {
+      throw new Error(`عنوان القسم "${slug}" غير مطابق لنفسه بـjs/site.js (updateDocTitle) — عدّل المكانين معاً.`);
+    }
+  }
   // نبني الكل بالذاكرة أولاً — لو فشل أي قسم، ما ينكتب ولا ملف (كل شي أو لا شي).
   const outputs = Object.entries(SECTIONS).map(([slug, meta]) => [slug, buildSectionHtml(template, slug, meta)]);
   for (const [slug, html] of outputs) {
