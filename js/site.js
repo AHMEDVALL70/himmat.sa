@@ -558,6 +558,52 @@ const DISTRICT_PRICES = {
 // بالبداية، تتعبى من district_prices بعد الاتصال بقاعدة البيانات، وتُستخدم
 // بصياغة sourceNote تحت لعرض وصف دقيق للفترة بدل نص ثابت.
 const DISTRICT_PRICE_META = {};
+/* ===== أسماء بديلة للأحياء (2026-09-28) =====
+   بعض الأحياء لها اسم شعبي غير الاسم المعتمد بسجلات الصفقات (رغدان/وزارة
+   العدل) — مثلاً "النسيم" بالمدينة المنورة هو نفسه "العيون" (أكّده المستخدم،
+   والنتيجة تطابقت فعلياً). تُطبَّق بالمؤشر ومقارنة الأحياء فقط (بحث عن سعر)،
+   وعمداً **مو** بأضف عقارك ولا العقود (الاسم ينحفظ كما كتبه صاحبه).
+   الخريطة داخل الدالة (مو ثابت أعلى الملف) لتجنّب خطأ TDZ لو استُدعيت مبكراً.
+   لإضافة اسم بديل: سطر واحد داخل الكائن. */
+function resolveDistrictAlias(city, name){
+  const ALIASES = {
+    'المدينة المنورة': { 'النسيم': 'العيون' },
+  };
+  const v = (name || '').trim();
+  const m = ALIASES[city];
+  return (m && Object.prototype.hasOwnProperty.call(m, v)) ? m[v] : v;
+}
+
+/* سطر توضيحي تحت حقل الحي بالمؤشر (2026-09-28):
+   - اسم بديل معروف ← "النسيم = حي العيون (...)"
+   - حي غير موجود **بعد انتهاء الكتابة** (committed) ← رسالة تحذير. أثناء
+     الكتابة (حروف ناقصة زي "النس") صمت تام — نفس حارس 2026-09-24.
+   ⚠️ textContent فقط (مو innerHTML) — النص فيه كتابة الزائر نفسه. */
+function updateValuationDistrictHint(city, raw, resolved, committed){
+  const el = document.getElementById('v-district-hint');
+  if (!el) return;
+  const list = CITY_DISTRICTS[city] || [];
+  const ar = currentLang !== 'en';
+  if (raw && resolved !== raw && list.includes(resolved)) {
+    el.textContent = ar
+      ? `«${raw}» = حي ${resolved} (الاسم المعتمد بسجلات الصفقات)`
+      : `"${raw}" = ${districtLabel(resolved)} (official name in transaction records)`;
+    el.style.color = 'var(--text-600)';
+    el.style.display = '';
+    return;
+  }
+  if (committed && raw && !list.includes(resolved)) {
+    el.textContent = ar
+      ? `⚠️ «${raw}» غير موجود بقائمة أحياء ${city} — اختر حياً من القائمة، أو امسح الحقل للحساب بمتوسط المدينة.`
+      : `⚠️ "${raw}" is not in the district list for this city — pick one from the list, or clear the field to use the city average.`;
+    el.style.color = 'var(--warn)';
+    el.style.display = '';
+    return;
+  }
+  el.textContent = '';
+  el.style.display = 'none';
+}
+
 function realDistrictPrice(city, district){
   return DISTRICT_PRICES[city] && DISTRICT_PRICES[city][district];
 }
@@ -2065,7 +2111,7 @@ function updateGradeFieldVisibility(){
   const gradeWrap = document.getElementById('v-grade-wrap');
   if (!gradeWrap) return;
   const city = document.getElementById('v-city').value;
-  const district = document.getElementById('v-district').value;
+  const district = resolveDistrictAlias(city, document.getElementById('v-district').value);
   gradeWrap.style.display = realDistrictPrice(city, district) ? 'none' : '';
 }
 document.getElementById('v-district')?.addEventListener('change', ()=>{
@@ -2207,7 +2253,9 @@ function runValuation(){
   const citySel = document.getElementById('v-city');
   const cityVal = citySel.value;
   const districtSel = document.getElementById('v-district');
-  const districtVal = districtSel.value;
+  const districtRaw = districtSel.value.trim();
+  // اسم بديل (النسيم ← العيون) — راجع resolveDistrictAlias
+  const districtVal = resolveDistrictAlias(cityVal, districtRaw);
   const typeSel = document.getElementById('v-type');
   const typeVal = typeSel.value;
   const typeInfo = PROPERTY_TYPES.find(t => t.v === typeVal);
@@ -2217,6 +2265,7 @@ function runValuation(){
   // أنواع مختلفة أحياناً — اكتُشف بالتشخيص المباشر 2026-09-24).
   if (!typeInfo) return;
   const districtsForCity = CITY_DISTRICTS[cityVal] || [];
+  updateValuationDistrictHint(cityVal, districtRaw, districtVal, districtSel.dataset.committed === '1');
   if (districtVal !== '' && !districtsForCity.includes(districtVal)) return;
   const realPrice = realDistrictPrice(cityVal, districtVal);
   const usingRealPrice = !!realPrice;
@@ -2351,7 +2400,21 @@ function runValuation(){
   document.getElementById('val-breakdown').innerHTML = bd[currentLang] || bd.ar;
   return estimate;
 }
-document.getElementById('btn-run-valuation').addEventListener('click', runValuation);
+document.getElementById('btn-run-valuation').addEventListener('click', ()=>{
+  // ضغط زر الحساب = انتهت الكتابة — تظهر رسالة "حي غير موجود" لو لزم
+  const d = document.getElementById('v-district');
+  if (d) d.dataset.committed = '1';
+  runValuation();
+});
+// حالة "انتهت كتابة الحي" (2026-09-28): مستمعات على document بمرحلة الالتقاط
+// (true) عشان تشتغل **قبل** مستمعات الحقل نفسه اللي تستدعي runValuation.
+// input = لسا يكتب (صمت)؛ change = خرج من الحقل أو اختار اقتراح (رسالة لو لزم).
+document.addEventListener('input', (e)=>{
+  if (e.target && e.target.id === 'v-district') e.target.dataset.committed = '0';
+}, true);
+document.addEventListener('change', (e)=>{
+  if (e.target && e.target.id === 'v-district') e.target.dataset.committed = '1';
+}, true);
 
 /* ============================================================================
    مقارنة الأحياء التفاعلية (2026-09-25) — تعتمد كلياً على البيانات
@@ -2425,8 +2488,9 @@ function buildCompareCardHtml(slot, district, price, meta, barWidthPct){
 function runCompare(){
   const results = document.getElementById('cmp-results');
   const cityVal = document.getElementById('cmp-city').value;
-  const distA = document.getElementById('cmp-district-a').value;
-  const distB = document.getElementById('cmp-district-b').value;
+  // اسم بديل (النسيم ← العيون) — راجع resolveDistrictAlias
+  const distA = resolveDistrictAlias(cityVal, document.getElementById('cmp-district-a').value);
+  const distB = resolveDistrictAlias(cityVal, document.getElementById('cmp-district-b').value);
   const districtsForCity = CITY_DISTRICTS[cityVal] || [];
 
   if (!distA || !distB || distA === distB ||
