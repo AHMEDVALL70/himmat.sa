@@ -1,0 +1,27 @@
+{
+  "_note": "بيانات اصطناعية لـscripts/smoke-test.js — أسعار وهمية عمداً (مو أسعار رغدان الحقيقية؛ المستودع عام). الأسماء حقيقية لأن الأسماء البديلة وقائمة الأحياء بالكود تعتمد عليها.",
+  "updated_at": "2026-01-01T00:00:00Z",
+  "test_city": "المدينة المنورة",
+  "test_type": "فيلا",
+  "known_district": "قباء",
+  "second_district": "العزيزية",
+  "partial_input": "النس",
+  "aliases": [["النسيم", "العيون"], ["الكوردي", "الفتح"], ["الكردي", "الفتح"], ["أرض الكردي", "الفتح"], ["ارض الكردي", "الفتح"]],
+  "cities": [
+    { "id": "c1", "name": "المدينة المنورة", "price_per_sqm": 1000, "raghdan_slug": null },
+    { "id": "c2", "name": "مكة المكرمة", "price_per_sqm": 1100, "raghdan_slug": null },
+    { "id": "c3", "name": "جدة", "price_per_sqm": 1200, "raghdan_slug": null },
+    { "id": "c4", "name": "الرياض", "price_per_sqm": 1300, "raghdan_slug": null }
+  ],
+  "districts": [
+    { "id": "d1", "city": "المدينة المنورة", "name": "قباء", "price": 3000, "count": 100 },
+    { "id": "d2", "city": "المدينة المنورة", "name": "العيون", "price": 1500, "count": 50 },
+    { "id": "d3", "city": "المدينة المنورة", "name": "الفتح", "price": 2000, "count": 20 },
+    { "id": "d4", "city": "المدينة المنورة", "name": "العزيزية", "price": 1200, "count": 80 }
+  ],
+  "offers": [
+    { "id": "00000000-0000-0000-0000-000000000001", "title": "عرض اختبار آلي", "city": "المدينة المنورة", "district": "قباء",
+      "property_type": "فيلا", "price_final": 1000000, "price_original": 1100000, "area_sqm": 300, "rooms": 5,
+      "is_published": true, "is_pinned": false, "created_at": "2026-01-01T00:00:00Z", "images": [], "image_url": null }
+  ]
+}
