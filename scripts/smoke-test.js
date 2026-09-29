@@ -185,6 +185,17 @@ const CHECKS = [
   ["عنوان التبويب: /offers يعطي عنوان قسم العروض", async ({ offers }) => {
     return offers.w.document.title.startsWith("عروض عقارية") || `العنوان: "${offers.w.document.title}"`;
   }],
+  ["كل طلبات العروض/العقارات العامة تستثني المحذوف (deleted_at)", async () => {
+    // 2026-09-29: المدير المسجّل دخول كان يشوف العروض المحذوفة بالموقع (RLS تسمح له)
+    const bad = [];
+    const re = /from\((['"])(offers|properties)\1\)[\s\S]*?;/g;
+    let m;
+    while ((m = re.exec(SITE_JS))) {
+      if (/\.(insert|update|delete|upsert)\(/.test(m[0])) continue;
+      if (!/\.is\((['"])deleted_at\1,\s*null\)/.test(m[0])) bad.push(SITE_JS.slice(0, m.index).split("\n").length);
+    }
+    return bad.length === 0 || `طلبات بدون فلتر المحذوف بالأسطر: ${bad.join("، ")}`;
+  }],
   ["Analytics: ضغطة زر واتساب العائم = whatsapp_click", async ({ home }) => {
     const a = home.w.document.getElementById("whatsapp-float");
     if (!a) return "#whatsapp-float غير موجود";

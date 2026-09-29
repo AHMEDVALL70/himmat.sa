@@ -885,7 +885,7 @@ async function openCompareModal(){
     let o = OFFER_REGISTRY[key];
     if (!o && dbReady){
       try {
-        const { data } = await withTimeout(supa.from('offers').select('*').eq('id', key).eq('is_published', true).maybeSingle());
+        const { data } = await withTimeout(supa.from('offers').select('*').eq('id', key).eq('is_published', true).is('deleted_at', null).maybeSingle());
         if (data) o = data;
       } catch (e) { console.error('openCompareModal: fetch failed for', key, e); }
     }
@@ -1113,7 +1113,7 @@ async function showOfferDetail(key){
   renderOfferDetailPage(cached); // عرض فوري بالبيانات المتوفرة (سريع الاستجابة)، ثم تحديثها بأحدث نسخة فعلية
   if (dbReady && cached.id){
     try {
-      const { data } = await withTimeout(supa.from('offers').select('*').eq('id', cached.id).eq('is_published', true).maybeSingle());
+      const { data } = await withTimeout(supa.from('offers').select('*').eq('id', cached.id).eq('is_published', true).is('deleted_at', null).maybeSingle());
       if (data && currentDetailOfferId === data.id){ // الزائر لسا بنفس صفحة هذا العرض (ما تنقّل لعرض ثاني أثناء الجلب)
         OFFER_REGISTRY[key] = data;
         renderOfferDetailPage(data);
@@ -1341,7 +1341,7 @@ function prefillValuationFromURL(){
 async function openOfferById(id){
   if (!dbReady) return;
   try {
-    const { data, error } = await withTimeout(supa.from('offers').select('*').eq('id', id).eq('is_published', true).maybeSingle());
+    const { data, error } = await withTimeout(supa.from('offers').select('*').eq('id', id).eq('is_published', true).is('deleted_at', null).maybeSingle());
     if (error || !data) return;
     const key = registerOffer(data);
     openDetailModal(key);
@@ -1361,7 +1361,7 @@ async function handleDeepLinkOffer(){
   const offerId = hashMatch ? hashMatch[1] : (pathMatch ? decodeURIComponent(pathMatch[1]) : null);
   if (!offerId || !dbReady) return;
   try {
-    const { data, error } = await withTimeout(supa.from('offers').select('*').eq('id', offerId).eq('is_published', true).maybeSingle());
+    const { data, error } = await withTimeout(supa.from('offers').select('*').eq('id', offerId).eq('is_published', true).is('deleted_at', null).maybeSingle());
     if (error || !data) return;
     showPage('offers');
     const key = registerOffer(data);
@@ -1414,7 +1414,7 @@ async function renderSimilarOffers(current){
   if (similar.length < 2 && dbReady){
     try {
       const { data } = await withTimeout(
-        supa.from('offers').select('*').eq('is_published', true).eq('city', current.city).neq('id', current.id).limit(10)
+        supa.from('offers').select('*').eq('is_published', true).is('deleted_at', null).eq('city', current.city).neq('id', current.id).limit(10)
       );
       if (data && data.length) similar = pick(data.concat(similar));
     } catch (e) { console.error('renderSimilarOffers: fallback query failed', e); }
@@ -1599,7 +1599,7 @@ async function renderOffers(filters){
     try {
       // نُبقي فلترة المدينة صارمة (أغلب المشترين ما يفكرون بمدينة ثانية)،
       // وبقية التفضيلات (نوع، سعر، غرف) تُحسب كنسبة توافق بدل استبعاد صارم
-      let query = supa.from('offers').select('*').eq('is_published', true).order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(30);
+      let query = supa.from('offers').select('*').eq('is_published', true).is('deleted_at', null).order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(30);
       if (f.city) query = query.eq('city', f.city);
       const { data, error } = await withTimeout(query);
       if (!error && data && data.length){
@@ -1641,7 +1641,7 @@ async function renderFeatured(){
   let items = [];
   if (dbReady){
     try {
-      const { data, error } = await withTimeout(supa.from('offers').select('*').eq('is_published', true).order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(3));
+      const { data, error } = await withTimeout(supa.from('offers').select('*').eq('is_published', true).is('deleted_at', null).order('is_pinned', { ascending: false }).order('created_at', { ascending: false }).limit(3));
       if (!error && data && data.length) items = data;
     } catch (e) {
       console.error('renderFeatured: Supabase call failed, falling back to demo data.', e);
@@ -2820,7 +2820,10 @@ document.getElementById('btn-add-property').addEventListener('click', async ()=>
   }
 });
 
-/* ============================================================================
+/* 2026-09-29: كل طلبات العروض/العقارات العامة فيها .is('deleted_at', null)
+   صراحة — قواعد RLS تخفي المحذوف عن الزائر أصلاً، لكن حساب الإدارة (is_staff)
+   يقرأ كل الصفوف، فالمدير المسجّل دخول كان يشوف العروض المحذوفة بالموقع العام.
+   ============================================================================
    6) Analytics — reads real approved properties, shared by everyone
    ========================================================================== */
 async function renderAnalytics(){
@@ -2828,7 +2831,7 @@ async function renderAnalytics(){
   if (!dbReady) return;
 
   try {
-    const { data, error } = await withTimeout(supa.from('properties').select('*').eq('status','approved').order('created_at', {ascending:false}).limit(50));
+    const { data, error } = await withTimeout(supa.from('properties').select('*').eq('status','approved').is('deleted_at', null).order('created_at', {ascending:false}).limit(50));
     if (error || !data || !data.length) return;
 
     document.getElementById('stat-live-count').dataset.target = data.length;
@@ -3242,7 +3245,7 @@ async function loadHeroSlides(){
       const { data, error } = await withTimeout(
         supa.from('offers')
           .select('image_url, title, city, district, price_final, price_original')
-          .eq('is_published', true)
+          .eq('is_published', true).is('deleted_at', null)
           .eq('featured', true)
           .not('image_url', 'is', null)
           .order('created_at', { ascending: false })
@@ -3598,7 +3601,7 @@ async function searchProperties(q){
   let results = [];
   if (dbReady){
     try {
-      let query = supa.from('properties').select('*').eq('status', 'approved').limit(5);
+      let query = supa.from('properties').select('*').eq('status', 'approved').is('deleted_at', null).limit(5);
       if (q.city) query = query.eq('city', q.city);
       if (q.type) query = query.eq('property_type', q.type);
       if (q.maxPrice) query = query.lte('price', q.maxPrice);
@@ -4012,7 +4015,7 @@ async function loadLiveStatsCount(){
   if (!dbReady) return;
   try {
     const { count, error } = await withTimeout(
-      supa.from('properties').select('id', { count: 'exact', head: true }).eq('status', 'approved')
+      supa.from('properties').select('id', { count: 'exact', head: true }).eq('status', 'approved').is('deleted_at', null)
     );
     if (!error && typeof count === 'number'){
       document.getElementById('stat-live-count').dataset.target = count;

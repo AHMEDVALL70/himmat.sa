@@ -52,8 +52,8 @@ function money(n) {
 
 async function buildSnapshotHtml() {
   const [properties, offers, cities] = await Promise.all([
-    supaSelect("properties", "select=property_type,city,district,price,area_sqm&status=eq.approved&order=created_at.desc&limit=40"),
-    supaSelect("offers", "select=title,description,price_final,price_original,city,district&is_published=eq.true&order=created_at.desc&limit=30"),
+    supaSelect("properties", "select=property_type,city,district,price,area_sqm&status=eq.approved&deleted_at=is.null&order=created_at.desc&limit=40"),
+    supaSelect("offers", "select=title,description,price_final,price_original,city,district&is_published=eq.true&deleted_at=is.null&order=created_at.desc&limit=30"),
     supaSelect("cities", "select=name,price_per_sqm"),
   ]);
 
