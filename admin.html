@@ -236,10 +236,6 @@
             <label for="city-new-price">متوسط سعر المتر (اختياري)</label>
             <input id="city-new-price" type="text" inputmode="decimal" placeholder="مثال: 5000">
           </div>
-          <div class="field" style="margin-bottom:14px">
-            <label for="city-new-slug">معرّف رغدان (اختياري — لتحديث الأسعار الأسبوعي التلقائي)</label>
-            <input id="city-new-slug" type="text" placeholder="فاضي = يجرّب اسم المدينة نفسه">
-          </div>
           <button class="btn btn-primary" id="btn-add-city" style="width:100%">إضافة المدينة</button>
           <p id="city-new-msg" style="font-size:13px;margin-top:10px;min-height:18px"></p>
         </div>
@@ -261,7 +257,7 @@
         <div class="card" style="flex:1 1 320px;padding:20px" data-owner-only>
           <h3 style="margin:0 0 6px">تحديث سعر حي يدوياً</h3>
           <p style="font-size:12.5px;color:var(--text-600);margin:0 0 14px">
-            لحي فشل التحديث التلقائي من راغدان — أدخل نطاق سعر من مصدر رسمي (مثل REGA). التحديث الأسبوعي يتوقف عن لمس هذا الحي تلقائياً بعدها.
+            لحي ما له صفقات كافية ببيانات وزارة العدل (أقل من ٥ صفقات بآخر 12 شهراً) — أدخل نطاق سعر من مصدر موثوق واكتب المصدر. الاستيراد الربع سنوي ما يلمس هذا الحي بعدها.
           </p>
           <div class="field" style="margin-bottom:12px">
             <label for="price-manual-city">المدينة</label>
@@ -281,7 +277,7 @@
             <input id="price-manual-note" type="text" placeholder="مثال: تقرير REGA أبريل 2026">
           </div>
           <button class="btn btn-primary" id="btn-save-manual-price" style="width:100%;margin-bottom:8px">حفظ يدوياً</button>
-          <button class="btn btn-ghost" id="btn-revert-manual-price" style="width:100%;display:none">↩️ إرجاع للتحديث التلقائي</button>
+          <button class="btn btn-ghost" id="btn-revert-manual-price" style="width:100%;display:none">↩️ إلغاء السعر اليدوي (رجوع لبيانات وزارة العدل)</button>
           <p id="price-manual-msg" style="font-size:13px;margin-top:10px;min-height:18px"></p>
         </div>
       </div>
@@ -397,6 +393,6 @@
 
 <div id="turnstile-container" style="display:none"></div>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script src="js/admin.js?v=20260919b"></script>
+<script src="js/admin.js?v=20260929a"></script>
 </body>
 </html>

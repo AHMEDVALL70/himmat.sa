@@ -12,8 +12,8 @@
  * كيف يشتغل: يحمّل index.html (وصفحات الأقسام المولّدة) بمتصفح محاكى
  * (jsdom)، ويشغّل js/site.js الحقيقي، مع Supabase وهمي يرجّع بيانات
  * **اصطناعية** من scripts/smoke-fixtures.json.
- * ⚠️ البيانات اصطناعية عمداً (أسعار وهمية): المستودع عام، ونشر أسعار رغدان
- *    الحقيقية فيه = إعادة نشر لبياناتهم (راجع قسم رغدان بملف التسليم).
+ * ⚠️ البيانات اصطناعية عمداً (أسعار وهمية) — الاختبار يفحص السلوك، مو الأرقام.
+ *    (2026-09-29: المصدر صار بيانات وزارة العدل المفتوحة بدل رغدان.)
  * ⚠️ المحاكاة ما تغني عن فحص حي بمتصفح حقيقي بعد النشر (القاعدة ٣).
  *
  * التشغيل (خارج المستودع عشان node_modules ما تنرفع بالغلط):
@@ -44,7 +44,7 @@ function tables() {
     districts: FX.districts.map((d) => ({ id: d.id, name: d.name, city_id: cid[d.city], cities: { name: d.city } })),
     district_prices: FX.districts.filter((d) => d.price).map((d) => ({
       district_id: d.id, price_per_sqm: d.price, transaction_count: d.count, updated_at: FX.updated_at,
-      source: "raghdan.sa", period_note: "fixture", districts: { id: d.id, name: d.name, cities: { name: d.city } },
+      source: "moj.gov.sa", period_note: FX.period_note, districts: { id: d.id, name: d.name, cities: { name: d.city } },
     })),
     district_price_history: [],
     offers: FX.offers,
@@ -147,6 +147,14 @@ const CHECKS = [
   ["المؤشر: حي غير موجود بعد انتهاء الكتابة = رسالة تحذير", async ({ val }) => {
     const r = valuate(val.w, { ...V, district: "حي_غير_موجود_للاختبار", ev: "change" });
     return (r.low === "—" && r.hint.includes("غير موجود")) || `low=${r.low} hint="${r.hint}"`;
+  }],
+  ["مصدر السعر: وزارة العدل + فترة الربع من القاعدة، وصفر ذكر لرغدان", async ({ val }) => {
+    valuate(val.w, { ...V, district: FX.known_district });
+    const src = val.w.document.getElementById("v-price-source").textContent;
+    if (!src.includes("وزارة العدل")) return `ملاحظة المصدر ما فيها وزارة العدل: "${src}"`;
+    if (!src.includes("2025-Q2 إلى 2026-Q1")) return `الفترة ما انقرأت من period_note: "${src}"`;
+    if (/رغدان|raghdan/i.test(val.w.document.body.textContent)) return "كلمة رغدان موجودة بالصفحة";
+    return true;
   }],
   ["مقارنة الأحياء: حيّين مختلفين تعرض نتيجة", async ({ val }) => {
     const r = compare(val.w, C, FX.known_district, FX.second_district);

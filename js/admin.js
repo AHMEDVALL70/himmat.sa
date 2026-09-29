@@ -220,7 +220,6 @@ loadDistrictsListTable();
 document.getElementById('btn-add-city')?.addEventListener('click', async ()=>{
   const nameInput = document.getElementById('city-new-name');
   const priceInput = document.getElementById('city-new-price');
-  const slugInput = document.getElementById('city-new-slug');
   const msg = document.getElementById('city-new-msg');
   const name = nameInput.value.trim();
   if (!name){
@@ -235,7 +234,6 @@ document.getElementById('btn-add-city')?.addEventListener('click', async ()=>{
   }
   const payload = { name };
   if (priceInput.value) payload.price_per_sqm = parseFloat(priceInput.value);
-  if (slugInput.value.trim()) payload.raghdan_slug = slugInput.value.trim();
   msg.textContent = 'جارٍ الإضافة...';
   msg.style.color = 'var(--text-600)';
   try {
@@ -247,7 +245,7 @@ document.getElementById('btn-add-city')?.addEventListener('click', async ()=>{
     }
     msg.textContent = '✅ تمت إضافة المدينة.';
     msg.style.color = 'var(--ok)';
-    nameInput.value = ''; priceInput.value = ''; slugInput.value = '';
+    nameInput.value = ''; priceInput.value = '';
     await refreshCityDistrictData();
   } catch (e) {
     msg.textContent = '⚠️ تعذّر الاتصال بقاعدة البيانات.';
@@ -302,7 +300,7 @@ document.getElementById('btn-add-district')?.addEventListener('click', async ()=
    تحديث سعر حي يدوياً (owner فقط) — لحي فشل التحديث التلقائي من راغدان.
    يُخزَّن نطاق (أدنى/أعلى)، والمتوسط بينهم يُستخدم كـprice_per_sqm العادي
    (نفس حقل راغدان بالضبط) — باقي الموقع يحسب عليه بدون أي منطق خاص. علامة
-   source='manual' توقف التحديث الأسبوعي عن لمس هذا الحي لحد "إرجاع للتلقائي".
+   source='manual' يمنع الاستيراد الربع سنوي (وزارة العدل) من لمس هذا الحي لحد "إلغاء السعر اليدوي".
    ========================================================================== */
 function populatePriceManualCitySelect(){
   const sel = document.getElementById('price-manual-city');
@@ -397,7 +395,7 @@ document.getElementById('btn-save-manual-price')?.addEventListener('click', asyn
       updated_at: new Date().toISOString(),
     }, { onConflict: 'district_id' });
     if (error){ msg.textContent = '⚠️ تعذّر الحفظ: ' + error.message; msg.style.color = 'var(--danger)'; return; }
-    msg.textContent = '✅ تم الحفظ — التحديث الأسبوعي التلقائي ما يلمس هذا الحي بعد الحين.';
+    msg.textContent = '✅ تم الحفظ — الاستيراد الربع سنوي ما يلمس هذا الحي بعد الحين.';
     msg.style.color = 'var(--ok)';
     loadManualPriceStatus();
   } catch (e) {
@@ -411,20 +409,18 @@ document.getElementById('btn-revert-manual-price')?.addEventListener('click', as
   const msg = document.getElementById('price-manual-msg');
   const cityName = document.getElementById('price-manual-city').value;
   const districtName = document.getElementById('price-manual-district').value;
-  if (!confirm('إرجاع هذا الحي للتحديث التلقائي؟ السعر الحالي يبقى مؤقتاً لحد أول تشغيلة أسبوعية جاية.')) return;
+  if (!confirm('إلغاء السعر اليدوي لهذا الحي؟ يُحذف السعر، ويظهر الحي بتقدير متوسط المدينة لحد الاستيراد الربع سنوي القادم من بيانات وزارة العدل.')) return;
   msg.textContent = 'جارٍ التحديث...';
   msg.style.color = 'var(--text-600)';
   try {
     const districtId = await findDistrictId(cityName, districtName);
     if (!districtId){ msg.textContent = '⚠️ تعذّر إيجاد الحي بقاعدة البيانات.'; msg.style.color = 'var(--danger)'; return; }
-    const { error } = await supa.from('district_prices').update({
-      source: 'raghdan.sa',
-      manual_price_low: null,
-      manual_price_high: null,
-      manual_source_note: null,
-    }).eq('district_id', districtId);
+    // 2026-09-29: حذف الصف بدل تغيير المصدر — لو غيّرنا المصدر لـmoj.gov.sa
+    // يظهر متوسط النطاق اليدوي للزائر كأنه رقم وزارة العدل (نسبة خاطئة).
+    // الاستيراد الربع سنوي يرجّع سعر الوزارة لأي حي ما له صف (schema.sql 3.10).
+    const { error } = await supa.from('district_prices').delete().eq('district_id', districtId).eq('source', 'manual');
     if (error){ msg.textContent = '⚠️ تعذّر التحديث: ' + error.message; msg.style.color = 'var(--danger)'; return; }
-    msg.textContent = '✅ رجع للتحديث التلقائي — بيتحدَّث أول تشغيلة أسبوعية جاية.';
+    msg.textContent = '✅ أُلغي السعر اليدوي — يرجع سعر وزارة العدل مع الاستيراد الربع سنوي القادم.';
     msg.style.color = 'var(--ok)';
     loadManualPriceStatus();
   } catch (e) {

@@ -58,7 +58,7 @@ async function buildSnapshotHtml() {
   ]);
 
   const citiesRows = cities
-    .map((c) => `<li>${escapeHtml(c.name)}: ${c.price_per_sqm ? money(c.price_per_sqm) + " ريال سعودي للمتر المربع (متوسط السوق، مصدره منصة رغدان العقارية، محدَّث أسبوعياً)" : "بيانات قيد التحديث"}</li>`)
+    .map((c) => `<li>${escapeHtml(c.name)}: ${c.price_per_sqm ? money(c.price_per_sqm) + " ريال سعودي للمتر المربع (وسيط صفقات آخر 12 شهراً، المصدر: بيانات وزارة العدل المفتوحة، يُحدَّث كل ربع سنة)" : "بيانات قيد التحديث"}</li>`)
     .join("\n");
 
   const propertiesRows = properties

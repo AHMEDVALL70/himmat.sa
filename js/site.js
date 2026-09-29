@@ -50,7 +50,7 @@ const I18N = {
     val_eyebrow:"مؤشر فوري", val_title:"استشارات ودراسات عقارية استرشادية",
     val_desc:"خمس معلومات بسيطة، ومؤشر سعري شفاف خلال ثوانٍ.",
     val_honesty_label:"ملاحظة مهمة حول الدقة: ",
-    val_honesty_text:"هذا المؤشر ناتج عن معادلة حسابية شفافة (سعر المتر × المساحة مع معاملات تعديل) — لا نموذج ذكاء اصطناعي يخمّن، سعر المتر نفسه إما من صفقات حقيقية موثّقة (وزارة العدل عبر رغدان) لو متوفرة لهذا الحي تحديداً، أو متوسط عام للمدينة — النتيجة أدناه توضح أي الحالتين تنطبق. اعتبره نقطة انطلاق للنقاش، لا تقييماً معتمداً رسمياً.",
+    val_honesty_text:"هذا المؤشر ناتج عن معادلة حسابية شفافة (سعر المتر × المساحة مع معاملات تعديل) — لا نموذج ذكاء اصطناعي يخمّن، سعر المتر نفسه إما من صفقات حقيقية موثّقة (وزارة العدل — البيانات المفتوحة، وسيط آخر 12 شهراً) لو متوفرة لهذا الحي تحديداً، أو متوسط عام للمدينة — النتيجة أدناه توضح أي الحالتين تنطبق. اعتبره نقطة انطلاق للنقاش، لا تقييماً معتمداً رسمياً.",
     val_run:"احسب المؤشر", res_low:"أدنى النطاق (ر.س)", res_high:"أعلى النطاق (ر.س)",
     val_share:"📤 شارك النتيجة بواتساب",
     cmp_title:"مقارنة الأحياء", cmp_desc:"قارن سعر المتر بين حيين بنفس المدينة.",
@@ -166,7 +166,7 @@ const I18N = {
     val_eyebrow:"Instant indicator", val_title:"Guided Real Estate Consulting & Studies",
     val_desc:"Five simple details, and a transparent price indicator in seconds.",
     val_honesty_label:"Accuracy note: ",
-    val_honesty_text:"This indicator comes from a transparent formula (price per sqm × area with adjustment factors) — not an AI model guessing. The per-sqm price itself is either based on real documented transactions (Ministry of Justice via Raghdan) when available for that specific district, or a general citywide average otherwise — the result below shows which applies. Consider it a starting point for discussion, not an officially certified valuation.",
+    val_honesty_text:"This indicator comes from a transparent formula (price per sqm × area with adjustment factors) — not an AI model guessing. The per-sqm price itself is either based on real documented transactions (Saudi Ministry of Justice open data, median of the last 12 months) when available for that specific district, or a general citywide average otherwise — the result below shows which applies. Consider it a starting point for discussion, not an officially certified valuation.",
     val_run:"Calculate Estimate", res_low:"Low range (SAR)", res_high:"High range (SAR)",
     val_share:"📤 Share via WhatsApp",
     cmp_title:"Compare Districts", cmp_desc:"Compare the price per sqm between two districts in the same city.",
@@ -525,33 +525,34 @@ const CITY_DISTRICTS = {
   "جدة": ["الروضة","الزهراء","السلامة","النهضة","الشاطئ","المحمدية","الخالدية","النعيم","النزهة","البوادي","الربوة","الصفا","الفيصلية","الرحاب","مشرفة","العزيزية","الورود","بني مالك","النسيم","الواحة","السامر","المنار","الأجواد","الريان","مريخ","بريمان","المنطقة الصناعية","الجامعة","الفيحاء","السليمانية","الثغر","الروابي","الوزيرية","غليل","مدائن الفهد","البلد","الهنداوية","البغدادية الشرقية","البغدادية الغربية","الكندرة","الصحيفة","السبيل","النزلة الشرقية","النزلة اليمانية","الثعالبة","المحجر","الكرنتينا","الأمير فواز الشمالي","الأمير فواز الجنوبي","السنابل","الهدى","الأجاويد","الفضيلة","الخمرة","القرينية","الحمدانية","الصالحية","الفلاح","الرحمانية","طيبة","الرياض","الكوثر","الياقوت","الزمرد","اللؤلؤ","الأمواج","الشراع","الفردوس","الأصالة","البساتين","أبحر الجنوبية","أبحر الشمالية","المرجان","الشفا","المنتزهات","أم السلم","الحرازات"],
   "الرياض": ["العليا","السليمانية","الملز","الوزارات","الضباط","الورود","الرحمانية","المحمدية","الرائد","النخيل","أم الحمام الشرقي","أم الحمام الغربي","المعذر","المعذر الشمالي","الهدا","الشفا","بدر","المروة","عكاظ","الحزم","ديراب","نمار","ظهرة نمار","العريجاء","العريجاء الغربية","العريجاء الوسطى","ظهرة البديعة","البديعة","السويدي","السويدي الغربي","شبرا","سلطانة","الجرادية","منفوحة","منفوحة الجديدة","الديرة","الشميسي","الفاخرية","العود","المرقب","الصالحية","الخالدية","غبيراء","اليمامة","الربوة","الريان","الروابي","النسيم الشرقي","النسيم الغربي","السلام","المنار","النهضة","الخليج","القدس","الحمراء","غرناطة","الشهداء","قرطبة","اليرموك","المونسية","الرمال","الجنادرية","القادسية","اشبيلية","الملك فيصل","الروضة","الملقا","حطين","العقيق","الصحافة","الياسمين","النرجس","العارض","القيروان","الربيع","الغدير","النفل","الوادي","التعاون","الازدهار","المصيف","المرسلات","الفلاح","الندى","الواحة","صلاح الدين","الملك فهد","الملك عبدالله","الملك عبدالعزيز","المغرزات","النور"],
 };
-const CITY_PRICE_PER_SQM = { "المدينة المنورة":4200, "مكة المكرمة":6100, "جدة":5800, "الرياض":6500 };
+const CITY_PRICE_PER_SQM = { "المدينة المنورة":1270, "مكة المكرمة":1953, "جدة":3000, "الرياض":2103 };
 
-// أسعار متر حقيقية موثّقة لأحياء محددة — مصدرها صفقات فعلية موثّقة من وزارة
-// العدل السعودية (عبر منصة رغدان raghdan.sa). الأرقام هنا "بذرة" احتياطية
-// تُستخدم فقط لو تعذّر الاتصال بقاعدة البيانات؛ بعد الإقلاع تُستبدَل/تُحدَّث
-// تلقائياً من جدول district_prices (يحدّثه Edge Function أسبوعياً). البيانات
-// بطبيعتها تراكمية (كل الصفقات المسجَّلة منذ فترة، مو سنة واحدة بالضبط) —
-// السبب قلة عدد الصفقات بالحي الواحد سنوياً، فما يكفي لمتوسط سنوي موثوق.
-// أي حي مو موجود هنا يستخدم تقدير "متوسط المدينة × تصنيف الحي" (استرشادي).
+// أسعار متر حقيقية موثّقة لأحياء محددة — وسيط صفقات وزارة العدل السعودية
+// (البيانات المفتوحة للصفقات العقارية، آخر 12 شهراً: 2025-Q2 إلى 2026-Q1،
+// صفقات العقار الواحد، بعد استبعاد القيم الشاذة). الأرقام هنا "بذرة" احتياطية
+// تُستخدم فقط لو تعذّر الاتصال بقاعدة البيانات؛ بعد الإقلاع تُستبدَل من جدول
+// district_prices (يُحدَّث كل ربع سنة من بيانات الوزارة — راجع schema.sql 3.10).
+// CITY_PRICE_PER_SQM فوق = وسيط كل صفقات المدينة لنفس الفترة.
+// أي حي مو موجود هنا ولا بالقاعدة يستخدم تقدير "متوسط المدينة × تصنيف الحي" (استرشادي).
+// 2026-09-29: استبدلت أرقام رغدان السابقة (أُوقف الاعتماد عليها نهائياً).
 const DISTRICT_PRICES = {
   "المدينة المنورة": {
-    "العزيزية": 1522, "المبعوث": 2690, "قباء": 4839, "الرانوناء": 2186,
-    "مذينب": 3593, "طيبة": 2284, "وادي البطان": 863, "أبو بريقاء": 188,
+    "العزيزية": 1291, "المبعوث": 2073, "قباء": 4839, "الرانوناء": 1976,
+    "مذينب": 3180, "طيبة": 1499, "وادي البطان": 478, "أبو بريقاء": 188,
   },
   "مكة المكرمة": {
-    "بطحاء قريش": 3519, "العمرة": 1726, "المعابدة": 9431, "الملك فهد": 2881,
+    "بطحاء قريش": 3504, "العمرة": 1435, "المعابدة": 10511, "الملك فهد": 3270,
   },
   "جدة": {
-    "الشاطئ": 6870, "الخالدية": 6667, "المحمدية": 6316, "النهضة": 5930,
-    "السلامة": 5361, "الفيحاء": 4138, "المنار": 3639, "الصفا": 3804,
-    "الواحة": 3646, "الريان": 3132, "مريخ": 2976, "الرحمانية": 2744,
-    "الياقوت": 2883, "القرينية": 2058, "الرياض": 1567,
+    "الشاطئ": 6364, "الخالدية": 6300, "المحمدية": 6133, "النهضة": 5730,
+    "السلامة": 5000, "الفيحاء": 3897, "المنار": 3581, "الصفا": 3589,
+    "الواحة": 3325, "الريان": 3106, "مريخ": 3100, "الرحمانية": 2000,
+    "الياقوت": 2600, "القرينية": 1391, "الرياض": 1231,
   },
   "الرياض": {
-    "الغدير": 16123, "الصحافة": 12691, "الملقا": 10285, "النرجس": 8559,
-    "المغرزات": 10699, "المعذر": 10667, "الياسمين": 5954, "الرمال": 4075,
-    "الجنادرية": 2874, "بدر": 2293, "نمار": 1548,
+    "الغدير": 12010, "الصحافة": 11347, "الملقا": 9744, "النرجس": 7500,
+    "المغرزات": 9229, "المعذر": 10000, "الياسمين": 6859, "الرمال": 3800,
+    "الجنادرية": 1650, "بدر": 2470, "نمار": 1213,
   },
 };
 // بيانات إضافية (عدد الصفقات ووصف الفترة) لكل حي عنده سعر حقيقي — فاضية
@@ -559,7 +560,7 @@ const DISTRICT_PRICES = {
 // بصياغة sourceNote تحت لعرض وصف دقيق للفترة بدل نص ثابت.
 const DISTRICT_PRICE_META = {};
 /* ===== أسماء بديلة للأحياء (2026-09-28) =====
-   بعض الأحياء لها اسم شعبي غير الاسم المعتمد بسجلات الصفقات (رغدان/وزارة
+   بعض الأحياء لها اسم شعبي غير الاسم المعتمد بسجلات صفقات وزارة
    العدل) — مثلاً "النسيم" بالمدينة المنورة هو نفسه "العيون" (أكّده المستخدم،
    والنتيجة تطابقت فعلياً). تُطبَّق بالمؤشر ومقارنة الأحياء فقط (بحث عن سعر)،
    وعمداً **مو** بأضف عقارك ولا العقود (الاسم ينحفظ كما كتبه صاحبه).
@@ -1979,8 +1980,8 @@ async function loadCitiesFromDb(){
   }
 }
 
-/* أسعار الأحياء الحقيقية — تحدّثها Edge Function أسبوعياً من رغدان (انظر
-   supabase/functions/update-district-prices). تُدمَج فوق DISTRICT_PRICES
+/* أسعار الأحياء الحقيقية — وسيط صفقات وزارة العدل (البيانات المفتوحة)، تُستورَد
+   كل ربع سنة لجدول district_prices (راجع schema.sql 3.10). تُدمَج فوق DISTRICT_PRICES
    الثابتة (البذرة الاحتياطية)، فأي حي بقاعدة البيانات يطغى على رقمه القديم،
    وأي حي غير موجود بعد بقاعدة البيانات يبقى على رقم البذرة أو التقدير العام. */
 /* 2026-09-18: بانر عام أعلى صفحة "المؤشر" — أحدث updated_at بين كل الأحياء
@@ -2359,14 +2360,15 @@ function runValuation(){
   // متوفر، وإلا نص عام دقيق بدون الادّعاء بسنة واحدة محدَّدة (كانت المشكلة
   // السابقة: "2020–2026" ثابتة بالكود رغم إن البيانات تراكمية بطبيعتها).
   const priceMeta = DISTRICT_PRICE_META[cityVal]?.[districtVal];
+  // 2026-09-29: بيانات وزارة العدل = وسيط آخر 12 شهراً. الفترة (مثل
+  // "2025-Q2 إلى 2026-Q1") تُقرأ من period_note بالقاعدة، فتتحدّث تلقائياً مع
+  // كل استيراد ربع سنوي بدون تعديل كود.
+  const qm = (priceMeta?.periodNote || '').match(/(\d{4}-Q\d)\D+(\d{4}-Q\d)/);
   const periodDesc = {
-    ar: priceMeta
-      ? `بيانات تراكمية (${priceMeta.count ? money(priceMeta.count) + ' صفقة موثّقة، ' : ''}آخر تحديث ${new Date(priceMeta.updatedAt).toLocaleDateString('ar-SA')})`
-      : 'بيانات تراكمية موثّقة (مو لسنة واحدة بالضبط — راجع تفاصيل المصدر)',
-    en: priceMeta
-      ? `cumulative data (${priceMeta.count ? money(priceMeta.count) + ' documented deals, ' : ''}last updated ${new Date(priceMeta.updatedAt).toLocaleDateString('en-GB')})`
-      : 'cumulative documented data (not a single specific year — see source for details)',
+    ar: `وسيط ${priceMeta?.count ? money(priceMeta.count) + ' صفقة موثّقة ' : 'صفقات موثّقة '}بآخر 12 شهراً${qm ? ` (${qm[1]} إلى ${qm[2]})` : ''}`,
+    en: `median of ${priceMeta?.count ? money(priceMeta.count) + ' documented deals ' : 'documented deals '}over the last 12 months${qm ? ` (${qm[1]} to ${qm[2]})` : ''}`,
   };
+
 
   // 2026-09-18: تاريخ آخر تحديث للسعر اليدوي نفسه — priceMeta.updatedAt
   // حقيقي ومحدَّث فعلياً وقت الحفظ من لوحة التحكم (راجع btn-save-manual-price
@@ -2381,12 +2383,12 @@ function runValuation(){
     ar: isManual
       ? `سعر المتر (${money(pricePerSqm)} ر.س) متوسط نطاق سعري مُدخَل يدوياً لحي ${districtVal}: ${money(priceMeta.manualLow)}–${money(priceMeta.manualHigh)} ر.س/م²${priceMeta.manualNote ? ' — المصدر: ' + priceMeta.manualNote : ''}${manualUpdatedDesc.ar}.`
       : usingRealPrice
-      ? `سعر المتر (${money(pricePerSqm)} ر.س) وسيط صفقات فعلية موثّقة لحي ${districtVal} — ${periodDesc.ar} (مصدر: وزارة العدل عبر رغدان العقارية) — قد يختلف عن سعر السوق الحالي بالضبط في الأحياء سريعة الارتفاع.`
+      ? `سعر المتر (${money(pricePerSqm)} ر.س) لحي ${districtVal}: ${periodDesc.ar} (المصدر: وزارة العدل — البيانات المفتوحة للصفقات العقارية) — قد يختلف عن سعر السوق الحالي بالضبط في الأحياء سريعة الارتفاع.`
       : `سعر المتر (${money(pricePerSqm)} ر.س) هو متوسط استرشادي لمدينة ${cityVal} بالكامل (ما فيه بيانات صفقات فعلية موثّقة لحي ${districtVal} بعد)، معدَّل بتصنيف الحي اليدوي — رقم استرشادي عام غير مرتبط بجدولة تحديث دورية محدَّدة.`,
     en: isManual
       ? `The per-sqm price (${money(pricePerSqm)} SAR) is the midpoint of a manually entered range for ${districtVal}: ${money(priceMeta.manualLow)}–${money(priceMeta.manualHigh)} SAR/sqm${priceMeta.manualNote ? ' — source: ' + priceMeta.manualNote : ''}${manualUpdatedDesc.en}.`
       : usingRealPrice
-      ? `The per-sqm price (${money(pricePerSqm)} SAR) is a median of documented transactions for ${districtVal} — ${periodDesc.en} (source: Ministry of Justice via Raghdan) — may differ from the exact current market price in fast-appreciating districts.`
+      ? `The per-sqm price (${money(pricePerSqm)} SAR) for ${districtVal}: ${periodDesc.en} (source: Saudi Ministry of Justice open real-estate transaction data) — may differ from the exact current market price in fast-appreciating districts.`
       : `The per-sqm price (${money(pricePerSqm)} SAR) is a citywide indicator for ${cityVal} (no verified transaction data for ${districtVal} yet), adjusted by the manual district grade — a general guideline figure not tied to a specific periodic update schedule.`,
   };
   const priceSourceEl = document.getElementById('v-price-source');
