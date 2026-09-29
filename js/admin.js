@@ -297,9 +297,9 @@ document.getElementById('btn-add-district')?.addEventListener('click', async ()=
 });
 
 /* ============================================================================
-   تحديث سعر حي يدوياً (owner فقط) — لحي فشل التحديث التلقائي من راغدان.
+   تحديث سعر حي يدوياً (owner فقط) — لحي ما له صفقات كافية ببيانات وزارة العدل.
    يُخزَّن نطاق (أدنى/أعلى)، والمتوسط بينهم يُستخدم كـprice_per_sqm العادي
-   (نفس حقل راغدان بالضبط) — باقي الموقع يحسب عليه بدون أي منطق خاص. علامة
+   (نفس حقل أسعار وزارة العدل بالضبط) — باقي الموقع يحسب عليه بدون أي منطق خاص. علامة
    source='manual' يمنع الاستيراد الربع سنوي (وزارة العدل) من لمس هذا الحي لحد "إلغاء السعر اليدوي".
    ========================================================================== */
 function populatePriceManualCitySelect(){
@@ -891,33 +891,69 @@ async function loadDashboard(){
   loadMostViewed();
 }
 
+/* 2026-09-29: حالة الوظائف التلقائية — القائمة تطابق الجدولات الحية فعلاً
+   (select jobname from cron.job): daily-notify-saved-searches وdaily-purge-soft-deleted.
+   - update-district-prices (مصدر الأسعار الأسبوعي السابق) أُلغيت 2026-09-29 — الأسعار صارت استيراد ربع
+     سنوي يدوي من وزارة العدل، فحالتها تُقرأ من district_prices نفسه (سطر مستقل).
+   - send-reminders موجودة كدالة بس **غير مجدولة** (ما فيه cron لها) — تنعرض
+     كذا بصراحة بدل "لا يوجد تشغيل بعد" اللي يوحي إنها بتشتغل.
+   - آخر تشغيل لكل وظيفة باستعلام مستقل (قبل: آخر ٥٠ صف لكل الوظائف مع بعض —
+     مع الوقت اليومية تزاحم الباقي وتختفي من القائمة).
+   - maxAgeHours: لو آخر تشغيل أقدم من كذا ← ⚠️ متأخرة (يومية = 48 ساعة). */
 const JOB_LABELS = {
-  'update-district-prices': 'تحديث أسعار الأحياء',
-  'send-reminders': 'تنبيهات الدفعات/الإخلاء',
+  'notify-saved-searches': { label: 'تنبيهات البحث المحفوظ (نبّهني) — يومياً', maxAgeHours: 48,
+    extra: s => s?.total != null ? ` (${s.total} بحث محفوظ، ${s.matched ?? 0} تطابق)` : '' },
+  'purge-soft-deleted': { label: 'الحذف النهائي للمحذوفات (بعد 30 يوم) — يومياً', maxAgeHours: 48,
+    extra: s => s?.offers_deleted != null ? ` (حُذف ${s.offers_deleted} عرض و${s.properties_deleted ?? 0} عقار)` : '' },
+  'send-reminders': { label: 'تنبيهات الدفعات/الإخلاء', unscheduled: true },
 };
 
 async function loadJobStatus(){
   const el = document.getElementById('job-status-list');
   try {
-    const { data, error } = await supa.from('job_runs')
-      .select('*')
-      .order('finished_at', { ascending: false })
-      .limit(50);
-    if (error) throw error;
-
-    const latestByJob = {};
-    (data || []).forEach(r => { if (!latestByJob[r.job_name]) latestByJob[r.job_name] = r; });
-
-    el.innerHTML = Object.entries(JOB_LABELS).map(([name, label]) => {
-      const run = latestByJob[name];
-      if (!run) return `<div>⚪ ${label} — لا يوجد تشغيل مسجَّل بعد</div>`;
-      const icon = run.status === 'success' ? '✅' : (run.status === 'partial' ? '⚠️' : '❌');
+    const rows = await Promise.all(Object.entries(JOB_LABELS).map(async ([name, cfg]) => {
+      const { data, error } = await supa.from('job_runs')
+        .select('status, summary, finished_at')
+        .eq('job_name', name)
+        .order('finished_at', { ascending: false })
+        .limit(1);
+      if (error) throw error;
+      const run = data && data[0];
+      if (!run) return cfg.unscheduled
+        ? `⚪ ${cfg.label} — غير مجدولة حالياً`
+        : `⚪ ${cfg.label} — لا يوجد تشغيل مسجَّل بعد`;
+      const ageH = (Date.now() - new Date(run.finished_at).getTime()) / 3600000;
+      const late = cfg.maxAgeHours && ageH > cfg.maxAgeHours;
+      const icon = late ? '⚠️' : (run.status === 'success' ? '✅' : (run.status === 'partial' ? '⚠️' : '❌'));
       const when = new Date(run.finished_at).toLocaleString('ar-SA');
-      const extra = run.summary?.updated != null ? ` (${run.summary.updated} نجح، ${run.summary.failed ?? 0} فشل، من ${run.summary.total})` : '';
-      return `<div>${icon} ${label} — آخر تشغيل: ${when}${extra}</div>`;
-    }).join('');
+      const suffix = cfg.unscheduled ? ' — غير مجدولة حالياً' : (late ? ' — متأخرة! المفروض تشتغل يومياً' : '');
+      return `${icon} ${cfg.label} — آخر تشغيل: ${when}${cfg.extra ? cfg.extra(run.summary) : ''}${suffix}`;
+    }));
+
+    // أسعار الأحياء: مو وظيفة مجدولة — استيراد ربع سنوي يدوي (schema.sql 3.10)
+    let pricesLine = '⚪ أسعار الأحياء — تعذّر التحقق';
+    const { data: p, error: pe } = await supa.from('district_prices')
+      .select('updated_at, period_note')
+      .eq('source', 'moj.gov.sa')
+      .order('updated_at', { ascending: false })
+      .limit(1);
+    const { count } = await supa.from('district_prices')
+      .select('district_id', { count: 'exact', head: true })
+      .eq('source', 'moj.gov.sa');
+    if (!pe && p && p[0]) {
+      const qm = (p[0].period_note || '').match(/(\d{4}-Q\d)\D+(\d{4}-Q\d)/);
+      pricesLine = `📊 أسعار الأحياء — المصدر: وزارة العدل (البيانات المفتوحة)، آخر استيراد: ${new Date(p[0].updated_at).toLocaleDateString('ar-SA')}`
+        + `${qm ? ` للفترة ${qm[1]} إلى ${qm[2]}` : ''}${count != null ? `، ${count} حي` : ''} — التحديث ربع سنوي يدوي`;
+    }
+
+    el.innerHTML = '';
+    [pricesLine, ...rows].forEach(t => {
+      const d = document.createElement('div');
+      d.textContent = t;
+      el.appendChild(d);
+    });
   } catch (e) {
-    el.innerHTML = '⚠️ تعذّر تحميل حالة الوظائف.';
+    el.textContent = '⚠️ تعذّر تحميل حالة الوظائف.';
     console.error('loadJobStatus failed', e);
   }
 }

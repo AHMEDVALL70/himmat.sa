@@ -13,7 +13,7 @@
  * (jsdom)، ويشغّل js/site.js الحقيقي، مع Supabase وهمي يرجّع بيانات
  * **اصطناعية** من scripts/smoke-fixtures.json.
  * ⚠️ البيانات اصطناعية عمداً (أسعار وهمية) — الاختبار يفحص السلوك، مو الأرقام.
- *    (2026-09-29: المصدر صار بيانات وزارة العدل المفتوحة بدل رغدان.)
+ *    (2026-09-29: مصدر الأسعار = بيانات وزارة العدل المفتوحة.)
  * ⚠️ المحاكاة ما تغني عن فحص حي بمتصفح حقيقي بعد النشر (القاعدة ٣).
  *
  * التشغيل (خارج المستودع عشان node_modules ما تنرفع بالغلط):
@@ -148,13 +148,25 @@ const CHECKS = [
     const r = valuate(val.w, { ...V, district: "حي_غير_موجود_للاختبار", ev: "change" });
     return (r.low === "—" && r.hint.includes("غير موجود")) || `low=${r.low} hint="${r.hint}"`;
   }],
-  ["مصدر السعر: وزارة العدل + فترة الربع من القاعدة، وصفر ذكر لرغدان", async ({ val }) => {
+  ["مصدر السعر: وزارة العدل + فترة الربع من القاعدة، وصفر ذكر للمصدر القديم", async ({ val }) => {
     valuate(val.w, { ...V, district: FX.known_district });
     const src = val.w.document.getElementById("v-price-source").textContent;
     if (!src.includes("وزارة العدل")) return `ملاحظة المصدر ما فيها وزارة العدل: "${src}"`;
     if (!src.includes("2025-Q2 إلى 2026-Q1")) return `الفترة ما انقرأت من period_note: "${src}"`;
-    if (/رغدان|raghdan/i.test(val.w.document.body.textContent)) return "كلمة رغدان موجودة بالصفحة";
+    // اسم المصدر القديم مكتوب بترميز يونيكود عمداً — عشان حتى هالملف ما يحتويه كنص
+    if (new RegExp("\u0631\u063a\u062f\u0627\u0646|\u0631\u0627\u063a\u062f\u0627\u0646|r[a]ghdan", "i").test(val.w.document.body.textContent)) return "اسم المصدر القديم موجود بالصفحة";
     return true;
+  }],
+  ["المؤشر: حي بالقائمة بدون صفقات كافية = بدون أرقام + رابط واتساب", async ({ val }) => {
+    const r = valuate(val.w, { ...V, district: FX.no_data_district });
+    const el = val.w.document.getElementById("v-price-source");
+    const link = el.querySelector('a[href^="https://wa.me/966"]');
+    if (r.low !== "—") return `ظهر رقم "${r.low}" لحي بدون صفقات`;
+    if (!el.textContent.includes("ما فيه صفقات كافية")) return `الرسالة: "${el.textContent}"`;
+    if (!link || !decodeURIComponent(link.href).includes(FX.no_data_district)) return "رابط واتساب ناقص أو ما فيه اسم الحي";
+    // بعدها حي له سعر يرجع يحسب طبيعي
+    const k = valuate(val.w, { ...V, district: FX.known_district });
+    return k.low !== "—" || "بعد حي بدون صفقات، الحي المعروف ما رجع يحسب";
   }],
   ["مقارنة الأحياء: حيّين مختلفين تعرض نتيجة", async ({ val }) => {
     const r = compare(val.w, C, FX.known_district, FX.second_district);

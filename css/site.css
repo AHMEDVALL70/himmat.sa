@@ -233,7 +233,7 @@ nav.links a.active::after{content:"";position:absolute;right:0;left:0;bottom:-16
 .stat b{display:block;font-size:30px;font-family:var(--font-display);color:#c0a16b;text-shadow:0 2px 4px rgba(0,0,0,.5)}
 .stat span{font-size:13px;color:#c7cedb;text-shadow:0 1px 3px rgba(0,0,0,.5)}
 
-/* الوضع النهاري: الهيرو نفسه موحَّد غامق بالوضعين (نفس أسلوب رغدان) —
+/* الوضع النهاري: الهيرو نفسه موحَّد غامق بالوضعين (أسلوب منصات العقار الشائعة) —
    الفرق يبقى فقط بألوان النصوص الفرعية اللي تحتاج تباين أوضح. */
 [data-theme="light"] .hero p.desc{color:#c7cedb}
 [data-theme="light"] .hero .stat span{color:#94a3b8}
