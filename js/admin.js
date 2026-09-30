@@ -905,7 +905,9 @@ const JOB_LABELS = {
     extra: s => s?.total != null ? ` (${s.total} بحث محفوظ، ${s.matched ?? 0} تطابق)` : '' },
   'purge-soft-deleted': { label: 'الحذف النهائي للمحذوفات (بعد 30 يوم) — يومياً', maxAgeHours: 48,
     extra: s => s?.offers_deleted != null ? ` (حُذف ${s.offers_deleted} عرض و${s.properties_deleted ?? 0} عقار)` : '' },
-  'send-reminders': { label: 'تنبيهات الدفعات/الإخلاء', unscheduled: true },
+  // 2026-09-30: صارت مجدولة — إيميل يومي للفريق ٩ الصبح بالرياض (نفس حماية نبّهني)
+  'send-reminders': { label: 'تنبيهات الدفعات والعقود — يومياً ٩ ص', maxAgeHours: 48,
+    extra: s => s?.today ? (s.emailed ? ` (أُرسل: ${s.overdue ?? 0} متأخرة، ${s.due3 ?? 0} خلال ٣ أيام، ${s.due15 ?? 0} خلال ١٥ يوم، ${s.ending ?? 0} عقد ينتهي)` : ' (ما فيه تنبيهات)') : '' },
 };
 
 async function loadJobStatus(){
@@ -1743,7 +1745,7 @@ async function toggleInstallments(contractId){
              <tr>
                <td>${new Date(i.due_date).toLocaleDateString('ar-SA')}</td>
                <td>${money(i.total_installment)} ر.س</td>
-               <td>${i.payment_status === 'PAID' ? '✅ مدفوعة' : '⏳ قيد الانتظار'}</td>
+               <td>${i.payment_status === 'PAID' ? '✅ مدفوعة' : i.payment_status === 'OVERDUE' ? '🔴 متأخرة' : '⏳ قيد الانتظار'}</td>
                <td>${i.payment_status !== 'PAID' ? `<button class="btn btn-ghost" data-staff-only onclick="markInstallmentPaid('${i.id}', '${contractId}')">تم السداد</button>` : ''}</td>
              </tr>`).join('')}</tbody>
          </table>`
