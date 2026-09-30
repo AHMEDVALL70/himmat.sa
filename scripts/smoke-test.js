@@ -49,6 +49,7 @@ function tables() {
     district_price_history: [],
     offers: FX.offers,
     __rpc: [],
+    __invoke: [],
   };
 }
 function fakeSupabase(T) {
@@ -67,6 +68,7 @@ function fakeSupabase(T) {
     createClient: () => ({
       from: builder,
       rpc: (name, args) => { T.__rpc.push({ name, args }); return Promise.resolve({ data: null, error: null }); },
+      functions: { invoke: (name, opts) => { T.__invoke.push({ name, opts }); return Promise.resolve({ data: { ok: true }, error: null }); } },
       auth: { getSession: async () => ({ data: { session: null } }), onAuthStateChange() { return { data: { subscription: { unsubscribe() {} } } }; } },
       channel: () => ({ on() { return this; }, subscribe() { return this; } }),
       removeChannel() {},
@@ -86,6 +88,9 @@ function loadPage(file, urlPath) {
     w.fetch = async () => ({ ok: true, status: 200, json: async () => ({}), text: async () => "" });
     w.matchMedia = () => ({ matches: false, addEventListener() {}, addListener() {} });
     w.scrollTo = () => {};
+    const opened = [];
+    w.open = (u) => { opened.push(String(u)); return {}; };
+    w.print = () => {};
     w.HTMLElement.prototype.scrollIntoView = function () {};
     const T = tables();
     w.supabase = fakeSupabase(T);
@@ -94,7 +99,7 @@ function loadPage(file, urlPath) {
     } catch (e) { errors.push("site.js: " + e.message); }
     // نلتقط أحداث Analytics بعد تحميل site.js (index.html يعرّف gtag كدالة عامة)
     w.gtag = (type, name, params) => { if (type === "event") gtagEvents.push({ name, params }); };
-    setTimeout(() => resolve({ w, errors, gtagEvents, rpc: T.__rpc }), 1200);
+    setTimeout(() => resolve({ w, errors, gtagEvents, rpc: T.__rpc, invoke: T.__invoke, opened }), 1200);
   });
 }
 
@@ -224,6 +229,25 @@ const CHECKS = [
     if (!$("contract-text").textContent.includes("28,750")) return `نص العقد التجاري: "${$("contract-text").textContent.split("\n").slice(-2).join(" | ")}"`;
     tab("residential");
     if (!$("c-vat-wrap").classList.contains("hide") || $("c-vat-registered").value !== "0") return "الرجوع للسكني ما صفّر خانة الضريبة";
+    return true;
+  }],
+  ["العقود: زر الإرسال وحده = حفظ + إيميل للفريق + واتساب (بدون طباعة)", async ({ contracts }) => {
+    // 2026-09-30: قبل، واتساب والإيميل كانوا بزر الطباعة بس ورسالة التأكيد تقول «أُرسل»
+    const w = contracts.w, $ = (id) => w.document.getElementById(id);
+    const o0 = contracts.opened.length, i0 = contracts.invoke.length;
+    $("btn-generate-contract").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    await new Promise(r => setTimeout(r, 80));
+    const wa = contracts.opened.slice(o0).find(u => u.startsWith("https://wa.me/966530500906?text="));
+    if (!wa) return `واتساب ما انفتح من زر الإرسال (فُتح: ${JSON.stringify(contracts.opened.slice(o0))})`;
+    const waText = decodeURIComponent(wa.split("?text=")[1]);
+    if (!waText.includes("*المؤجر*") || !waText.includes("*المستأجر*") || !waText.includes("ضريبة القيمة المضافة")) return `رسالة واتساب غير مرتّبة: ${waText.slice(0, 120)}`;
+    const inv = contracts.invoke.slice(i0).find(x => x.name === "public-submit" && x.opts.body.type === "contract");
+    if (!inv || !inv.opts.body.payload.contract || !inv.opts.body.payload.contract.number) return "إيميل العقد (public-submit) ما انرسل بحقول منفصلة";
+    const m = $("contract-msg").textContent;
+    if (!m.includes("اضغط «إرسال»") || !m.includes("بالإيميل")) return `رسالة الحالة: "${m}"`;
+    const o1 = contracts.opened.length;
+    $("btn-print-contract").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    if (contracts.opened.length !== o1) return "زر التنزيل فتح واتساب (المفروض طباعة/حفظ بس)";
     return true;
   }],
   ["Analytics: ضغطة زر واتساب العائم = whatsapp_click", async ({ home }) => {

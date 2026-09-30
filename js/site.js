@@ -137,7 +137,7 @@ const I18N = {
     contract_property_label:"العقار", contract_term_label:"مدة العقد",
     contract_term_from:"من", contract_term_to:"إلى",
     contract_rent_label:"الإيجار السنوي", contract_vat_label:"ضريبة القيمة المضافة", contract_vat_exempt_res:"معفى (عقد سكني)", contract_vat_not_reg:"بدون ضريبة (المؤجر غير مسجّل بالضريبة)", contract_total_with_vat:"الإجمالي السنوي شامل الضريبة", contract_deposit_label:"الضمان", contract_frequency_label:"عدد الدفعات سنوياً",
-    contract_print_btn:"🖨️ طباعة العقد / حفظ PDF",
+    contract_print_btn:"⬇️ تنزيل نسخة PDF (اختياري)",
     type_residential:"سكني", type_commercial:"تجاري",
     opt_east:"شرقية (+5%)", opt_north:"شمالية (+4%)", opt_south:"جنوبية", opt_west:"غربية (-2%)",
     opt_upscale:"حي راقي (+25%)", opt_investment:"حي استثماري (+15%)", opt_mid:"حي متوسط",
@@ -253,7 +253,7 @@ const I18N = {
     contract_property_label:"Property", contract_term_label:"Term",
     contract_term_from:"from", contract_term_to:"to",
     contract_rent_label:"Annual rent", contract_vat_label:"VAT", contract_vat_exempt_res:"Exempt (residential lease)", contract_vat_not_reg:"No VAT (lessor not VAT-registered)", contract_total_with_vat:"Annual total incl. VAT", contract_deposit_label:"Deposit", contract_frequency_label:"Installments per year",
-    contract_print_btn:"🖨️ Print Contract / Save as PDF",
+    contract_print_btn:"⬇️ Download a PDF copy (optional)",
     type_residential:"Residential", type_commercial:"Commercial",
     opt_east:"East (+5%)", opt_north:"North (+4%)", opt_south:"South", opt_west:"West (-2%)",
     opt_upscale:"Upscale district (+25%)", opt_investment:"Investment district (+15%)", opt_mid:"Mid-range district",
@@ -2973,9 +2973,6 @@ document.querySelectorAll('#contracts .field input, #contracts .field select').f
   el.addEventListener('change', ()=> el.classList.remove('input-error'));
 });
 
-// نص رسالة واتساب الجاهز لآخر عقد تولّد — يُخزَّن هنا ويُستخدم بزر "طباعة
-// العقد" (مو يُفتح فوراً وقت التوليد)، عشان واتساب يفتح بنفس لحظة حفظ PDF.
-let lastContractWhatsAppText = null;
 
 document.getElementById('btn-generate-contract').addEventListener('click', async ()=>{
   const msg = document.getElementById('contract-msg');
@@ -3068,21 +3065,97 @@ ${t.contract_frequency_label}: ${frequencyDisplay}`;
     : `This contract was issued via the Himmat Al Madinah Real Estate platform on ${new Date().toLocaleDateString('en-GB')}`);
   document.getElementById('btn-print-contract').classList.remove('hide');
 
-  // نخزّن النص بدل ما نفتح واتساب فوراً — يفتح لاحقاً بالضبط لحظة ضغط زر
-  // "طباعة العقد" (نفس ضغطة الزر، عشان المتصفح ما يحجبه كنافذة منبثقة)،
-  // فيصير حفظ PDF وفتح واتساب متزامنين، وتقدر ترفق الملف يدوياً بنفس المحادثة.
-  lastContractWhatsAppText = text;
+  // 2026-09-30: زر «إرسال العقد للتوثيق» صار يسوي كل شي بضغطة وحدة (حفظ +
+  // إيميل للفريق + واتساب + generate_lead). قبل: واتساب والإيميل كانوا بزر
+  // الطباعة بس، ورسالة التأكيد كانت تقول «أُرسل عبر واتساب» وهو ما انرسل —
+  // المستخدم اللي ما يطبع (أغلبهم) كان يطلع وإحنا ما وصلنا شي.
+  // ⚠️ window.open لازم يكون قبل أي await (وإلا المتصفح يحجبه كنافذة منبثقة).
+  const idTypeLabel = (val) => val ? (t['id_type_' + ({ national_id: 'national', iqama: 'iqama', other: 'other' }[val] || 'other')] || val) : '—';
+  const partyLines = (prefix) => [
+    `${currentLang==='ar' ? 'الاسم' : 'Name'}: ${v(prefix + '-name')}`,
+    `${t.contract_id_label}: ${v(prefix + '-id')} (${idTypeLabel(v(prefix + '-id-type'))})`,
+    `${currentLang==='ar' ? 'الجنسية' : 'Nationality'}: ${v(prefix + '-nationality') || '—'}`,
+    `${t.contract_phone_label2}: ${v(prefix + '-phone')}`,
+    `${t.contract_dob_label}: ${v(prefix + '-dob') || '—'}`,
+  ].join('\n');
+  const waText = [
+    `*${t.contract_header} — ${contractTypeLabel}*`,
+    `${t.contract_number_label}: ${contractNumber}`,
+    '', `*${t.contract_lessor_label}*`, partyLines('c-lessor'),
+    '', `*${t.contract_lessee_label}*`, partyLines('c-lessee'),
+    '', `*${t.contract_property_label}*`,
+    `${typeDisplay} — ${districtLabel(v('c-district'))}، ${cityDisplay}`,
+    `${currentLang==='ar' ? 'المساحة' : 'Area'}: ${v('c-area')} م²${v('c-floor-number') ? ' — ' + (currentLang==='ar' ? 'الدور' : 'Floor') + ': ' + v('c-floor-number') : ''}`,
+    `${currentLang==='ar' ? 'رقم الصك' : 'Deed no.'}: ${v('c-deed-number')}${v('c-deed-date') ? ' (' + v('c-deed-date') + ')' : ''}`,
+    '', `*${currentLang==='ar' ? 'المدة والمبالغ' : 'Term & amounts'}*`,
+    `${t.contract_term_label}: ${t.contract_term_from} ${v('c-start')} ${t.contract_term_to} ${v('c-end')}`,
+    `${t.contract_rent_label}: ${money(rent)} ${currency}`,
+    `${t.contract_vat_label}: ${vatDisplay}`,
+    `${t.contract_deposit_label}: ${money(parseFloat(v('c-deposit'))||0)} ${currency}`,
+    `${t.contract_frequency_label}: ${frequencyDisplay}`,
+  ].join('\n');
+  const waUrl = `https://wa.me/966530500906?text=${encodeURIComponent(waText)}`;
+  const waWin = window.open(waUrl, '_blank');
+  trackEvent('generate_lead', { form: 'contract' });
+
+  // بيانات الإيميل كحقول منفصلة — الدالة (public-submit) هي اللي تبني الجدول
+  // وتنظّف كل قيمة، عشان ما أحد يقدر يدسّ HTML بإيميلات الفريق.
+  const party = (prefix) => ({ name: v(prefix + '-name'), id: v(prefix + '-id'), id_type: idTypeLabel(v(prefix + '-id-type')),
+    nationality: v(prefix + '-nationality'), phone: v(prefix + '-phone'), dob: v(prefix + '-dob') });
+  const emailContract = {
+    number: contractNumber, type: contractTypeLabel,
+    lessor: party('c-lessor'), lessee: party('c-lessee'),
+    property: `${typeDisplay} — ${districtLabel(v('c-district'))}، ${cityDisplay}`,
+    area: v('c-area'), floor: v('c-floor-number'), deed: `${v('c-deed-number')}${v('c-deed-date') ? ' (' + v('c-deed-date') + ')' : ''}`,
+    term: `${t.contract_term_from} ${v('c-start')} ${t.contract_term_to} ${v('c-end')}`, rent: `${money(rent)} ${currency}`, vat: vatDisplay,
+    deposit: `${money(parseFloat(v('c-deposit'))||0)} ${currency}`, frequency: String(frequencyDisplay),
+  };
+
+  // رسالة الحالة: صادقة عن كل خطوة (حفظ / إيميل / واتساب) — عناصر DOM + textContent
+  const showStatus = (saved, emailed) => {
+    const ar = currentLang === 'ar';
+    const parts = [];
+    parts.push(saved === true ? (ar ? 'تم حفظ العقد وجدول دفعاته' : 'The contract and its payment schedule were saved')
+      : saved === 'offline' ? (ar ? 'قاعدة البيانات غير مربوطة — ما انحفظ جدول الدفعات' : 'Database not connected — the payment schedule was not saved')
+      : (ar ? 'تعذّر حفظ العقد بقاعدة البيانات' + (saved ? ': ' + saved : '') : 'The contract could not be saved' + (saved ? ': ' + saved : '')));
+    parts.push(emailed ? (ar ? 'وأُرسل لفريقنا بالإيميل' : 'and emailed to our team')
+      : (ar ? 'وتعذّر إرسال الإيميل لفريقنا' : 'but the email to our team failed'));
+    msg.textContent = ((saved === true && emailed) ? '✅ ' : '⚠️ ') + parts.join(ar ? '، ' : ', ') + '. ';
+    msg.appendChild(document.createElement('br'));
+    if (waWin) {
+      msg.appendChild(document.createTextNode(ar ? '📲 انفتح لك واتساب برسالة العقد جاهزة — اضغط «إرسال» فيه عشان توصلنا مباشرة. ' : '📲 WhatsApp opened with the contract message ready — press "Send" there so it reaches us. '));
+    } else {
+      msg.appendChild(document.createTextNode(ar ? '📲 المتصفح منع فتح واتساب تلقائياً — ' : '📲 Your browser blocked WhatsApp from opening — '));
+      const a = document.createElement('a');
+      a.href = waUrl; a.target = '_blank'; a.rel = 'noopener';
+      a.textContent = ar ? 'اضغط هنا لإرسال العقد بواتساب' : 'tap here to send the contract on WhatsApp';
+      msg.appendChild(a);
+    }
+    msg.style.color = (saved === true && emailed) ? 'var(--ok)' : 'var(--warn)';
+  };
+
+  const sendEmail = async () => {
+    try {
+      const turnstileToken = await getTurnstileToken();
+      const { error } = await supa.functions.invoke('public-submit', {
+        body: { type: 'contract', payload: { contract: emailContract, summary: text }, turnstileToken },
+      });
+      if (error) { console.error('إيميل العقد رُفض', error); return false; }
+      return true;
+    } catch (e) {
+      console.error('تعذّر إرسال إيميل العقد', e);
+      return false;
+    }
+  };
 
   if (!dbReady){
-    msg.textContent = '⚠️ ' + (currentLang==='ar'
-      ? 'تم توليد العقد وإرساله للوسيط عبر واتساب — بس قاعدة البيانات غير مربوطة، لن يُحفظ جدول الدفعات.'
-      : 'Contract generated and sent to the broker via WhatsApp — but the database isn\'t connected, so the payment schedule won\'t be saved.');
-    msg.style.color = 'var(--warn)';
+    showStatus('offline', false);
     return;
   }
 
+  let saved = true;
   try {
-    const { data, error } = await supa.rpc('create_contract_with_schedule', {
+    const { error } = await supa.rpc('create_contract_with_schedule', {
       p_contract_number: contractNumber,
       p_contract_type: contractType,
       p_lessor_name: v('c-lessor-name'), p_lessor_id_number: v('c-lessor-id'), p_lessor_phone: v('c-lessor-phone'),
@@ -3102,44 +3175,19 @@ ${t.contract_frequency_label}: ${frequencyDisplay}`;
       p_frequency: parseInt(document.getElementById('c-frequency').value, 10),
       p_lessor_vat_registered: vatRegistered
     });
-
-    if (error){
-      msg.textContent = '⚠️ ' + (currentLang==='ar'
-        ? 'تم إرسال العقد للوسيط عبر واتساب، لكن تعذّر حفظه بقاعدة البيانات: '
-        : 'The contract was sent to the broker via WhatsApp, but could not be saved to the database: ') + error.message;
-      msg.style.color = 'var(--danger)';
-    } else {
-      msg.textContent = '✅ ' + (currentLang==='ar'
-        ? 'تم توليد العقد وحفظه بجدول الدفعات كاملاً، وإرساله للوسيط عبر واتساب.'
-        : 'The contract and its full payment schedule were saved, and it was sent to the broker via WhatsApp.');
-      msg.style.color = 'var(--ok)';
-    }
+    if (error) saved = error.message || String(error);
   } catch (e) {
-    msg.textContent = '⚠️ ' + (currentLang==='ar'
-      ? 'تم إرسال العقد للوسيط عبر واتساب، لكن تعذّر الاتصال بقاعدة البيانات لحفظه — تحقق من اتصالك وحاول مجدداً.'
-      : 'The contract was sent to the broker via WhatsApp, but the database could not be reached to save it — check your connection and try again.');
-    msg.style.color = 'var(--danger)';
+    saved = currentLang==='ar' ? 'تعذّر الاتصال — تحقق من اتصالك' : 'connection failed — check your connection';
     console.error('btn-generate-contract: Supabase call failed.', e);
   }
+  // الإيميل ينرسل حتى لو فشل الحفظ — الفريق يعرف بالعقد ويتابعه يدوياً
+  const emailed = await sendEmail();
+  showStatus(saved, emailed);
 });
 
+// 2026-09-30: زر الطباعة صار «تنزيل نسخة PDF (اختياري)» — طباعة/حفظ بس،
+// ما يرسل شي (الإرسال كله صار بزر «إرسال العقد للتوثيق»).
 document.getElementById('btn-print-contract').addEventListener('click', ()=>{
-  if (lastContractWhatsAppText){
-    window.open(`https://wa.me/966530500906?text=${encodeURIComponent(lastContractWhatsAppText)}`, '_blank');
-    trackEvent('generate_lead', { form: 'contract' });
-    // إشعار بريدي إضافي بنفس اللحظة (بالخلفية) — ما يأخّر فتح واتساب ولا
-    // الطباعة، وما يوقف أي شي لو فشل (إشعار إضافي مو جزء أساسي من العملية)
-    (async ()=>{
-      try {
-        const turnstileToken = await getTurnstileToken();
-        await supa.functions.invoke('public-submit', {
-          body: { type: 'contract', payload: { summary: lastContractWhatsAppText }, turnstileToken },
-        });
-      } catch (e) {
-        console.error('تعذّر إرسال إشعار العقد بالبريد', e);
-      }
-    })();
-  }
   window.print();
 });
 
