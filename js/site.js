@@ -3185,10 +3185,76 @@ ${t.contract_frequency_label}: ${frequencyDisplay}`;
   showStatus(saved, emailed);
 });
 
-// 2026-09-30: زر الطباعة صار «تنزيل نسخة PDF (اختياري)» — طباعة/حفظ بس،
-// ما يرسل شي (الإرسال كله صار بزر «إرسال العقد للتوثيق»).
-document.getElementById('btn-print-contract').addEventListener('click', ()=>{
-  window.print();
+/* 2026-09-30: زر «⬇️ تنزيل» ينزّل ملف PDF مباشرة (بدون نافذة الطباعة ولا زر
+   Save حق المتصفح). يصوّر قالب الطباعة (#contract-print-view) كصورة عالية
+   الدقة ويحطها بصفحة A4 — الحروف العربية تطلع سليمة لأن المتصفح نفسه يرسمها.
+   المكتبتين محفوظتين بالموقع (lib/) وتتحمّل بس عند أول ضغطة (ما تثقّل الصفحة).
+   لو فشل أي شي ← نرجع لنافذة الطباعة القديمة (ما يعلق المستخدم أبداً).
+   ما يرسل شي — الإرسال كله بزر «إرسال العقد للتوثيق». */
+function loadScriptOnce(src){
+  return new Promise((resolve, reject)=>{
+    if (document.querySelector(`script[data-lazy="${src}"]`)) return resolve();
+    const el = document.createElement('script');
+    el.src = src; el.async = true; el.dataset.lazy = src;
+    el.onload = () => resolve();
+    el.onerror = () => { el.remove(); reject(new Error('تعذّر تحميل ' + src)); };
+    document.head.appendChild(el);
+  });
+}
+async function downloadContractPdf(){
+  await loadScriptOnce('lib/html2canvas-1.4.1.min.js');
+  await loadScriptOnce('lib/jspdf-4.2.1.umd.min.js');
+  const src = document.getElementById('contract-print-view');
+  // نسخة ظاهرة خارج الشاشة بعرض A4 (794px = 210mm عند 96dpi) — الأصل مخفي
+  const holder = document.createElement('div');
+  holder.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;background:#fff;z-index:-1';
+  const clone = src.cloneNode(true);
+  // نبقي id عشان تنطبق تنسيقات القالب (#contract-print-view h2...)؛ display:block
+  // المباشر يغلب قاعدة الإخفاء. النسخة تنحذف فوراً بعد التصوير.
+  clone.classList.remove('hide');
+  clone.style.cssText = 'display:block;direction:rtl;color:#000;background:#fff;padding:40px 44px;width:794px;box-sizing:border-box;font-family:var(--font-body,Arial,sans-serif)';
+  // ألوان ثابتة للطباعة (بعض عناصر القالب ترث ألوان الموقع الفاتحة/الداكنة)
+  clone.querySelectorAll('th, td, h1, h2, p, span, div').forEach(el => { el.style.color = '#000'; });
+  // html2canvas يرسم النص أنزل شوي داخل خلايا الجدول — ارتفاع سطر صريح يوسّطه
+  clone.querySelectorAll('th, td').forEach(el => { el.style.lineHeight = '1.5'; el.style.verticalAlign = 'top'; el.style.padding = '6px 10px 12px'; });
+  holder.appendChild(clone);
+  document.body.appendChild(holder);
+  try {
+    const canvas = await window.html2canvas(clone, { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+    const pageW = 210, pageH = 297;
+    const imgH = canvas.height * pageW / canvas.width;
+    const img = canvas.toDataURL('image/jpeg', 0.92);
+    if (imgH <= pageH) {
+      pdf.addImage(img, 'JPEG', 0, 0, pageW, imgH);
+    } else {
+      // عقد أطول من صفحة (نادر) — نفس الصورة مزاحة لكل صفحة
+      for (let y = 0; y < imgH; y += pageH) {
+        if (y > 0) pdf.addPage();
+        pdf.addImage(img, 'JPEG', 0, -y, pageW, imgH);
+      }
+    }
+    const num = (document.getElementById('pv-number').textContent.match(/HMD-\d+/) || ['عقد'])[0];
+    pdf.save(`عقد-${num}.pdf`);
+  } finally {
+    holder.remove();
+  }
+}
+document.getElementById('btn-print-contract').addEventListener('click', async (e)=>{
+  const btn = e.currentTarget;
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = currentLang==='ar' ? '⏳ جارٍ تجهيز الملف...' : '⏳ Preparing file...';
+  try {
+    await downloadContractPdf();
+  } catch (err) {
+    console.error('downloadContractPdf failed — نرجع لنافذة الطباعة', err);
+    window.print();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
 });
 
 /* ============================================================================
