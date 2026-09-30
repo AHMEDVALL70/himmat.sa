@@ -48,6 +48,7 @@ function tables() {
     })),
     district_price_history: [],
     offers: FX.offers,
+    __rpc: [],
   };
 }
 function fakeSupabase(T) {
@@ -65,7 +66,7 @@ function fakeSupabase(T) {
   return {
     createClient: () => ({
       from: builder,
-      rpc: () => Promise.resolve({ data: null, error: null }),
+      rpc: (name, args) => { T.__rpc.push({ name, args }); return Promise.resolve({ data: null, error: null }); },
       auth: { getSession: async () => ({ data: { session: null } }), onAuthStateChange() { return { data: { subscription: { unsubscribe() {} } } }; } },
       channel: () => ({ on() { return this; }, subscribe() { return this; } }),
       removeChannel() {},
@@ -86,13 +87,14 @@ function loadPage(file, urlPath) {
     w.matchMedia = () => ({ matches: false, addEventListener() {}, addListener() {} });
     w.scrollTo = () => {};
     w.HTMLElement.prototype.scrollIntoView = function () {};
-    w.supabase = fakeSupabase(tables());
+    const T = tables();
+    w.supabase = fakeSupabase(T);
     try {
       w.eval(SITE_JS);
     } catch (e) { errors.push("site.js: " + e.message); }
     // نلتقط أحداث Analytics بعد تحميل site.js (index.html يعرّف gtag كدالة عامة)
     w.gtag = (type, name, params) => { if (type === "event") gtagEvents.push({ name, params }); };
-    setTimeout(() => resolve({ w, errors, gtagEvents }), 1200);
+    setTimeout(() => resolve({ w, errors, gtagEvents, rpc: T.__rpc }), 1200);
   });
 }
 
@@ -196,6 +198,34 @@ const CHECKS = [
     }
     return bad.length === 0 || `طلبات بدون فلتر المحذوف بالأسطر: ${bad.join("، ")}`;
   }],
+  ["العقود: سكني بدون ضريبة، وتجاري ١٥٪ بس لو المؤجر مسجّل", async ({ contracts }) => {
+    const w = contracts.w, d = w.document, $ = (id) => d.getElementById(id);
+    const set = (id, val) => { $(id).value = val; };
+    Object.entries({ "c-lessor-name": "مؤجر", "c-lessor-id": "1000000000", "c-lessor-phone": "0500000000",
+      "c-lessor-nationality": "سعودي", "c-lessee-name": "مستأجر", "c-lessee-id": "2000000000", "c-lessee-phone": "0500000001",
+      "c-lessee-nationality": "سعودي", "c-district": "قباء", "c-unit-type": "شقة في عمارة", "c-area": "100",
+      "c-deed-number": "1", "c-deed-date": "2020-01-01", "c-start": "2026-10-01", "c-end": "2027-10-01", "c-rent": "25000" })
+      .forEach(([k, v]) => set(k, v));
+    set("c-frequency", "4");
+    const tab = (name) => d.querySelector(`.tabs button[data-tab="${name}"]`).dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    const gen = async () => { $("btn-generate-contract").dispatchEvent(new w.MouseEvent("click", { bubbles: true })); await new Promise(r => setTimeout(r, 50)); };
+    const calls = contracts.rpc;
+    tab("residential"); await gen();
+    let last = calls.filter(c => c.name === "create_contract_with_schedule").pop();
+    if (!last) return `ما انرسل طلب حفظ العقد — الرسالة: "${$("contract-msg").textContent}"`;
+    if (last.args.p_lessor_vat_registered !== false) return "العقد السكني انرسل مع ضريبة";
+    if (!$("contract-text").textContent.includes("معفى")) return "نص العقد السكني ما فيه «معفى»";
+    tab("commercial");
+    if ($("c-vat-wrap").classList.contains("hide")) return "خانة الضريبة ما ظهرت بالعقد التجاري";
+    await gen(); last = calls.filter(c => c.name === "create_contract_with_schedule").pop();
+    if (last.args.p_lessor_vat_registered !== false) return "العقد التجاري بالافتراضي (لا) انرسل مع ضريبة";
+    set("c-vat-registered", "1"); await gen(); last = calls.filter(c => c.name === "create_contract_with_schedule").pop();
+    if (last.args.p_lessor_vat_registered !== true) return "العقد التجاري المسجّل ما انرسل مع ضريبة";
+    if (!$("contract-text").textContent.includes("28,750")) return `نص العقد التجاري: "${$("contract-text").textContent.split("\n").slice(-2).join(" | ")}"`;
+    tab("residential");
+    if (!$("c-vat-wrap").classList.contains("hide") || $("c-vat-registered").value !== "0") return "الرجوع للسكني ما صفّر خانة الضريبة";
+    return true;
+  }],
   ["Analytics: ضغطة زر واتساب العائم = whatsapp_click", async ({ home }) => {
     const a = home.w.document.getElementById("whatsapp-float");
     if (!a) return "#whatsapp-float غير موجود";
@@ -211,6 +241,7 @@ const CHECKS = [
     home: await loadPage("index.html", "/"),
     val: await loadPage(fs.existsSync(path.join(ROOT, "valuation.html")) ? "valuation.html" : "index.html", "/valuation"),
     offers: await loadPage(fs.existsSync(path.join(ROOT, "offers.html")) ? "offers.html" : "index.html", "/offers"),
+    contracts: await loadPage(fs.existsSync(path.join(ROOT, "contracts.html")) ? "contracts.html" : "index.html", "/contracts"),
   };
   let failed = 0;
   for (const [name, fn] of CHECKS) {

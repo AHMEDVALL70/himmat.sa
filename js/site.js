@@ -85,7 +85,7 @@ const I18N = {
     f_lessor_name:"اسم المؤجر", f_lessor_id:"هوية المؤجر", f_lessor_phone:"جوال المؤجر",
     f_lessee_name:"اسم المستأجر", f_lessee_id:"هوية المستأجر", f_lessee_phone:"جوال المستأجر",
     f_unit_type:"نوع الوحدة", f_deposit:"الضمان (ر.س)", f_start:"تاريخ البداية", f_end:"تاريخ النهاية",
-    f_rent:"الإيجار السنوي (ر.س)", f_frequency:"عدد الدفعات سنوياً", contract_generate:"إرسال العقد للتوثيق",
+    f_rent:"الإيجار السنوي (ر.س)", f_vat_registered:"المؤجر مسجّل بضريبة القيمة المضافة؟", opt_vat_no:"لا — بدون ضريبة", opt_vat_yes:"نعم — تُضاف ١٥٪", f_frequency:"عدد الدفعات سنوياً", contract_generate:"إرسال العقد للتوثيق",
     f_lessor_dob:"تاريخ ميلاد المؤجر", f_lessee_dob:"تاريخ ميلاد المستأجر", contract_dob_label:"تاريخ الميلاد",
     f_lessor_id_type:"نوع هوية المؤجر", f_lessee_id_type:"نوع هوية المستأجر",
     f_lessor_nationality:"جنسية المؤجر", f_lessee_nationality:"جنسية المستأجر",
@@ -136,7 +136,7 @@ const I18N = {
     contract_id_label:"هوية", contract_phone_label2:"جوال",
     contract_property_label:"العقار", contract_term_label:"مدة العقد",
     contract_term_from:"من", contract_term_to:"إلى",
-    contract_rent_label:"الإيجار السنوي", contract_deposit_label:"الضمان", contract_frequency_label:"عدد الدفعات سنوياً",
+    contract_rent_label:"الإيجار السنوي", contract_vat_label:"ضريبة القيمة المضافة", contract_vat_exempt_res:"معفى (عقد سكني)", contract_vat_not_reg:"بدون ضريبة (المؤجر غير مسجّل بالضريبة)", contract_total_with_vat:"الإجمالي السنوي شامل الضريبة", contract_deposit_label:"الضمان", contract_frequency_label:"عدد الدفعات سنوياً",
     contract_print_btn:"🖨️ طباعة العقد / حفظ PDF",
     type_residential:"سكني", type_commercial:"تجاري",
     opt_east:"شرقية (+5%)", opt_north:"شمالية (+4%)", opt_south:"جنوبية", opt_west:"غربية (-2%)",
@@ -201,7 +201,7 @@ const I18N = {
     f_lessor_name:"Lessor name", f_lessor_id:"Lessor ID", f_lessor_phone:"Lessor phone",
     f_lessee_name:"Lessee name", f_lessee_id:"Lessee ID", f_lessee_phone:"Lessee phone",
     f_unit_type:"Unit type", f_deposit:"Deposit (SAR)", f_start:"Start date", f_end:"End date",
-    f_rent:"Annual rent (SAR)", f_frequency:"Installments per year", contract_generate:"Send Contract for Documentation",
+    f_rent:"Annual rent (SAR)", f_vat_registered:"Is the lessor VAT-registered?", opt_vat_no:"No — no VAT", opt_vat_yes:"Yes — 15% added", f_frequency:"Installments per year", contract_generate:"Send Contract for Documentation",
     f_lessor_dob:"Lessor's date of birth", f_lessee_dob:"Lessee's date of birth", contract_dob_label:"Date of birth",
     f_lessor_id_type:"Lessor's ID type", f_lessee_id_type:"Lessee's ID type",
     f_lessor_nationality:"Lessor's nationality", f_lessee_nationality:"Lessee's nationality",
@@ -252,7 +252,7 @@ const I18N = {
     contract_id_label:"ID", contract_phone_label2:"Phone",
     contract_property_label:"Property", contract_term_label:"Term",
     contract_term_from:"from", contract_term_to:"to",
-    contract_rent_label:"Annual rent", contract_deposit_label:"Deposit", contract_frequency_label:"Installments per year",
+    contract_rent_label:"Annual rent", contract_vat_label:"VAT", contract_vat_exempt_res:"Exempt (residential lease)", contract_vat_not_reg:"No VAT (lessor not VAT-registered)", contract_total_with_vat:"Annual total incl. VAT", contract_deposit_label:"Deposit", contract_frequency_label:"Installments per year",
     contract_print_btn:"🖨️ Print Contract / Save as PDF",
     type_residential:"Residential", type_commercial:"Commercial",
     opt_east:"East (+5%)", opt_north:"North (+4%)", opt_south:"South", opt_west:"West (-2%)",
@@ -2876,6 +2876,13 @@ document.querySelectorAll('.tabs button[data-tab]').forEach(btn=>{
   btn.addEventListener('click', ()=>{
     document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
     btn.classList.add('active');
+    // 2026-09-30: خانة تسجيل المؤجر بالضريبة للعقد التجاري فقط؛ الرجوع للسكني يصفّرها
+    const vatWrap = document.getElementById('c-vat-wrap');
+    if (vatWrap){
+      const commercial = btn.dataset.tab === 'commercial';
+      vatWrap.classList.toggle('hide', !commercial);
+      if (!commercial) document.getElementById('c-vat-registered').value = '0';
+    }
   });
 });
 
@@ -3001,6 +3008,13 @@ document.getElementById('btn-generate-contract').addEventListener('click', async
   };
   const frequencyVal = parseInt(document.getElementById('c-frequency').value, 10);
   const frequencyDisplay = frequencyLabels[currentLang]?.[frequencyVal] || frequencyVal;
+  // 2026-09-30: ضريبة القيمة المضافة — السكني معفى؛ التجاري ١٥٪ بس لو المؤجر مسجّل.
+  // نفس القاعدة مطبّقة بالقاعدة (create_contract_with_schedule) — هذا للعرض فقط.
+  const vatRegistered = !isResidential && document.getElementById('c-vat-registered')?.value === '1';
+  const vatAnnual = vatRegistered ? Math.round(rent * 0.15 * 100) / 100 : 0;
+  const vatDisplay = isResidential ? t.contract_vat_exempt_res
+    : vatRegistered ? `15% = ${money(vatAnnual)} ${currency} — ${t.contract_total_with_vat}: ${money(rent + vatAnnual)} ${currency}`
+    : t.contract_vat_not_reg;
 
   const text = `${t.contract_header} — ${contractTypeLabel}
 ${t.contract_number_label}: ${contractNumber}
@@ -3009,6 +3023,7 @@ ${t.contract_lessee_label}: ${v('c-lessee-name')} (${t.contract_id_label}: ${v('
 ${t.contract_property_label}: ${typeDisplay} — ${districtLabel(v('c-district'))}, ${cityDisplay} — ${v('c-area')} م²${v('c-floor-number') ? ' — ' + (currentLang==='ar' ? 'الدور' : 'Floor') + ': ' + v('c-floor-number') : ''}
 ${t.contract_term_label}: ${t.contract_term_from} ${v('c-start')} ${t.contract_term_to} ${v('c-end')}
 ${t.contract_rent_label}: ${money(rent)} ${currency} — ${t.contract_deposit_label}: ${money(parseFloat(v('c-deposit'))||0)} ${currency}
+${t.contract_vat_label}: ${vatDisplay}
 ${t.contract_frequency_label}: ${frequencyDisplay}`;
 
   pre.textContent = text;
@@ -3032,6 +3047,8 @@ ${t.contract_frequency_label}: ${frequencyDisplay}`;
   document.getElementById('pv-term-v').textContent = `${t.contract_term_from} ${v('c-start')} ${t.contract_term_to} ${v('c-end')}`;
   document.getElementById('pv-rent-l').textContent = t.contract_rent_label;
   document.getElementById('pv-rent-v').textContent = `${money(rent)} ${currency}`;
+  document.getElementById('pv-vat-l').textContent = t.contract_vat_label;
+  document.getElementById('pv-vat-v').textContent = vatDisplay;
   document.getElementById('pv-deposit-l').textContent = t.contract_deposit_label;
   document.getElementById('pv-deposit-v').textContent = `${money(parseFloat(v('c-deposit'))||0)} ${currency}`;
   document.getElementById('pv-frequency-l').textContent = t.contract_frequency_label;
@@ -3082,7 +3099,8 @@ ${t.contract_frequency_label}: ${frequencyDisplay}`;
       p_city: v('c-city'), p_district: v('c-district'), p_unit_type: v('c-unit-type'),
       p_area_sqm: parseFloat(v('c-area')) || 0, p_security_deposit: parseFloat(v('c-deposit')) || 0,
       p_start_date: v('c-start'), p_end_date: v('c-end'), p_annual_rent: rent,
-      p_frequency: parseInt(document.getElementById('c-frequency').value, 10)
+      p_frequency: parseInt(document.getElementById('c-frequency').value, 10),
+      p_lessor_vat_registered: vatRegistered
     });
 
     if (error){

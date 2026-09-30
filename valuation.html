@@ -748,6 +748,10 @@
         <div class="field"><label data-i18n="f_frequency" for="c-frequency">عدد الدفعات سنوياً</label>
           <select id="c-frequency"><option value="1">سنوي (دفعة واحدة)</option><option value="2" selected>نصف سنوي</option><option value="4">ربع سنوي</option><option value="12">شهري</option></select>
         </div>
+        <!-- 2026-09-30: يظهر بالعقد التجاري فقط — السكني معفى من الضريبة دائماً -->
+        <div class="field hide" id="c-vat-wrap"><label data-i18n="f_vat_registered" for="c-vat-registered">المؤجر مسجّل بضريبة القيمة المضافة؟</label>
+          <select id="c-vat-registered"><option value="0" selected data-i18n="opt_vat_no">لا — بدون ضريبة</option><option value="1" data-i18n="opt_vat_yes">نعم — تُضاف ١٥٪</option></select>
+        </div>
       </div>
       <button class="btn btn-primary" id="btn-generate-contract" style="margin-top:6px" data-i18n="contract_generate">إرسال العقد للتوثيق</button>
       <button class="btn btn-outline hide" id="btn-print-contract" style="margin-top:6px" data-i18n="contract_print_btn">🖨️ طباعة العقد / حفظ PDF</button>
@@ -1024,7 +1028,7 @@
 </div>
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script src="js/site.js?v=20260929c"></script>
+<script src="js/site.js?v=20260930a"></script>
 <div id="contract-print-view" class="hide">
   <div class="print-header">
     <picture>
@@ -1047,6 +1051,7 @@
       <tr><td id="pv-property-l"></td><td id="pv-property-v"></td></tr>
       <tr><td id="pv-term-l"></td><td id="pv-term-v"></td></tr>
       <tr><td id="pv-rent-l"></td><td id="pv-rent-v"></td></tr>
+      <tr><td id="pv-vat-l"></td><td id="pv-vat-v"></td></tr>
       <tr><td id="pv-deposit-l"></td><td id="pv-deposit-v"></td></tr>
       <tr><td id="pv-frequency-l"></td><td id="pv-frequency-v"></td></tr>
       <tr id="pv-deed-row" class="hide"><td id="pv-deed-l"></td><td id="pv-deed-v"></td></tr>
