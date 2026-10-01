@@ -310,6 +310,91 @@ const CHECKS = [
     if (!lastOf(ms).includes("جدة") || lastOf(ms).includes("الرياض")) return "سؤال جدة المفروض يحمل جدة فقط";
     return true;
   }],
+  ["المساعد الذكي: يذكر ويعرض عروضنا المطابقة (حي أو مدينة+نوع) ولا يعرض شي عشوائي", async () => {
+    // 2026-10-01: سؤال «كيف اشتري فيلا في حي العيون» كان يرد بخطوات عامة والفيلا المنشورة عندنا بنفس الحي ما تنذكر
+    const pg = await loadPage("index.html", "/");
+    const mk = (n, type, district, city, price, extra = {}) => ({ id: `aaaaaaaa-0000-0000-0000-00000000000${n}`, title: "t", property_type: type, district, city, area_sqm: 400, rooms: 5, price_final: price, price_original: price, is_published: true, is_sold: false, ...extra });
+    pg.T.offers = [
+      mk(1, "فيلا", "العيون", "المدينة المنورة", 3100000),
+      mk(2, "شقة في عمارة", "الروضة", "جدة", 700000),
+      mk(3, "فيلا", "قباء", "المدينة المنورة", 1000000, { is_sold: true }),
+    ];
+    const w = pg.w, sent = [];
+    w.fetch = async (u, opts) => {
+      if (String(u).endsWith("/chat")) sent.push(JSON.parse(opts.body));
+      return { ok: true, status: 200, json: async () => ({ reply: "رد المساعد" }), text: async () => "" };
+    };
+    const ask = async (q) => {
+      sent.length = 0;
+      const body = w.document.getElementById("assist-body");
+      body.innerHTML = "";
+      w.document.getElementById("assist-input").value = q;
+      w.document.getElementById("assist-send").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+      await new Promise(r => setTimeout(r, 1200));
+      const last = sent[0] ? String(sent[0].messages[sent[0].messages.length - 1].text) : null;
+      return { last, links: [...body.querySelectorAll("a[href^='/offer/']")].map(a => a.getAttribute("href")) };
+    };
+
+    let r = await ask("كيف اشتري فيلا في حي العيون");
+    if (!r.last) return "ما انرسل طلب /chat (فيلا العيون)";
+    if (!r.last.includes("عروضنا المنشورة") || !r.last.includes("3,100,000") || !r.last.includes("فيلا في العيون")) return "فيلا العيون ما انمررت للمساعد مع السؤال";
+    if (r.links.length !== 1 || !r.links[0].includes("00000000001")) return `بطاقة فيلا العيون ما ظهرت (الروابط: ${JSON.stringify(r.links)})`;
+
+    r = await ask("كيف اشتري شقة في الروضة");
+    if (r.links.length !== 1 || !r.links[0].includes("00000000002")) return `شقة الروضة: الروابط ${JSON.stringify(r.links)}`;
+
+    r = await ask("كيف اشتري فيلا في جدة");
+    if (r.last && r.last.includes("عروضنا المنشورة")) return "فيلا جدة: ما عندنا فيلا بجدة لكن انمرر عرض";
+    if (r.links.length) return "فيلا جدة: ظهرت بطاقة عشوائية";
+
+    r = await ask("كيف اشتري فيلا");
+    if (r.links.length || (r.last && r.last.includes("عروضنا المنشورة"))) return "سؤال عام بدون حي/مدينة: المفروض ما يعرض شي";
+
+    r = await ask("كيف اشتري فيلا في حي قباء");
+    if (r.links.length) return "عرض مباع (قباء) ظهر بالبطاقات";
+    return true;
+  }],
+  ["المساعد: أرخص/أغلى حي = 20 صفقة فأكثر + «المدينة» = المنورة + عدد الصفقات بالجواب", async () => {
+    // 2026-10-01: شجوى (3 ر.س/م² من 5 صفقات) طلعت «أرخص حي»، و«في المدينة» قارنت كل المدن (أغلى حي = جبل عمر بمكة)
+    const pg = await loadPage("index.html", "/");
+    const row = (name, city, p, n) => ({ district_id: name, price_per_sqm: p, transaction_count: n, districts: { name, cities: { name: city } } });
+    pg.T.district_prices = [
+      row("شجوى", "المدينة المنورة", 3, 5), row("الصويدرة", "المدينة المنورة", 144, 363), row("الجماوات", "المدينة المنورة", 4711, 173),
+      row("جبل عمر", "مكة المكرمة", 82529, 67), row("النزهة", "مكة المكرمة", 2901, 40),
+    ];
+    const w = pg.w;
+    w.fetch = async () => ({ ok: true, status: 200, json: async () => ({ reply: "ذكاء" }), text: async () => "" });
+    const ask = async (q) => {
+      const body = w.document.getElementById("assist-body"); body.innerHTML = "";
+      w.document.getElementById("assist-input").value = q;
+      w.document.getElementById("assist-send").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+      await new Promise(r => setTimeout(r, 1200));
+      const msgs = [...body.querySelectorAll(".assist-row:not(.user) .assist-msg")];
+      return msgs.length ? msgs[msgs.length - 1].textContent : "";
+    };
+    let a = await ask("ارخص حي في المدينة");
+    if (a.includes("شجوى")) return `الأرخص طلع شجوى (5 صفقات): ${a}`;
+    if (!a.includes("الصويدرة") || !a.includes("144") || !a.includes("363")) return `الأرخص المفروض الصويدرة 144 (363 صفقة): ${a}`;
+    a = await ask("اغلى حي في المدينة");
+    if (a.includes("جبل عمر") || !a.includes("الجماوات")) return `«في المدينة» المفروض المدينة المنورة بس: ${a}`;
+    a = await ask("اغلى حي");
+    if (!a.includes("جبل عمر")) return `بدون مدينة المفروض كل المدن (جبل عمر): ${a}`;
+    return true;
+  }],
+  ["المؤشر: حي بأقل من 10 صفقات يظهر عليه تنبيه «عينة صغيرة» والموثوق ما يظهر", async () => {
+    const pg = await loadPage("valuation.html", "/valuation");
+    const rows = pg.T.district_prices;
+    const fath = rows.find(r => r.districts.name === "الفتح");
+    if (!fath) return "حي الفتح غير موجود بالبيانات التجريبية";
+    fath.transaction_count = 5;
+    await pg.w.loadDistrictPricesFromDb();
+    const el = () => pg.w.document.getElementById("v-price-source");
+    valuate(pg.w, { ...V, district: "الفتح" });
+    if (!el().textContent.includes("عينة صغيرة") || !el().textContent.includes("5") || !el().className.includes("notice-warn")) return `الفتح (5 صفقات) بدون تنبيه: ${el().className} | ${el().textContent.slice(0, 160)}`;
+    valuate(pg.w, { ...V, district: FX.known_district });
+    if (el().textContent.includes("عينة صغيرة")) return "قباء (100 صفقة) طلع عليه تنبيه عينة صغيرة";
+    return true;
+  }],
   ["Analytics: ضغطة زر واتساب العائم = whatsapp_click", async ({ home }) => {
     const a = home.w.document.getElementById("whatsapp-float");
     if (!a) return "#whatsapp-float غير موجود";

@@ -2401,9 +2401,17 @@ function runValuation(){
       ? `The per-sqm price (${money(pricePerSqm)} SAR) for ${districtVal}: ${periodDesc.en} (source: Saudi Ministry of Justice open real-estate transaction data) — may differ from the exact current market price in fast-appreciating districts.`
       : `The per-sqm price (${money(pricePerSqm)} SAR) is a citywide indicator for ${cityVal} (no verified transaction data for ${districtVal} yet), adjusted by the manual district grade — a general guideline figure not tied to a specific periodic update schedule.`,
   };
+  // 2026-10-01: حي سعره مبني على أقل من SMALL_SAMPLE_DEALS صفقات (مثل شجوى: 5 صفقات
+  // = 3 ر.س/م²) يظهر بنفس شكل الأحياء الموثوقة. التنبيه يوضّح إنها عينة صغيرة.
+  const smallSample = usingRealPrice && !isManual && priceMeta?.count > 0 && priceMeta.count < SMALL_SAMPLE_DEALS;
+  const smallSampleNote = {
+    ar: ` عينة صغيرة: الرقم مبني على ${priceMeta?.count} صفقات فقط، فقد لا يعكس سعر السوق الفعلي في الحي.`,
+    en: ` Small sample: this figure is based on only ${priceMeta?.count} deals, so it may not reflect the real market price in this district.`,
+  };
   const priceSourceEl = document.getElementById('v-price-source');
-  priceSourceEl.className = 'notice ' + ((usingRealPrice || isManual) ? 'notice-ok-source' : 'notice-warn');
-  priceSourceEl.innerHTML = ((usingRealPrice || isManual) ? '✅ ' : '⚠️ ') + (sourceNote[currentLang] || sourceNote.ar);
+  priceSourceEl.className = 'notice ' + (((usingRealPrice || isManual) && !smallSample) ? 'notice-ok-source' : 'notice-warn');
+  priceSourceEl.innerHTML = (((usingRealPrice || isManual) && !smallSample) ? '✅ ' : '⚠️ ') + (sourceNote[currentLang] || sourceNote.ar)
+    + (smallSample ? '<br><b>' + (smallSampleNote[currentLang] || smallSampleNote.ar).trim() + '</b>' : '');
   updatePriceTrend(priceMeta?.districtId, pricePerSqm);
 
   const bd = {
@@ -3687,6 +3695,10 @@ function detectCity(text, lower){
     const lbl = CITY_LABELS[cname];
     if (lbl && ((lbl.en && lower.includes(lbl.en.toLowerCase())) || (lbl.fr && lower.includes(lbl.fr.toLowerCase())))) return cname;
   }
+  // 2026-10-01: «في المدينة» لوحدها (بدون «المنورة») تعني المدينة المنورة — المنصة مبنية عليها.
+  // قبل كان «أرخص/أغلى حي في المدينة» يقارن كل المدن (وأغلى حي كان يطلع جبل عمر بمكة).
+  // نستثني «المدينة المكرمة» (خطأ شائع لمكة).
+  if (CITY_DISTRICTS['المدينة المنورة'] && /(^|[\s،,؟?وبفلك])المدينة(?!\s*(?:المنورة|المكرمة))(?=$|[\s،,؟?.!])/.test(text)) return 'المدينة المنورة';
   return null;
 }
 function detectType(text, lower){
@@ -3875,12 +3887,12 @@ async function fetchAllDistrictPriceRows(){
   if (!dbReady) return null;
   try {
     const { data, error } = await withTimeout(
-      supa.from('district_prices').select('price_per_sqm, districts(name, cities(name))')
+      supa.from('district_prices').select('price_per_sqm, transaction_count, districts(name, cities(name))')
     );
     if (error || !data || !data.length) return null;
     const rows = data
       .filter(r => r.districts && r.price_per_sqm)
-      .map(r => ({ name: r.districts.name, city: r.districts.cities?.name || '', price: Math.round(r.price_per_sqm) }))
+      .map(r => ({ name: r.districts.name, city: r.districts.cities?.name || '', price: Math.round(r.price_per_sqm), deals: r.transaction_count || 0 }))
       .sort((a, b) => a.price - b.price);
     if (!rows.length) return null;
     districtPriceRowsCache = rows;
@@ -3929,6 +3941,8 @@ function fitAiHistory(messages){
 // الحين نرسل فقط اللي يخص السؤال: الأحياء المذكورة بالاسم، أو كل أحياء المدينة
 // المذكورة (لو صغيرة)، أو ملخص لكل مدينة (أرخص/أغلى 5) لو ما ذُكر شي — دايماً
 // أقل من AI_PRICE_CONTEXT_MAX حرف بغض النظر عن حجم الجدول.
+const SMALL_SAMPLE_DEALS = 10;      // أقل من كذا صفقة = «عينة صغيرة» بقسم المؤشر
+const SUPERLATIVE_MIN_DEALS = 20;  // أرخص/أغلى حي: نحتسب بس الأحياء اللي فيها هالعدد من الصفقات فأكثر
 const AI_PRICE_CONTEXT_MAX = 5500;
 function buildSmartPriceContext(allRows, text, mentionedCity){
   const pool = mentionedCity ? allRows.filter(r => r.city === mentionedCity) : allRows;
@@ -3963,7 +3977,65 @@ function buildSmartPriceContext(allRows, text, mentionedCity){
   return { mode: 'summary', text: summary.slice(0, AI_PRICE_CONTEXT_MAX) };
 }
 
-async function askAiAssistant(text){
+// 2026-10-01: ترويج عروضنا داخل ردود المساعد. قبل كان المساعد ما يعرف عروضنا أصلاً
+// (يوصله الأسعار فقط) فسؤال «كيف اشتري فيلا في حي العيون» يرد بخطوات عامة والفيلا
+// المنشورة عندنا بنفس الحي ما تنذكر. المصدر نفس جدول صفحة العروض العامة (offers،
+// منشور وغير محذوف وغير مباع). المطابقة: حي مذكور بالاسم، أو مدينة + نوع.
+// ما نعرض شي لو ما فيه تطابق — ما نرجع لبطاقة عشوائية (قاعدة 20/9).
+let promoOffersCache = null, promoOffersCacheTime = 0;
+async function fetchPublishedOffersForAssistant(){
+  if (promoOffersCache && (Date.now() - promoOffersCacheTime) < 600000) return promoOffersCache;
+  if (!dbReady) return [];
+  try {
+    const { data, error } = await withTimeout(
+      supa.from('offers').select('id, title, property_type, district, city, area_sqm, rooms, price_final, price_original, is_sold')
+        .eq('is_published', true).is('deleted_at', null).limit(100)
+    );
+    if (error || !data) return [];
+    promoOffersCache = data.filter(o => !o.is_sold);
+    promoOffersCacheTime = Date.now();
+    return promoOffersCache;
+  } catch (e) {
+    console.error('fetchPublishedOffersForAssistant failed', e);
+    return [];
+  }
+}
+async function findPromoOffers(text){
+  const rows = await fetchPublishedOffersForAssistant();
+  if (!rows.length) return [];
+  const norm = normalizeArabicForMatch(text);
+  const lower = text.toLowerCase();
+  const type = detectType(text, lower);
+  const city = detectCity(text, lower);
+  const sameType = (a, b) => a === b || (String(a).startsWith('شقة') && String(b).startsWith('شقة'));
+  let pool = rows.filter(o => { const d = normalizeArabicForMatch(o.district); return d.length >= 3 && norm.includes(d); });
+  if (!pool.length && city && type) pool = rows.filter(o => o.city === city);
+  if (type) pool = pool.filter(o => sameType(o.property_type, type));
+  return pool.slice(0, 3);
+}
+function promoOffersContextText(promo){
+  const lines = promo.map(o => {
+    const price = o.price_final ?? o.price_original;
+    const priceTxt = price ? `السعر الإجمالي ${money(price)} ر.س` : 'السعر عند الطلب';
+    return `- ${o.property_type} في ${o.district} (${o.city}) — ${o.area_sqm || '—'} م²${o.rooms ? ' · ' + o.rooms + ' غرف' : ''} — ${priceTxt}`;
+  });
+  return `[عروضنا المنشورة المطابقة لسؤال الزائر — متاحة فعلاً عندنا]\n${lines.join('\n')}\n[اذكرها باختصار بجوابك كفرصة متاحة عندنا (النوع، الحي، السعر الإجمالي) بدون اختلاق أي تفصيل غير مذكور هنا، ووجّه الزائر لقسم «العروض»]`;
+}
+function promoCardsHtml(promo){
+  if (!promo.length) return '';
+  const cards = promo.map(o => {
+    const price = o.price_final ?? o.price_original;
+    const priceText = price ? `${money(price)} ${currentLang==='ar' ? 'ر.س' : 'SAR'}` : I18N[currentLang].price_on_request;
+    return `<a class="assist-result-card" href="/offer/${encodeURIComponent(o.id)}/" style="display:block;text-decoration:none;color:inherit">
+      <b>${escapeHtml(typeLabel(o.property_type))} — ${escapeHtml(districtLabel(o.district))}</b>
+      <div class="meta">${escapeHtml(cityLabel(o.city))} · ${o.area_sqm || '—'} م²${o.rooms ? (' · ' + o.rooms + ' ' + I18N[currentLang].rooms_suffix) : ''}</div>
+      <span class="price">${priceText}</span>
+    </a>`;
+  }).join('');
+  return cards + `<a href="/offers" style="display:block;margin-top:6px;font-weight:700;color:inherit;text-decoration:underline">${currentLang==='ar' ? 'تصفّح كل العروض ←' : 'Browse all offers →'}</a>`;
+}
+
+async function askAiAssistant(text, promo = []){
   assistantHistory.push({ role: 'user', text }); // نخزّن النص الأصلي النظيف بالسجل المعروض
   if (assistantHistory.length > 20) assistantHistory = assistantHistory.slice(-20);
 
@@ -3972,22 +4044,25 @@ async function askAiAssistant(text){
   // وخفيف لباقي الأسئلة بنفس المحادثة)
   window.__lastDebug = null;
   let messagesToSend = assistantHistory;
+  const blocks = [];
   if (looksLikePriceQuestion(text)){
     const allRows = await fetchAllDistrictPriceRows();
     if (allRows && allRows.length){
-      // لو السؤال يذكر مدينة صراحة، نفلتر البيانات لهذي المدينة بس قبل ما
-      // نرسلها — يضمن الإجابة تبقى بنفس المدينة المطلوبة دائماً، بدل ما
-      // نعتمد على الذكاء الاصطناعي يفلتر صح من بيانات 4 مدن مختلطة.
+      // لو السؤال يذكر مدينة صراحة نرسل بيانات هذي المدينة بس (والأحياء المذكورة بالاسم)،
+      // وبدون مدينة نرسل ملخصاً — كل شي مقصوص بسقف AI_PRICE_CONTEXT_MAX (راجع buildSmartPriceContext).
       const mentionedCity = detectCity(text, text.toLowerCase());
       const ctx = buildSmartPriceContext(allRows, text, mentionedCity);
       window.__lastDebug = `[تشخيص مؤقت] المدينة المكتشفة: ${mentionedCity || 'لا شي'} — نمط السياق: ${ctx.mode} — ${ctx.text.length} حرف`;
-      const priceContext = ctx.text;
       const cityNote = (mentionedCity && ctx.mode !== 'summary') ? `\n\n[ملاحظة: الزائر يسأل تحديداً عن مدينة ${mentionedCity} — البيانات أعلاه لهذي المدينة فقط، لا تذكر مدن ثانية بالرد]` : '';
-      messagesToSend = assistantHistory.slice(0, -1).concat([{
-        role: 'user',
-        text: `[بيانات أسعار حقيقية من قاعدة بياناتنا — ريال/م²]\n${priceContext}${cityNote}\n\n[سؤال الزائر]: ${text}`
-      }]);
+      blocks.push(`${ctx.text}${cityNote}`);
     }
+  }
+  if (promo && promo.length) blocks.push(promoOffersContextText(promo));
+  if (blocks.length){
+    messagesToSend = assistantHistory.slice(0, -1).concat([{
+      role: 'user',
+      text: `[بيانات أسعار حقيقية من قاعدة بياناتنا — ريال/م²]\n${blocks.join('\n\n')}\n\n[سؤال الزائر]: ${text}`
+    }]);
   }
 
   const AI_TIMEOUT_MS = 20000; // 20 ثانية — أطول من قبل لأن سؤال الأسعار يحتاج جلب بيانات إضافية قبل الاتصال بالذكاء الاصطناعي
@@ -4128,13 +4203,21 @@ async function handleAssistSend(textOverride, isPredefinedChip){
       if (!rows.length){
         addAssistMsg(currentLang==='ar' ? `ما لقيت بيانات أسعار كافية حالياً${mentionedCity ? ' لـ' + cityLabel(mentionedCity) : ''}.` : `Not enough price data available${mentionedCity ? ' for ' + cityLabel(mentionedCity) : ''} right now.`, 'bot');
       } else {
-        // rows مرتّبة تصاعدياً أصلاً (من fetchAllDistrictPriceRows)
-        const target = superlative === 'high' ? rows[rows.length - 1] : rows[0];
+        // rows مرتّبة تصاعدياً أصلاً (من fetchAllDistrictPriceRows). 2026-10-01: نحتسب بس
+        // الأحياء اللي فيها SUPERLATIVE_MIN_DEALS صفقة فأكثر — شجوى طلعت «أرخص حي» بـ3 ر.س/م²
+        // من 5 صفقات. لو ما بقي حي مؤهل نرجع لكل الأحياء ونوضّح العدد بالجواب.
+        const eligible = rows.filter(r => r.deals >= SUPERLATIVE_MIN_DEALS);
+        const pool = eligible.length ? eligible : rows;
+        const target = superlative === 'high' ? pool[pool.length - 1] : pool[0];
         const cityPhraseAr = mentionedCity ? ` في ${cityLabel(mentionedCity)}` : '';
         const cityPhraseEn = mentionedCity ? ` in ${cityLabel(mentionedCity)}` : '';
+        const dealsAr = target.deals ? ` (بناءً على ${money(target.deals)} صفقة)` : '';
+        const dealsEn = target.deals ? ` (based on ${money(target.deals)} deals)` : '';
+        const noteAr = eligible.length ? ` — نحتسب الأحياء اللي فيها ${SUPERLATIVE_MIN_DEALS} صفقة فأكثر عشان الرقم يكون موثوق.` : '.';
+        const noteEn = eligible.length ? ` — only districts with ${SUPERLATIVE_MIN_DEALS}+ deals are counted so the figure is reliable.` : '.';
         const reply = currentLang==='ar'
-          ? `${superlative==='high' ? 'أغلى حي' : 'أقل حي سعراً'}${cityPhraseAr} حسب بياناتنا هو حي ${districtLabel(target.name)} بمتوسط سعر ${money(target.price)} ريال/م².`
-          : `${superlative==='high' ? 'The most expensive district' : 'The cheapest district'}${cityPhraseEn} according to our data is ${districtLabel(target.name)}, averaging ${money(target.price)} SAR/sqm.`;
+          ? `${superlative==='high' ? 'أغلى حي' : 'أقل حي سعراً'}${cityPhraseAr} حسب بياناتنا هو حي ${districtLabel(target.name)} بمتوسط سعر ${money(target.price)} ريال/م²${dealsAr}${noteAr}`
+          : `${superlative==='high' ? 'The most expensive district' : 'The cheapest district'}${cityPhraseEn} according to our data is ${districtLabel(target.name)}, averaging ${money(target.price)} SAR/sqm${dealsEn}${noteEn}`;
         addAssistMsg(reply, 'bot');
       }
     }
@@ -4148,7 +4231,8 @@ async function handleAssistSend(textOverride, isPredefinedChip){
     addAssistMsg(reply, 'bot');
     if (goto) showPage(goto);
   } else {
-    const aiReply = await askAiAssistant(text);
+    const promo = await findPromoOffers(text);
+    const aiReply = await askAiAssistant(text, promo);
     await sleep(300);
     hideTyping();
     if (aiReply.ok){
@@ -4164,7 +4248,7 @@ async function handleAssistSend(textOverride, isPredefinedChip){
         addAssistMsg(sectionRule.reply, 'bot');
         showPage(sectionRule.goto);
       } else {
-        addAssistMsg(aiReply.reply, 'bot');
+        addAssistMsg(aiReply.reply, 'bot', promoCardsHtml(promo));
       }
     } else {
       // الذكاء الاصطناعي غير متاح مؤقتاً (ازدحام أو انقطاع أو تجاوز مهلة) —
