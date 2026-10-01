@@ -429,6 +429,24 @@ const CHECKS = [
     if (ids.length) return `فيلا بجدة: ما عندنا لكن طلعت [${ids}]`;
     return true;
   }],
+  ["صفحة «غير موجودة»: مسار خاطئ يعرض 404 لا الرئيسية، والروابط المعروفة سليمة", async () => {
+    const bad = await loadPage("index.html", "/supabase/schema.sql");
+    const d = bad.w.document;
+    const nf = d.getElementById("notfound-page");
+    if (!nf) return "ما ظهرت #notfound-page لمسار خاطئ";
+    if (!/404/.test(nf.textContent)) return "نص 404 غير موجود";
+    if (d.getElementById("home").style.display !== "none") return "الرئيسية ما زالت ظاهرة مع 404";
+    // زر العودة يرجع للرئيسية ويزيل الشاشة
+    nf.querySelector("a[href='/']").dispatchEvent(new bad.w.MouseEvent("click", { bubbles: true, cancelable: true }));
+    if (d.getElementById("notfound-page")) return "شاشة 404 ما زالت ظاهرة بعد العودة للرئيسية";
+    if (d.getElementById("home").style.display === "none") return "الرئيسية ما ظهرت بعد العودة";
+    // مسارات صحيحة ما لازم تتأثر
+    for (const ok of ["/", "/offers", "/valuation", "/contracts/", "/privacy", "/index.html"]) {
+      const g = await loadPage("index.html", ok);
+      if (g.w.document.getElementById("notfound-page")) return `مسار صحيح ${ok} عُرض كـ404`;
+    }
+    return true;
+  }],
   ["Analytics: ضغطة زر واتساب العائم = whatsapp_click", async ({ home }) => {
     const a = home.w.document.getElementById("whatsapp-float");
     if (!a) return "#whatsapp-float غير موجود";

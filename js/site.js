@@ -3561,7 +3561,41 @@ function updateDocTitle(id){
   } catch (e) { /* عنوان التبويب تحسين شكلي — لا يوقف التنقّل أبداً */ }
 }
 
+/* مسار غير معروف (مثل /supabase/schema.sql أو أي رابط خاطئ): نعرض «الصفحة غير موجودة»
+   بدل الرئيسية. المسارات المعروفة: الرئيسية، صفحات PAGES (مع أو بدون / بالنهاية)،
+   وعرض التفاصيل /offer/<id>/. الروابط القديمة #hash تُفحص فقط على مسار الرئيسية. */
+function isUnknownPath(){
+  const path = location.pathname;
+  if (path === '/' || path === '/index.html') return false;
+  if (/^\/offer\/[^\/]+\/?$/.test(path)) return false;
+  const slug = path.replace(/^\/+|\/+$/g, '');
+  return !PAGES.includes(slug);
+}
+function showNotFoundPage(){
+  PAGES.forEach(p=>{ const el = document.getElementById(p); if (el) el.style.display = 'none'; });
+  let box = document.getElementById('notfound-page');
+  if (!box){
+    box = document.createElement('section');
+    box.id = 'notfound-page';
+    const ar = (typeof currentLang === 'undefined') || currentLang !== 'en';
+    box.innerHTML = `<div class="container" style="max-width:640px;text-align:center;padding:72px 16px">
+      <div style="font-size:72px;font-weight:800;line-height:1;color:var(--gold-500)">404</div>
+      <h2 style="margin:16px 0 8px">${ar ? 'الصفحة غير موجودة' : 'Page not found'}</h2>
+      <p style="margin:0 0 24px;color:var(--text-600)">${ar ? 'الرابط الذي فتحته غير صحيح أو لم يعد متاحاً.' : 'The link you opened is wrong or no longer available.'}</p>
+      <a href="/" class="btn btn-primary">${ar ? 'العودة للرئيسية' : 'Back to home'}</a>
+    </div>`;
+    const anchor = document.getElementById('home') || document.body.firstElementChild;
+    anchor.parentNode.insertBefore(box, anchor);
+    let robots = document.querySelector('meta[name="robots"]');
+    if (!robots){ robots = document.createElement('meta'); robots.name = 'robots'; document.head.appendChild(robots); }
+    robots.content = 'noindex';
+    document.title = (ar ? 'الصفحة غير موجودة' : 'Page not found') + ' | ' + (ar ? 'همة المدينة العقارية' : 'Himmat Al-Madinah Real Estate');
+  }
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
 function showPage(id){
+  document.getElementById('notfound-page')?.remove(); // شاشة «غير موجودة» تزول بأي تنقّل
   if (!PAGES.includes(id)) id = 'home';
   logPageView(id);
   updateDocTitle(id);
@@ -4374,13 +4408,15 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   // الرئيسية استُثنيت عمداً — عدّاداتها المتحركة تعتمد بيانات تُحسب
   // بأسفل بنفس هذا التحميل، فتُركت بمكانها الأصلي لتجنّب أي أثر جانبي.
   const isDeepLinkOffer = /^\/offer\/[^\/]+\/?$/.test(location.pathname) || /^#offer-/.test(location.hash);
-  const initialPage = isDeepLinkOffer ? null : (() => {
+  const unknownPath = !isDeepLinkOffer && isUnknownPath();
+  const initialPage = (isDeepLinkOffer || unknownPath) ? null : (() => {
     const p = location.pathname.replace(/^\//, '') || 'home';
     const h = location.hash.slice(1);
     return PAGES.includes(p) ? p : (PAGES.includes(h) ? h : 'home');
   })();
   if (initialPage && initialPage !== 'home') showPage(initialPage);
   if (isDeepLinkOffer) handleDeepLinkOffer();
+  if (unknownPath) showNotFoundPage();
 
   const safely = async (label, fn) => {
     try { await fn(); }

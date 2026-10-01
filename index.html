@@ -15,6 +15,9 @@
       return s.replace(/~and~/g, '&');
     }).join('?');
     window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
+    // مسار غير موجود فعلياً (مثل /supabase/schema.sql): الأصول النسبية (css/js/icons) كانت تُحل
+    // نسبةً للمسار الوهمي فتنكسر الصفحة. نثبّت أساس الروابط على الجذر، فقط بهذه الحالة.
+    document.write('<base href="/">');
   }
 }(window.location));
 </script>
@@ -1028,7 +1031,7 @@
 </div>
 
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script src="js/site.js?v=20261001d"></script>
+<script src="js/site.js?v=20261001e"></script>
 <div id="contract-print-view" class="hide">
   <div class="print-header">
     <picture>
