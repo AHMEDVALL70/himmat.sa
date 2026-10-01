@@ -474,6 +474,22 @@ const CHECKS = [
     if (!sent) return `ما أُرسل الطلب بعد المحاولة الثانية (محاولات Turnstile=${calls})`;
     return sent.opts.body.turnstileToken === "tok-ok" || `الرمز المرسل: ${sent.opts.body.turnstileToken}`;
   }],
+  ["أضف عقارك: رمز Turnstile يبدأ يتجهّز لحظة اختيار الصورة (قبل الضغط على إدراج)", async () => {
+    const c = await loadPage("add-property.html", "/add-property");
+    let calls = 0;
+    c.w.turnstile = { render: () => { calls++; return "w" + calls; }, remove() {} };
+    c.w.URL.createObjectURL = () => "blob:test";
+    const input = c.w.document.getElementById("add-images");
+    const f = new c.w.File([new Uint8Array(10)], "a.jpg", { type: "image/jpeg" });
+    Object.defineProperty(input, "files", { value: [f], configurable: true });
+    input.dispatchEvent(new c.w.Event("change", { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 100));
+    if (calls !== 1) return `عدد استدعاءات Turnstile بعد اختيار الصورة = ${calls} (المتوقع 1)`;
+    // اختيار صورة ثانية لا يولّد رمزاً ثانياً بلا داعٍ
+    input.dispatchEvent(new c.w.Event("change", { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 100));
+    return calls === 1 || `ولّد رمزاً زائداً: ${calls}`;
+  }],
   ["صفحة 404: ما فيه رابط مميَّز (active) بالقائمة", async () => {
     const bad = await loadPage("index.html", "/zzz/none");
     const act = bad.w.document.querySelectorAll(".links a.active").length;

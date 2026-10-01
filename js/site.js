@@ -2742,6 +2742,7 @@ document.getElementById('add-images')?.addEventListener('change', (e) => {
   addPropertySelectedFiles = addPropertySelectedFiles.concat(picked.slice(0, Math.max(0, room)));
   e.target.value = '';
   renderAddPropertyThumbs();
+  if (addPropertySelectedFiles.length > 0) prefetchUploadToken();
 });
 
 /** يضغط ويرفع كل الصور المختارة عبر public-upload-image، يرجع مصفوفة روابط
@@ -2754,7 +2755,7 @@ async function uploadAddPropertyImages(){
   lap('الضغط');
   const base64Images = await Promise.all(compressedBlobs.map(b => blobToBase64(b)));
   lap('التحويل base64');
-  const turnstileToken = await getTurnstileTokenWithRetry('upload');
+  const turnstileToken = await getTurnstileTokenWithRetry('upload', takePrefetchedUploadToken());
   lap('Turnstile');
   if (!turnstileToken) throw new Error('TURNSTILE_FAILED');
   const { data, error: fnError } = await supa.functions.invoke('public-upload-image', {
@@ -2804,9 +2805,12 @@ document.getElementById('btn-add-property').addEventListener('click', async ()=>
     return;
   }
   try {
+    const tSubmit0 = performance.now();
+    let submitTokenPromise = null;
     if (addPropertySelectedFiles.length > 0){
-      msg.textContent = '⏳ جاري رفع الصور...';
+      msg.textContent = '⏳ جاري رفع الصور (قد يستغرق عدة ثوانٍ)...';
       msg.style.color = 'var(--text-600)';
+      submitTokenPromise = createTurnstileToken(); // رمز الإرسال النهائي يتجهّز بالتوازي مع رفع الصور
       const imageUrls = await uploadAddPropertyImages();
       if (imageUrls.length > 0){
         payload.image_url = imageUrls[0];
@@ -2814,11 +2818,12 @@ document.getElementById('btn-add-property').addEventListener('click', async ()=>
       }
     }
     msg.textContent = '⏳ جاري الإرسال...';
-    const turnstileToken = await getTurnstileTokenWithRetry('add-property');
+    const turnstileToken = await getTurnstileTokenWithRetry('add-property', submitTokenPromise);
     if (!turnstileToken) throw new Error('TURNSTILE_FAILED');
     const { data, error: fnError } = await supa.functions.invoke('public-submit', {
       body: { type: 'property', payload, turnstileToken },
     });
+    console.info(`⏱ إرسال العقار — الكل من الضغط حتى الرد: ${Math.round(performance.now()-tSubmit0)}ms`);
     const error = fnError || (data && data.error ? { message: data.error } : null);
     if (error){
       msg.textContent = '⚠️ تعذّر الحفظ: ' + error.message;
@@ -3859,17 +3864,54 @@ function getTurnstileToken(timeoutMs = 8000){
   });
 }
 
-/* للنماذج العامة (رفع الصور وإرسال العقار): مهلة أطول ومحاولة ثانية تلقائية.
-   كانت المهلة 8 ثوانٍ ثم يُرسل الطلب برمز فارغ فيرفضه الخادم بـ403 — فيظهر للزائر
-   خطأ مضلّل «تعذّر الاتصال بقاعدة البيانات» (2026-10-01). */
-async function getTurnstileTokenWithRetry(label){
+/* ينشئ رمز Turnstile بودجت مستقل (حاوية خاصة به) — يسمح بتوليد رمزين بالتوازي أو مبكراً
+   بدون ما يلغي أحدهما الآخر (الدالة المشتركة أعلاه تمسح الودجت السابق). الرمز لاستخدام واحد. */
+function createTurnstileToken(timeoutMs = 15000){
+  return new Promise((resolve)=>{
+    if (!window.turnstile){ resolve(null); return; }
+    const box = document.createElement('div');
+    box.style.display = 'none';
+    document.body.appendChild(box);
+    let widgetId = null, done = false;
+    const finish = (token)=>{
+      if (done) return; done = true;
+      if (!token){ try { if (widgetId !== null) turnstile.remove(widgetId); } catch(e) {} box.remove(); }
+      resolve(token);
+    };
+    try {
+      widgetId = turnstile.render(box, {
+        sitekey: TURNSTILE_SITE_KEY,
+        size: 'invisible',
+        callback: (token)=> finish(token),
+        'error-callback': ()=> finish(null),
+        'timeout-callback': ()=> finish(null),
+      });
+    } catch (e) { console.error('Turnstile render failed', e); finish(null); }
+    setTimeout(()=> finish(null), timeoutMs);
+  });
+}
+/* رمز جاهز مسبقاً لرفع الصور: يبدأ توليده لحظة اختيار الصورة (أثناء ما الزائر يكمل الاستمارة)
+   فما ينتظر 5 ثوانٍ عند الضغط. صلاحية الرمز 5 دقائق، فنتجاهل ما عمره > 200 ثانية. */
+let uploadTokenPrefetch = null;
+function prefetchUploadToken(){
+  if (uploadTokenPrefetch && Date.now() - uploadTokenPrefetch.at < 200000) return;
+  uploadTokenPrefetch = { at: Date.now(), promise: createTurnstileToken() };
+}
+function takePrefetchedUploadToken(){
+  const p = uploadTokenPrefetch;
+  uploadTokenPrefetch = null;
+  return (p && Date.now() - p.at < 200000) ? p.promise : null;
+}
+/* للنماذج العامة: يستخدم رمزاً جاهزاً لو موجود، ولو فشل (أو ما فيه) يجرّب مرة ثانية.
+   كانت المهلة 8 ثوانٍ ثم إرسال برمز فارغ فيرفضه الخادم بـ403 ورسالة مضلّلة (2026-10-01). */
+async function getTurnstileTokenWithRetry(label, readyPromise){
   const t0 = performance.now();
-  let token = await getTurnstileToken(15000);
+  let token = await (readyPromise || createTurnstileToken());
   if (!token){
     console.warn(`Turnstile (${label}): لا رمز بعد ${Math.round(performance.now()-t0)}ms — محاولة ثانية`);
-    token = await getTurnstileToken(15000);
+    token = await createTurnstileToken();
   }
-  console.info(`⏱ Turnstile (${label}): ${Math.round(performance.now()-t0)}ms ${token ? 'نجح' : 'فشل'}`);
+  console.info(`⏱ Turnstile (${label}): انتظار ${Math.round(performance.now()-t0)}ms ${token ? 'نجح' : 'فشل'}`);
   return token;
 }
 function turnstileFailMessage(){
