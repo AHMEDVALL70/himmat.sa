@@ -18,6 +18,12 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
+// تحديث 2026-10-01: كان كل طلب (حتى طلبات Supabase ورفع الصور بحمولة كبيرة) يمر عبر
+// fetch(event.request) بلا معالجة فشل، فأي انقطاع/إلغاء طلب يظهر بالكونسول كخطأ
+// «Uncaught (in promise) TypeError: Failed to fetch» من sw.js. الآن: التنقّل بين الصفحات
+// فقط يمر هنا (مع التقاط الفشل → استجابة خطأ شبكة نظيفة)، وكل ما عداه يتركه المتصفح
+// يتعامل معه مباشرة بدون وسيط. وجود معالج fetch يبقى كافياً لشرط التثبيت.
 self.addEventListener('fetch', (event) => {
-  event.respondWith(fetch(event.request));
+  if (event.request.mode !== 'navigate') return;
+  event.respondWith(fetch(event.request).catch(() => Response.error()));
 });

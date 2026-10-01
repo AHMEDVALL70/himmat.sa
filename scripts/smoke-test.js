@@ -490,6 +490,20 @@ const CHECKS = [
     await new Promise((r) => setTimeout(r, 100));
     return calls === 1 || `ولّد رمزاً زائداً: ${calls}`;
   }],
+  ["sw.js: التنقّل فقط يمر عبره، وفشل الشبكة ما يسبّب رفضاً غير ملتقَط", async () => {
+    const handlers = {};
+    const self = { addEventListener: (t, f) => { handlers[t] = f; }, skipWaiting() {}, clients: { claim() {} } };
+    const Response = { error: () => "NETWORK_ERROR_RESPONSE" };
+    const fetchFail = () => Promise.reject(new TypeError("Failed to fetch"));
+    new Function("self", "fetch", "Response", fs.readFileSync(path.join(ROOT, "sw.js"), "utf8"))(self, fetchFail, Response);
+    const mk = (mode) => { const e = { request: { mode }, responded: null, respondWith(p) { this.responded = p; } }; return e; };
+    const sub = mk("cors"); handlers.fetch(sub);
+    if (sub.responded) return "طلب غير تنقّل (مثل Supabase) ما زال يمر عبر sw.js";
+    const nav = mk("navigate"); handlers.fetch(nav);
+    if (!nav.responded) return "طلب التنقّل ما عولج";
+    const r = await nav.responded;
+    return r === "NETWORK_ERROR_RESPONSE" || `فشل الشبكة أعطى: ${r}`;
+  }],
   ["صفحة 404: ما فيه رابط مميَّز (active) بالقائمة", async () => {
     const bad = await loadPage("index.html", "/zzz/none");
     const act = bad.w.document.querySelectorAll(".links a.active").length;
