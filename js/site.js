@@ -3741,32 +3741,6 @@ function parseQuery(text){
   return { city: detectCity(text, lower), type: detectType(text, lower), minPrice, maxPrice, rooms: detectRooms(text) };
 }
 
-async function searchProperties(q){
-  let results = [];
-  if (dbReady){
-    try {
-      let query = supa.from('properties').select('*').eq('status', 'approved').is('deleted_at', null).limit(5);
-      if (q.city) query = query.eq('city', q.city);
-      if (q.type) query = query.eq('property_type', q.type);
-      if (q.maxPrice) query = query.lte('price', q.maxPrice);
-      if (q.minPrice) query = query.gte('price', q.minPrice);
-      if (q.rooms) query = query.eq('rooms', q.rooms);
-      const { data, error } = await withTimeout(query);
-      if (!error && data) results = data.map(p=>({ city:p.city, district:p.district, property_type:p.property_type, price:p.price, area_sqm:p.area_sqm, rooms:p.rooms }));
-    } catch (e) {
-      console.error('searchProperties: Supabase call failed.', e);
-    }
-  }
-  // 2026-09-18: أُزيل الاحتياطي للبيانات التوضيحية الثابتة (DEMO_OFFERS_I18N)
-  // من هذا المسار بالذات — كان يعرض عقارات وهمية للمساعد الذكي بثقة كاملة
-  // (بدون أي تحذير "توضيحي" زي صفحة العروض العادية)، مرتبطة برقم جوال
-  // الشركة الحقيقي. خطر ثقة حقيقي: زبون يتصل يسأل عن عقار غير موجود أصلاً.
-  // الأصح صراحة — صفر نتائج حقيقية = رسالة "ما لقيت نتيجة" (t.noResults
-  // بالمستدعي)، مو اختلاق نتيجة. DEMO_OFFERS_I18N نفسها لسا مستخدمة بأماكن
-  // أخرى (صفحة العروض وقسم "مميزة" بالرئيسية) وفيها تحذير واضح للزائر هناك.
-  return results;
-}
-
 function addAssistMsg(text, who, extraHtml=''){
   const body = document.getElementById('assist-body');
   const row = document.createElement('div');
@@ -3988,7 +3962,7 @@ async function fetchPublishedOffersForAssistant(){
   if (!dbReady) return [];
   try {
     const { data, error } = await withTimeout(
-      supa.from('offers').select('id, title, property_type, district, city, area_sqm, rooms, price_final, price_original, is_sold')
+      supa.from('offers').select('id, title, property_type, district, city, area_sqm, rooms, price_final, price_original, is_sold, is_pinned, created_at')
         .eq('is_published', true).is('deleted_at', null).limit(100)
     );
     if (error || !data) return [];
@@ -4007,11 +3981,43 @@ async function findPromoOffers(text){
   const lower = text.toLowerCase();
   const type = detectType(text, lower);
   const city = detectCity(text, lower);
-  const sameType = (a, b) => a === b || (String(a).startsWith('شقة') && String(b).startsWith('شقة'));
   let pool = rows.filter(o => { const d = normalizeArabicForMatch(o.district); return d.length >= 3 && norm.includes(d); });
   if (!pool.length && city && type) pool = rows.filter(o => o.city === city);
-  if (type) pool = pool.filter(o => sameType(o.property_type, type));
+  if (type) pool = pool.filter(o => assistSameType(o.property_type, type));
   return pool.slice(0, 3);
+}
+const assistSameType = (a, b) => a === b || (String(a).startsWith('شقة') && String(b).startsWith('شقة'));
+// 2026-10-01: بحث العقارات بالمساعد صار يقرأ جدول offers (نفس صفحة العروض العامة) بدل
+// properties (عقارات الزوار المعتمدة — ما كلها عروض منشورة)، ويفلتر بالحي المذكور. حي معروف
+// مذكور وما عندنا فيه عروض = نتيجة فاضية (ما نرجع عروض من أحياء ثانية). ترتيب: المثبّتة
+// ثم الأحدث، وحد أقصى 5.
+async function searchOffers(q, text){
+  const rows = await fetchPublishedOffersForAssistant();
+  if (!rows.length) return [];
+  const norm = normalizeArabicForMatch(text);
+  const nameHit = (name) => { const d = normalizeArabicForMatch(name); return d.length >= 3 && norm.includes(d); };
+  let pool = rows.filter(o => nameHit(o.district));
+  if (!pool.length){
+    const knownMentioned = Object.values(CITY_DISTRICTS).some(list => list.some(nameHit));
+    if (knownMentioned) return [];
+    pool = rows;
+  }
+  if (q.city) pool = pool.filter(o => o.city === q.city);
+  if (q.type) pool = pool.filter(o => assistSameType(o.property_type, q.type));
+  if (q.rooms) pool = pool.filter(o => o.rooms === q.rooms);
+  if (q.minPrice || q.maxPrice){
+    pool = pool.filter(o => {
+      const p = o.price_final ?? o.price_original;
+      if (p == null) return false;
+      return (!q.minPrice || p >= q.minPrice) && (!q.maxPrice || p <= q.maxPrice);
+    });
+  }
+  return pool
+    .sort((x, y) => (Number(!!y.is_pinned) - Number(!!x.is_pinned)) || String(y.created_at || '').localeCompare(String(x.created_at || '')))
+    .slice(0, 5);
+}
+function promoBrowseLinkHtml(){
+  return `<a href="/offers" style="display:block;margin-top:6px;font-weight:700;color:inherit;text-decoration:underline">${currentLang==='ar' ? 'تصفّح كل العروض ←' : 'Browse all offers →'}</a>`;
 }
 function promoOffersContextText(promo){
   const lines = promo.map(o => {
@@ -4032,7 +4038,7 @@ function promoCardsHtml(promo){
       <span class="price">${priceText}</span>
     </a>`;
   }).join('');
-  return cards + `<a href="/offers" style="display:block;margin-top:6px;font-weight:700;color:inherit;text-decoration:underline">${currentLang==='ar' ? 'تصفّح كل العروض ←' : 'Browse all offers →'}</a>`;
+  return cards + promoBrowseLinkHtml();
 }
 
 async function askAiAssistant(text, promo = []){
@@ -4165,23 +4171,14 @@ async function handleAssistSend(textOverride, isPredefinedChip){
   const superlative = looksLikePriceQuestion(text) ? detectPriceSuperlative(text) : null;
 
   if (isSearch){
-    const results = await searchProperties(q);
+    const results = await searchOffers(q, text);
     await sleep(350);
     hideTyping();
     if (!results.length){
-      addAssistMsg(t.noResults, 'bot');
+      addAssistMsg(t.noResults, 'bot', promoBrowseLinkHtml());
     } else {
-      const cardsHtml = results.map(r=>{
-        const priceText = r.price ? `${money(r.price)} ${currentLang==='ar' ? 'ر.س' : 'SAR'}` : I18N[currentLang].price_on_request;
-        return `<div class="assist-result-card">
-          <b>${r.property_type} — ${districtLabel(r.district)}</b>
-          <div class="meta">${cityLabel(r.city)} · ${r.area_sqm || '—'} م²${r.rooms ? (' · ' + r.rooms + ' ' + I18N[currentLang].rooms_suffix) : ''}</div>
-          <span class="price">${priceText}</span>
-        </div>`;
-      }).join('');
-      addAssistMsg(t.resultsIntro(results.length), 'bot', cardsHtml);
+      addAssistMsg(t.resultsIntro(results.length), 'bot', promoCardsHtml(results));
     }
-    showPage('offers');
   } else if (superlative){
     const allRows = await fetchAllDistrictPriceRows();
     await sleep(300);

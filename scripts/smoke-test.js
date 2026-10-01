@@ -395,6 +395,40 @@ const CHECKS = [
     if (el().textContent.includes("عينة صغيرة")) return "قباء (100 صفقة) طلع عليه تنبيه عينة صغيرة";
     return true;
   }],
+  ["المساعد: بحث العقارات يقرأ العروض المنشورة + يفلتر بالحي + بطاقات قابلة للضغط + بدون قفز", async () => {
+    // 2026-10-01: كان يقرأ properties (مو العروض) ولا يفلتر بالحي ويقفز لصفحة العروض
+    const pg = await loadPage("index.html", "/");
+    const mk = (n, type, district, city, price, created, extra = {}) => ({ id: `bbbbbbbb-0000-0000-0000-00000000000${n}`, title: "t", property_type: type, district, city, area_sqm: 400, rooms: 5, price_final: price, price_original: price, is_published: true, is_sold: false, is_pinned: false, created_at: created, ...extra });
+    pg.T.offers = [
+      mk(1, "فيلا", "العيون", "المدينة المنورة", 3100000, "2026-09-01T00:00:00Z"),
+      mk(2, "فيلا", "العيون", "المدينة المنورة", 2000000, "2026-09-20T00:00:00Z"),
+      mk(3, "فيلا", "قباء", "المدينة المنورة", 1000000, "2026-09-25T00:00:00Z"),
+      mk(4, "شقة في عمارة", "الروضة", "جدة", 700000, "2026-09-10T00:00:00Z"),
+      mk(5, "فيلا", "العيون", "المدينة المنورة", 900000, "2026-09-26T00:00:00Z", { is_sold: true }),
+    ];
+    pg.T.properties = [{ id: "p1", status: "approved", city: "المدينة المنورة", district: "الحرة", property_type: "فيلا", price: 500000, area_sqm: 300, rooms: 4 }];
+    const w = pg.w;
+    w.fetch = async () => ({ ok: true, status: 200, json: async () => ({ reply: "ذكاء" }), text: async () => "" });
+    const ask = async (q) => {
+      const body = w.document.getElementById("assist-body"); body.innerHTML = "";
+      w.document.getElementById("assist-input").value = q;
+      w.document.getElementById("assist-send").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+      await new Promise(r => setTimeout(r, 1200));
+      return [...body.querySelectorAll("a[href^='/offer/']")].map(a => a.getAttribute("href").replace(/.*0{11}/, "").replace("/", ""));
+    };
+    const shownPage = () => [...w.document.querySelectorAll(".page")].filter(e => e.style.display !== "none").map(e => e.id).join(",");
+    const before = shownPage();
+    let ids = await ask("ابي فيلا في العيون تحت 4 مليون");
+    if (ids.join() !== "2,1") return `فيلا العيون تحت 4 مليون: المتوقع [2,1] (الأحدث أولاً، بدون المباع وبدون قباء) والنتيجة [${ids}]`;
+    if (shownPage() !== before) return `المساعد قفز لصفحة ثانية (${before} ← ${shownPage()})`;
+    ids = await ask("ابي فيلا في العيون تحت 2.5 مليون");
+    if (ids.join() !== "2") return `فلتر السعر: المتوقع [2] والنتيجة [${ids}]`;
+    ids = await ask("ابي فيلا في العزيزية");
+    if (ids.length) return `حي العزيزية: ما عندنا عروض فيه لكن طلعت [${ids}] (properties أو حي ثاني)`;
+    ids = await ask("ابي فيلا في جدة");
+    if (ids.length) return `فيلا بجدة: ما عندنا لكن طلعت [${ids}]`;
+    return true;
+  }],
   ["Analytics: ضغطة زر واتساب العائم = whatsapp_click", async ({ home }) => {
     const a = home.w.document.getElementById("whatsapp-float");
     if (!a) return "#whatsapp-float غير موجود";
