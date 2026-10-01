@@ -3924,6 +3924,45 @@ function fitAiHistory(messages){
   return kept;
 }
 
+// 2026-10-01: بيانات أسعار كل الأحياء (569 حي ≈ 13,300 حرف) تجاوزت حد الـ Worker
+// (12,000) فصار أي سؤال أسعار بدون مدينة يرجع 400 ويعلّق على الرد الثابت.
+// الحين نرسل فقط اللي يخص السؤال: الأحياء المذكورة بالاسم، أو كل أحياء المدينة
+// المذكورة (لو صغيرة)، أو ملخص لكل مدينة (أرخص/أغلى 5) لو ما ذُكر شي — دايماً
+// أقل من AI_PRICE_CONTEXT_MAX حرف بغض النظر عن حجم الجدول.
+const AI_PRICE_CONTEXT_MAX = 5500;
+function buildSmartPriceContext(allRows, text, mentionedCity){
+  const pool = mentionedCity ? allRows.filter(r => r.city === mentionedCity) : allRows;
+  const base = pool.length ? pool : allRows;
+  const norm = normalizeArabicForMatch(text);
+
+  // 1) حي (أو أكثر) مذكور بالاسم — نطابق الاسم بعد التطبيع (≥3 حروف عشان ما نطابق بالغلط)
+  const named = base.filter(r => {
+    const n = normalizeArabicForMatch(r.name);
+    return n.length >= 3 && norm.includes(n);
+  });
+  if (named.length){
+    const shown = named.slice(0, 30);
+    return { mode: 'districts', text: buildPriceContextText(shown) };
+  }
+
+  // 2) مدينة مذكورة وأحياؤها تتسع — نرسلها كلها (نفس السلوك القديم)
+  if (mentionedCity){
+    const full = buildPriceContextText(base);
+    if (full.length <= AI_PRICE_CONTEXT_MAX) return { mode: 'city', text: full };
+  }
+
+  // 3) ملخص لكل مدينة: عدد الأحياء + أرخص 5 + أغلى 5 (rows مرتّبة تصاعدياً بالسعر)
+  const byCity = {};
+  base.forEach(r => { (byCity[r.city] = byCity[r.city] || []).push(r); });
+  const fmt = r => `${r.name}: ${money(r.price)}`;
+  const parts = Object.entries(byCity).map(([city, list]) => {
+    const low = list.slice(0, 5), high = list.slice(-5).reverse();
+    return `${city} (${list.length} حي) — أرخص: ${low.map(fmt).join('، ')} | أغلى: ${high.map(fmt).join('، ')}`;
+  });
+  const summary = parts.join('\n') + '\n[الأسعار بالريال/م²، وهذا ملخص فقط وليس كل الأحياء — لو الحي المسؤول عنه غير مذكور قل إن سعره غير متوفر لديك ووجّه الزائر لقسم «المؤشر»]';
+  return { mode: 'summary', text: summary.slice(0, AI_PRICE_CONTEXT_MAX) };
+}
+
 async function askAiAssistant(text){
   assistantHistory.push({ role: 'user', text }); // نخزّن النص الأصلي النظيف بالسجل المعروض
   if (assistantHistory.length > 20) assistantHistory = assistantHistory.slice(-20);
@@ -3940,11 +3979,10 @@ async function askAiAssistant(text){
       // نرسلها — يضمن الإجابة تبقى بنفس المدينة المطلوبة دائماً، بدل ما
       // نعتمد على الذكاء الاصطناعي يفلتر صح من بيانات 4 مدن مختلطة.
       const mentionedCity = detectCity(text, text.toLowerCase());
-      const relevantRows = mentionedCity ? allRows.filter(r => r.city === mentionedCity) : allRows;
-      const rowsToSend = relevantRows.length ? relevantRows : allRows;
-      window.__lastDebug = `[تشخيص مؤقت] المدينة المكتشفة: ${mentionedCity || 'لا شي'} — عدد الصفوف المُرسلة: ${rowsToSend.length} من أصل ${allRows.length}`;
-      const priceContext = buildPriceContextText(rowsToSend);
-      const cityNote = mentionedCity ? `\n\n[ملاحظة: الزائر يسأل تحديداً عن مدينة ${mentionedCity} — البيانات أعلاه لهذي المدينة فقط، لا تذكر مدن ثانية بالرد]` : '';
+      const ctx = buildSmartPriceContext(allRows, text, mentionedCity);
+      window.__lastDebug = `[تشخيص مؤقت] المدينة المكتشفة: ${mentionedCity || 'لا شي'} — نمط السياق: ${ctx.mode} — ${ctx.text.length} حرف`;
+      const priceContext = ctx.text;
+      const cityNote = (mentionedCity && ctx.mode !== 'summary') ? `\n\n[ملاحظة: الزائر يسأل تحديداً عن مدينة ${mentionedCity} — البيانات أعلاه لهذي المدينة فقط، لا تذكر مدن ثانية بالرد]` : '';
       messagesToSend = assistantHistory.slice(0, -1).concat([{
         role: 'user',
         text: `[بيانات أسعار حقيقية من قاعدة بياناتنا — ريال/م²]\n${priceContext}${cityNote}\n\n[سؤال الزائر]: ${text}`

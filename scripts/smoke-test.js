@@ -99,7 +99,7 @@ function loadPage(file, urlPath) {
     } catch (e) { errors.push("site.js: " + e.message); }
     // نلتقط أحداث Analytics بعد تحميل site.js (index.html يعرّف gtag كدالة عامة)
     w.gtag = (type, name, params) => { if (type === "event") gtagEvents.push({ name, params }); };
-    setTimeout(() => resolve({ w, errors, gtagEvents, rpc: T.__rpc, invoke: T.__invoke, opened }), 1200);
+    setTimeout(() => resolve({ w, errors, gtagEvents, rpc: T.__rpc, invoke: T.__invoke, opened, T }), 1200);
   });
 }
 
@@ -273,6 +273,41 @@ const CHECKS = [
     if (msgs.length > 20 || total > 12000) return `انرسل ${msgs.length} رسالة بمجموع ${total} حرف — الـ Worker بيرفضها`;
     if (!String(msgs[msgs.length - 1].text).includes("كيف اشتري فيلا في حي العيون")) return "السؤال الأخير ما انرسل كآخر رسالة";
     if (msgs.length < 2) return "انحذف كل السياق السابق (المفروض يبقى أحدث ما يدخل بالحد)";
+    return true;
+  }],
+  ["المساعد الذكي: أسئلة الأسعار ما تتجاوز 12,000 حرف حتى مع 569 حي (4 مدن)", async () => {
+    // 2026-10-01: بيانات كل الأحياء صارت ≈13,300 حرف فرفضها الـ Worker (400) لأي سؤال أسعار بدون مدينة
+    const pg = await loadPage("index.html", "/");
+    const cities = [["المدينة المنورة", 175], ["الرياض", 158], ["مكة المكرمة", 112], ["جدة", 124]];
+    let n = 0; const rows = [];
+    for (const [c, k] of cities) for (let i = 0; i < k; i++, n++) {
+      rows.push({ price_per_sqm: 1000 + n * 7, districts: { name: (c === cities[0][0] && i === 0) ? "العيون" : "المنطقة" + n, cities: { name: c } } });
+    }
+    pg.T.district_prices = rows;
+    const w = pg.w, sent = [];
+    w.fetch = async (u, opts) => {
+      if (String(u).endsWith("/chat")) sent.push(JSON.parse(opts.body));
+      return { ok: true, status: 200, json: async () => ({ reply: "تمام" }), text: async () => "" };
+    };
+    const ask = async (q) => { sent.length = 0; await w.askAiAssistant(q); return sent[0] && sent[0].messages; };
+    const size = (ms) => ms.reduce((t, m) => t + String(m.text || "").length, 0);
+    const lastOf = (ms) => String(ms[ms.length - 1].text);
+
+    let ms = await ask("كيف اشتري فيلا في حي العيون");
+    if (!ms) return "ما انرسل طلب /chat (سؤال حي بدون مدينة)";
+    if (size(ms) > 12000 || lastOf(ms).length > 8000) return `سؤال الحي: ${size(ms)} حرف (الـ Worker يرفض فوق 12,000)`;
+    if (!lastOf(ms).includes("العيون: ") || !lastOf(ms).includes("بيانات أسعار")) return "سعر حي العيون ما انرسل مع السؤال";
+    if (lastOf(ms).includes("المنطقة300")) return "انرسلت أحياء ما لها علاقة بالسؤال";
+
+    ms = await ask("ايش اسعار الاحياء");
+    if (!ms) return "ما انرسل طلب /chat (سؤال عام)";
+    if (size(ms) > 12000 || lastOf(ms).length > 8000) return `السؤال العام: ${size(ms)} حرف`;
+    if (!lastOf(ms).includes("ملخص") || !lastOf(ms).includes("(175 حي)")) return "الملخص (عدد الأحياء + أرخص/أغلى) غير موجود";
+
+    ms = await ask("ايش اسعار الاحياء في جدة");
+    if (!ms) return "ما انرسل طلب /chat (سؤال مدينة)";
+    if (size(ms) > 12000) return `سؤال المدينة: ${size(ms)} حرف`;
+    if (!lastOf(ms).includes("جدة") || lastOf(ms).includes("الرياض")) return "سؤال جدة المفروض يحمل جدة فقط";
     return true;
   }],
   ["Analytics: ضغطة زر واتساب العائم = whatsapp_click", async ({ home }) => {
