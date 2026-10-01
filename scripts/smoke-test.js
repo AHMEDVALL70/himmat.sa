@@ -250,6 +250,31 @@ const CHECKS = [
     if (contracts.opened.length !== o1) return "زر التنزيل فتح واتساب (المفروض طباعة/حفظ بس)";
     return true;
   }],
+  ["المساعد الذكي: المحادثة الطويلة ما تتجاوز حدود الـ Worker (12,000 حرف / 20 رسالة)", async ({ home }) => {
+    // 2026-10-01: قبل، لو طالت المحادثة الـ Worker يرد 400 «المحادثة طويلة جداً»
+    // وكل سؤال بعدها يرجع للرد الثابت لين يحدّث الزائر الصفحة
+    const w = home.w;
+    const sent = [];
+    const oldFetch = w.fetch;
+    // ردود طويلة من «الـ Worker» عشان تكبر المحادثة طبيعياً (assistantHistory
+    // متغير let داخل site.js، ما نوصله من برّا — نكبّره بأسئلة فعلية)
+    w.fetch = async (u, opts) => {
+      if (String(u).endsWith("/chat")) sent.push(JSON.parse(opts.body));
+      return { ok: true, status: 200, json: async () => ({ reply: "ر".repeat(1900) }), text: async () => "" };
+    };
+    try {
+      for (let i = 0; i < 7; i++) await w.askAiAssistant("سؤال طويل " + i + " " + "س".repeat(1900));
+      sent.length = 0;
+      await w.askAiAssistant("كيف اشتري فيلا في حي العيون");
+    } finally { w.fetch = oldFetch; }
+    if (!sent.length) return "ما انرسل طلب /chat";
+    const msgs = sent[0].messages;
+    const total = msgs.reduce((s, m) => s + String(m.text || "").length, 0);
+    if (msgs.length > 20 || total > 12000) return `انرسل ${msgs.length} رسالة بمجموع ${total} حرف — الـ Worker بيرفضها`;
+    if (!String(msgs[msgs.length - 1].text).includes("كيف اشتري فيلا في حي العيون")) return "السؤال الأخير ما انرسل كآخر رسالة";
+    if (msgs.length < 2) return "انحذف كل السياق السابق (المفروض يبقى أحدث ما يدخل بالحد)";
+    return true;
+  }],
   ["Analytics: ضغطة زر واتساب العائم = whatsapp_click", async ({ home }) => {
     const a = home.w.document.getElementById("whatsapp-float");
     if (!a) return "#whatsapp-float غير موجود";

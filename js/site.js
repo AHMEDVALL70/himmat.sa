@@ -3904,6 +3904,26 @@ function buildPriceContextText(rows){
     .join('\n\n');
 }
 
+// الـ Worker يرفض (400 «المحادثة طويلة جداً») لو مجموع نصوص المحادثة فوق
+// 12,000 حرف أو عددها فوق 20 — وقبل كان المساعد يعلق على الرد الثابت لكل
+// سؤال بعدها لين يحدّث الزائر الصفحة. هنا نحتفظ بالسؤال الأخير دايماً
+// ونضيف قبله أحدث الرسائل اللي تدخل بالميزانية، والأقدم يُترك.
+const AI_MAX_TOTAL_CHARS = 11000; // أقل من حد الـ Worker (12,000) بهامش
+const AI_MAX_MESSAGES = 20;
+function fitAiHistory(messages){
+  if (!messages.length) return messages;
+  const last = messages[messages.length - 1];
+  const kept = [last];
+  let total = String(last.text || '').length;
+  for (let i = messages.length - 2; i >= 0 && kept.length < AI_MAX_MESSAGES; i--){
+    const len = String(messages[i].text || '').length;
+    if (total + len > AI_MAX_TOTAL_CHARS) break;
+    kept.unshift(messages[i]);
+    total += len;
+  }
+  return kept;
+}
+
 async function askAiAssistant(text){
   assistantHistory.push({ role: 'user', text }); // نخزّن النص الأصلي النظيف بالسجل المعروض
   if (assistantHistory.length > 20) assistantHistory = assistantHistory.slice(-20);
@@ -3940,7 +3960,7 @@ async function askAiAssistant(text){
     const res = await fetch(AI_BACKEND_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: messagesToSend, turnstileToken }),
+      body: JSON.stringify({ messages: fitAiHistory(messagesToSend), turnstileToken }),
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
