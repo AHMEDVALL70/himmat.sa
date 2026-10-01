@@ -3963,7 +3963,65 @@ function buildSmartPriceContext(allRows, text, mentionedCity){
   return { mode: 'summary', text: summary.slice(0, AI_PRICE_CONTEXT_MAX) };
 }
 
-async function askAiAssistant(text){
+// 2026-10-01: ترويج عروضنا داخل ردود المساعد. قبل كان المساعد ما يعرف عروضنا أصلاً
+// (يوصله الأسعار فقط) فسؤال «كيف اشتري فيلا في حي العيون» يرد بخطوات عامة والفيلا
+// المنشورة عندنا بنفس الحي ما تنذكر. المصدر نفس جدول صفحة العروض العامة (offers،
+// منشور وغير محذوف وغير مباع). المطابقة: حي مذكور بالاسم، أو مدينة + نوع.
+// ما نعرض شي لو ما فيه تطابق — ما نرجع لبطاقة عشوائية (قاعدة 20/9).
+let promoOffersCache = null, promoOffersCacheTime = 0;
+async function fetchPublishedOffersForAssistant(){
+  if (promoOffersCache && (Date.now() - promoOffersCacheTime) < 600000) return promoOffersCache;
+  if (!dbReady) return [];
+  try {
+    const { data, error } = await withTimeout(
+      supa.from('offers').select('id, title, property_type, district, city, area_sqm, rooms, price_final, price_original, is_sold')
+        .eq('is_published', true).is('deleted_at', null).limit(100)
+    );
+    if (error || !data) return [];
+    promoOffersCache = data.filter(o => !o.is_sold);
+    promoOffersCacheTime = Date.now();
+    return promoOffersCache;
+  } catch (e) {
+    console.error('fetchPublishedOffersForAssistant failed', e);
+    return [];
+  }
+}
+async function findPromoOffers(text){
+  const rows = await fetchPublishedOffersForAssistant();
+  if (!rows.length) return [];
+  const norm = normalizeArabicForMatch(text);
+  const lower = text.toLowerCase();
+  const type = detectType(text, lower);
+  const city = detectCity(text, lower);
+  const sameType = (a, b) => a === b || (String(a).startsWith('شقة') && String(b).startsWith('شقة'));
+  let pool = rows.filter(o => { const d = normalizeArabicForMatch(o.district); return d.length >= 3 && norm.includes(d); });
+  if (!pool.length && city && type) pool = rows.filter(o => o.city === city);
+  if (type) pool = pool.filter(o => sameType(o.property_type, type));
+  return pool.slice(0, 3);
+}
+function promoOffersContextText(promo){
+  const lines = promo.map(o => {
+    const price = o.price_final ?? o.price_original;
+    const priceTxt = price ? `السعر الإجمالي ${money(price)} ر.س` : 'السعر عند الطلب';
+    return `- ${o.property_type} في ${o.district} (${o.city}) — ${o.area_sqm || '—'} م²${o.rooms ? ' · ' + o.rooms + ' غرف' : ''} — ${priceTxt}`;
+  });
+  return `[عروضنا المنشورة المطابقة لسؤال الزائر — متاحة فعلاً عندنا]\n${lines.join('\n')}\n[اذكرها باختصار بجوابك كفرصة متاحة عندنا (النوع، الحي، السعر الإجمالي) بدون اختلاق أي تفصيل غير مذكور هنا، ووجّه الزائر لقسم «العروض»]`;
+}
+function promoCardsHtml(promo){
+  if (!promo.length) return '';
+  const cards = promo.map(o => {
+    const price = o.price_final ?? o.price_original;
+    const priceText = price ? `${money(price)} ${currentLang==='ar' ? 'ر.س' : 'SAR'}` : I18N[currentLang].price_on_request;
+    return `<a class="assist-result-card" href="/offer/${encodeURIComponent(o.id)}/" style="display:block;text-decoration:none;color:inherit">
+      <b>${escapeHtml(typeLabel(o.property_type))} — ${escapeHtml(districtLabel(o.district))}</b>
+      <div class="meta">${escapeHtml(cityLabel(o.city))} · ${o.area_sqm || '—'} م²${o.rooms ? (' · ' + o.rooms + ' ' + I18N[currentLang].rooms_suffix) : ''}</div>
+      <span class="price">${priceText}</span>
+    </a>`;
+  }).join('');
+  return cards + `<a href="/offers" style="display:block;margin-top:6px;font-weight:700;color:inherit;text-decoration:underline">${currentLang==='ar' ? 'تصفّح كل العروض ←' : 'Browse all offers →'}</a>`;
+}
+
+async function askAiAssistant(text, promo = []){
   assistantHistory.push({ role: 'user', text }); // نخزّن النص الأصلي النظيف بالسجل المعروض
   if (assistantHistory.length > 20) assistantHistory = assistantHistory.slice(-20);
 
@@ -3972,22 +4030,25 @@ async function askAiAssistant(text){
   // وخفيف لباقي الأسئلة بنفس المحادثة)
   window.__lastDebug = null;
   let messagesToSend = assistantHistory;
+  const blocks = [];
   if (looksLikePriceQuestion(text)){
     const allRows = await fetchAllDistrictPriceRows();
     if (allRows && allRows.length){
-      // لو السؤال يذكر مدينة صراحة، نفلتر البيانات لهذي المدينة بس قبل ما
-      // نرسلها — يضمن الإجابة تبقى بنفس المدينة المطلوبة دائماً، بدل ما
-      // نعتمد على الذكاء الاصطناعي يفلتر صح من بيانات 4 مدن مختلطة.
+      // لو السؤال يذكر مدينة صراحة نرسل بيانات هذي المدينة بس (والأحياء المذكورة بالاسم)،
+      // وبدون مدينة نرسل ملخصاً — كل شي مقصوص بسقف AI_PRICE_CONTEXT_MAX (راجع buildSmartPriceContext).
       const mentionedCity = detectCity(text, text.toLowerCase());
       const ctx = buildSmartPriceContext(allRows, text, mentionedCity);
       window.__lastDebug = `[تشخيص مؤقت] المدينة المكتشفة: ${mentionedCity || 'لا شي'} — نمط السياق: ${ctx.mode} — ${ctx.text.length} حرف`;
-      const priceContext = ctx.text;
       const cityNote = (mentionedCity && ctx.mode !== 'summary') ? `\n\n[ملاحظة: الزائر يسأل تحديداً عن مدينة ${mentionedCity} — البيانات أعلاه لهذي المدينة فقط، لا تذكر مدن ثانية بالرد]` : '';
-      messagesToSend = assistantHistory.slice(0, -1).concat([{
-        role: 'user',
-        text: `[بيانات أسعار حقيقية من قاعدة بياناتنا — ريال/م²]\n${priceContext}${cityNote}\n\n[سؤال الزائر]: ${text}`
-      }]);
+      blocks.push(`${ctx.text}${cityNote}`);
     }
+  }
+  if (promo && promo.length) blocks.push(promoOffersContextText(promo));
+  if (blocks.length){
+    messagesToSend = assistantHistory.slice(0, -1).concat([{
+      role: 'user',
+      text: `[بيانات أسعار حقيقية من قاعدة بياناتنا — ريال/م²]\n${blocks.join('\n\n')}\n\n[سؤال الزائر]: ${text}`
+    }]);
   }
 
   const AI_TIMEOUT_MS = 20000; // 20 ثانية — أطول من قبل لأن سؤال الأسعار يحتاج جلب بيانات إضافية قبل الاتصال بالذكاء الاصطناعي
@@ -4148,7 +4209,8 @@ async function handleAssistSend(textOverride, isPredefinedChip){
     addAssistMsg(reply, 'bot');
     if (goto) showPage(goto);
   } else {
-    const aiReply = await askAiAssistant(text);
+    const promo = await findPromoOffers(text);
+    const aiReply = await askAiAssistant(text, promo);
     await sleep(300);
     hideTyping();
     if (aiReply.ok){
@@ -4164,7 +4226,7 @@ async function handleAssistSend(textOverride, isPredefinedChip){
         addAssistMsg(sectionRule.reply, 'bot');
         showPage(sectionRule.goto);
       } else {
-        addAssistMsg(aiReply.reply, 'bot');
+        addAssistMsg(aiReply.reply, 'bot', promoCardsHtml(promo));
       }
     } else {
       // الذكاء الاصطناعي غير متاح مؤقتاً (ازدحام أو انقطاع أو تجاوز مهلة) —
