@@ -490,6 +490,17 @@ const CHECKS = [
     await new Promise((r) => setTimeout(r, 100));
     return calls === 1 || `ولّد رمزاً زائداً: ${calls}`;
   }],
+  ["أسماء الأحياء بالإنجليزية: كل الأحياء المسعّرة مغطاة بنقحرة (بدون ترجمة ولا حروف عربية)", async () => {
+    const m = SITE_JS.match(/const DISTRICT_TRANSLIT = (\{[\s\S]*?\n\});/);
+    if (!m) return "DISTRICT_TRANSLIT غير موجود";
+    const dict = new Function("return " + m[1])();
+    const names = JSON.parse(fs.readFileSync(path.join(__dirname, "district-names.json"), "utf8"));
+    const missing = names.filter((n) => !dict[n]);
+    if (missing.length) return `${missing.length} حي بلا اسم إنجليزي، مثل: ${missing.slice(0, 3).join("، ")}`;
+    const bad = Object.entries(dict).filter(([, v]) => /[\u0600-\u06FF]/.test(v) || /\bKing\b/.test(v));
+    if (bad.length) return `اسم مترجم أو فيه عربي: ${bad[0].join(" → ")}`;
+    return true;
+  }],
   ["sw.js: التنقّل فقط يمر عبره، وفشل الشبكة ما يسبّب رفضاً غير ملتقَط", async () => {
     const handlers = {};
     const self = { addEventListener: (t, f) => { handlers[t] = f; }, skipWaiting() {}, clients: { claim() {} } };
