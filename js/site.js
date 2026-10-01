@@ -2748,12 +2748,20 @@ document.getElementById('add-images')?.addEventListener('change', (e) => {
  *  (فاضية لو ما فيه صور مختارة أصلاً — النموذج يبقى شغّال بدون صور زي قبل). */
 async function uploadAddPropertyImages(){
   if (addPropertySelectedFiles.length === 0) return [];
+  const t0 = performance.now();
+  const lap = (what) => console.info(`⏱ رفع الصور — ${what}: ${Math.round(performance.now()-t0)}ms (تراكمي)`);
   const compressedBlobs = await Promise.all(addPropertySelectedFiles.map(f => compressImageForUpload(f)));
+  lap('الضغط');
   const base64Images = await Promise.all(compressedBlobs.map(b => blobToBase64(b)));
-  const turnstileToken = await getTurnstileToken();
+  lap('التحويل base64');
+  const turnstileToken = await getTurnstileTokenWithRetry('upload');
+  lap('Turnstile');
+  if (!turnstileToken) throw new Error('TURNSTILE_FAILED');
   const { data, error: fnError } = await supa.functions.invoke('public-upload-image', {
     body: { images: base64Images, turnstileToken },
   });
+  lap('الرفع للخادم');
+  if (fnError && fnError.context && fnError.context.status === 403) throw new Error('TURNSTILE_FAILED');
   const error = fnError || (data && data.error ? { message: data.error } : null);
   if (error) throw new Error(error.message || 'تعذّر رفع الصور');
   return data.urls || [];
@@ -2806,7 +2814,8 @@ document.getElementById('btn-add-property').addEventListener('click', async ()=>
       }
     }
     msg.textContent = '⏳ جاري الإرسال...';
-    const turnstileToken = await getTurnstileToken();
+    const turnstileToken = await getTurnstileTokenWithRetry('add-property');
+    if (!turnstileToken) throw new Error('TURNSTILE_FAILED');
     const { data, error: fnError } = await supa.functions.invoke('public-submit', {
       body: { type: 'property', payload, turnstileToken },
     });
@@ -2822,7 +2831,9 @@ document.getElementById('btn-add-property').addEventListener('click', async ()=>
       renderAddPropertyThumbs();
     }
   } catch (e) {
-    msg.textContent = '⚠️ تعذّر الاتصال بقاعدة البيانات — تحقق من اتصالك وحاول مجدداً.';
+    msg.textContent = (e && e.message === 'TURNSTILE_FAILED')
+      ? turnstileFailMessage()
+      : '⚠️ تعذّر الاتصال بقاعدة البيانات — تحقق من اتصالك وحاول مجدداً.';
     msg.style.color = 'var(--danger)';
     console.error('btn-add-property: Supabase call failed.', e);
   }
@@ -3591,6 +3602,7 @@ function showNotFoundPage(){
     robots.content = 'noindex';
     document.title = (ar ? 'الصفحة غير موجودة' : 'Page not found') + ' | ' + (ar ? 'همة المدينة العقارية' : 'Himmat Al-Madinah Real Estate');
   }
+  document.querySelectorAll('.links a').forEach(a=>a.classList.remove('active')); // لا رابط مميَّز بصفحة 404
   window.scrollTo({ top: 0, behavior: 'auto' });
 }
 
@@ -3819,7 +3831,7 @@ const TURNSTILE_SITE_KEY = '0x4AAAAAAEu3S6icGpBIUVnz';
    وينتهي بسرعة). لو السكربت ما تحمّل لأي سبب (حجب إعلانات، مشكلة شبكة)،
    نرجّع null ونكمل عادي — الـWorker يتعامل مع هالحالة بلطف من طرفه. */
 let turnstileWidgetId = null;
-function getTurnstileToken(){
+function getTurnstileToken(timeoutMs = 8000){
   return new Promise((resolve)=>{
     if (!window.turnstile){ resolve(null); return; }
     const container = document.getElementById('turnstile-container');
@@ -3845,6 +3857,25 @@ function getTurnstileToken(){
     }
     setTimeout(()=> finish(null), 8000); // شبكة أمان لو أي callback ما انطلق
   });
+}
+
+/* للنماذج العامة (رفع الصور وإرسال العقار): مهلة أطول ومحاولة ثانية تلقائية.
+   كانت المهلة 8 ثوانٍ ثم يُرسل الطلب برمز فارغ فيرفضه الخادم بـ403 — فيظهر للزائر
+   خطأ مضلّل «تعذّر الاتصال بقاعدة البيانات» (2026-10-01). */
+async function getTurnstileTokenWithRetry(label){
+  const t0 = performance.now();
+  let token = await getTurnstileToken(15000);
+  if (!token){
+    console.warn(`Turnstile (${label}): لا رمز بعد ${Math.round(performance.now()-t0)}ms — محاولة ثانية`);
+    token = await getTurnstileToken(15000);
+  }
+  console.info(`⏱ Turnstile (${label}): ${Math.round(performance.now()-t0)}ms ${token ? 'نجح' : 'فشل'}`);
+  return token;
+}
+function turnstileFailMessage(){
+  return currentLang === 'en'
+    ? '⚠️ Security check failed (slow network or a blocker may be interfering). Please refresh the page and try again.'
+    : '⚠️ تعذّر التحقق الأمني (قد يكون بسبب بطء الشبكة أو إضافة تحجب التحقق). حدّث الصفحة وحاول مرة ثانية.';
 }
 
 /* بيانات أسعار الأحياء الحقيقية — نجيبها بس لما السؤال يبدو متعلق

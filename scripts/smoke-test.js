@@ -447,6 +447,38 @@ const CHECKS = [
     }
     return true;
   }],
+  ["أضف عقارك: فشل Turnstile = رسالة واضحة وبدون إرسال برمز فارغ؛ ومحاولة ثانية تنقذ الطلب", async () => {
+    const fill = (w) => {
+      const $ = (id) => w.document.getElementById(id);
+      $("add-district").value = "العزيزية"; $("add-price").value = "900000"; $("add-area").value = "300";
+    };
+    // (أ) Turnstile ما يطلع رمز أبداً → رسالة تحقق أمني، وما يُستدعى public-submit
+    const a = await loadPage("add-property.html", "/add-property");
+    a.w.turnstile = { render: (c, o) => { setTimeout(() => o["error-callback"](), 5); return "w"; }, remove() {} };
+    fill(a.w);
+    const i0 = a.invoke.length;
+    a.w.document.getElementById("btn-add-property").click();
+    await new Promise((r) => setTimeout(r, 400));
+    const msgA = a.w.document.getElementById("add-property-msg").textContent;
+    if (!/التحقق الأمني/.test(msgA)) return `الرسالة غير واضحة: «${msgA}»`;
+    if (a.invoke.slice(i0).some((x) => x.name === "public-submit")) return "أُرسل الطلب برمز فارغ";
+    // (ب) فشل أول ثم نجاح بالمحاولة الثانية → يُرسل برمز صحيح
+    const b = await loadPage("add-property.html", "/add-property");
+    let calls = 0;
+    b.w.turnstile = { render: (c, o) => { calls++; const n = calls; setTimeout(() => n >= 2 ? o.callback("tok-ok") : o["error-callback"](), 5); return "w" + n; }, remove() {} };
+    fill(b.w);
+    const j0 = b.invoke.length;
+    b.w.document.getElementById("btn-add-property").click();
+    await new Promise((r) => setTimeout(r, 500));
+    const sent = b.invoke.slice(j0).find((x) => x.name === "public-submit");
+    if (!sent) return `ما أُرسل الطلب بعد المحاولة الثانية (محاولات Turnstile=${calls})`;
+    return sent.opts.body.turnstileToken === "tok-ok" || `الرمز المرسل: ${sent.opts.body.turnstileToken}`;
+  }],
+  ["صفحة 404: ما فيه رابط مميَّز (active) بالقائمة", async () => {
+    const bad = await loadPage("index.html", "/zzz/none");
+    const act = bad.w.document.querySelectorAll(".links a.active").length;
+    return act === 0 || `روابط نشطة: ${act}`;
+  }],
   ["Analytics: ضغطة زر واتساب العائم = whatsapp_click", async ({ home }) => {
     const a = home.w.document.getElementById("whatsapp-float");
     if (!a) return "#whatsapp-float غير موجود";
