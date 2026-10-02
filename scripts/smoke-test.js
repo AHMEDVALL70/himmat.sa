@@ -250,6 +250,48 @@ const CHECKS = [
     if (contracts.opened.length !== o1) return "زر التنزيل فتح واتساب (المفروض طباعة/حفظ بس)";
     return true;
   }],
+  ["العقود: إيميل الفريق يحمل PDF مرفق + زر المشاركة يظهر لو المتصفح يدعم مشاركة الملفات", async ({ contracts }) => {
+    // 2026-10-02: PDF مرفق بإيميل الفريق + زر مشاركة الجوال (Web Share API). المكتبتين مستبدلتين بمزيَّفة هنا
+    // (اختبار صحة الـPDF الحقيقي من jsPDF بخطوة منفصلة)
+    const w = contracts.w, $ = (id) => w.document.getElementById(id);
+    if (!$("btn-share-contract")) return "زر المشاركة غير موجود بالصفحة";
+    for (const f of ["lib/html2canvas-1.4.1.min.js", "lib/jspdf-4.2.1.umd.min.js"]) {
+      const el = w.document.createElement("script"); el.dataset.lazy = f; w.document.head.appendChild(el);
+    }
+    const pdfBytes = "%PDF-1.3\n" + "x".repeat(400);
+    w.html2canvas = async () => ({ width: 1588, height: 1200, toDataURL: () => "data:image/jpeg;base64,/9j/" });
+    let saved = null;
+    w.jspdf = { jsPDF: class { addImage() {} addPage() {} save(n) { saved = n; }
+      output(t) { return t === "blob" ? new w.Blob([pdfBytes], { type: "application/pdf" }) : "data:application/pdf;filename=g.pdf;base64," + w.btoa(pdfBytes); } } };
+    const i0 = contracts.invoke.length;
+    $("btn-generate-contract").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    await new Promise(r => setTimeout(r, 120));
+    const inv = contracts.invoke.slice(i0).find(x => x.name === "public-submit" && x.opts.body.type === "contract");
+    if (!inv) return "إيميل العقد ما انرسل";
+    const pdf = inv.opts.body.payload.pdf;
+    if (!pdf || !/^contract-(HMD-\d+|new)\.pdf$/.test(pdf.name)) return `مرفق PDF مفقود أو اسمه غير آمن: ${JSON.stringify(pdf && pdf.name)}`;
+    if (Buffer.from(pdf.base64, "base64").toString("latin1").slice(0, 4) !== "%PDF") return "المرفق ليس PDF صحيح";
+    // الزر: مخفي لو المتصفح ما يدعم مشاركة الملفات، ويظهر لو يدعم
+    const gen = async () => { $("btn-generate-contract").dispatchEvent(new w.MouseEvent("click", { bubbles: true })); await new Promise(r => setTimeout(r, 60)); };
+    $("btn-share-contract").classList.add("hide");
+    delete w.navigator.canShare; await gen();
+    if (!$("btn-share-contract").classList.contains("hide")) return "زر المشاركة ظهر بمتصفح ما يدعم مشاركة الملفات";
+    let shared = null;
+    w.navigator.canShare = () => true;
+    w.navigator.share = async (d) => { shared = d; };
+    await gen();
+    if ($("btn-share-contract").classList.contains("hide")) return "زر المشاركة ما ظهر بمتصفح يدعمها";
+    $("btn-share-contract").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    await new Promise(r => setTimeout(r, 120));
+    if (!shared || !shared.files || shared.files[0].type !== "application/pdf" || !/\.pdf$/.test(shared.files[0].name)) return "زر المشاركة ما استدعى navigator.share بملف PDF";
+    // فشل المشاركة (غير الإلغاء) ← ينزّل الملف بدلها
+    shared = null; saved = null;
+    w.navigator.share = async () => { const e = new Error("x"); e.name = "NotAllowedError"; throw e; };
+    $("btn-share-contract").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+    await new Promise(r => setTimeout(r, 120));
+    if (!saved) return "فشل المشاركة ما رجع للتنزيل";
+    return true;
+  }],
   ["المساعد الذكي: المحادثة الطويلة ما تتجاوز حدود الـ Worker (12,000 حرف / 20 رسالة)", async ({ home }) => {
     // 2026-10-01: قبل، لو طالت المحادثة الـ Worker يرد 400 «المحادثة طويلة جداً»
     // وكل سؤال بعدها يرجع للرد الثابت لين يحدّث الزائر الصفحة

@@ -911,6 +911,9 @@ const JOB_LABELS = {
   // 2026-10-02: الدالة موجودة بوضع «تجربة» فقط — تُجدول بعد مراجعة أول نتيجة (schema.sql 3.17)
   'purge-orphan-images': { label: 'تنظيف الصور اليتيمة من التخزين', unscheduled: true,
     extra: s => s?.orphans != null ? ` (${s.mode === 'apply' ? 'حُذف ' + (s.deleted ?? 0) : 'تجربة: ' + s.orphans + ' يتيمة'} من ${s.total_files} ملف)` : '' },
+  // 2026-10-02: الاستيراد الربع سنوي تلقائي (GitHub Action شهري؛ يسجّل فقط لما يطبّق أو يتوقف للمراجعة)
+  'import-moj-quarter': { label: 'استيراد أسعار الأحياء من وزارة العدل (تلقائي عند صدور ربع جديد)',
+    extra: s => s?.districts != null ? ` (${s.quarter}: ${s.districts} حي)` : (s?.updated != null ? ` (${s.quarter}: حُدّث ${s.updated} حي، ${s.unknown_in_db ?? 0} غير موجود)` : (s?.message ? ' — توقّف للمراجعة: ' + s.message : '')) },
   // 2026-09-30: صارت مجدولة — إيميل يومي للفريق ٩ الصبح بالرياض (نفس حماية نبّهني)
   'send-reminders': { label: 'تنبيهات الدفعات والعقود — يومياً ٩ ص', maxAgeHours: 48,
     extra: s => s?.today ? (s.emailed ? ` (أُرسل: ${s.overdue ?? 0} متأخرة، ${s.due3 ?? 0} خلال ٣ أيام، ${s.due15 ?? 0} خلال ١٥ يوم، ${s.ending ?? 0} عقد ينتهي)` : ' (ما فيه تنبيهات)') : '' },
@@ -951,7 +954,7 @@ async function loadJobStatus(){
     if (!pe && p && p[0]) {
       const qm = (p[0].period_note || '').match(/(\d{4}-Q\d)\D+(\d{4}-Q\d)/);
       pricesLine = `📊 أسعار الأحياء — المصدر: وزارة العدل (البيانات المفتوحة)، آخر استيراد: ${new Date(p[0].updated_at).toLocaleDateString('ar-SA')}`
-        + `${qm ? ` للفترة ${qm[1]} إلى ${qm[2]}` : ''}${count != null ? `، ${count} حي` : ''} — التحديث ربع سنوي يدوي`;
+        + `${qm ? ` للفترة ${qm[1]} إلى ${qm[2]}` : ''}${count != null ? `، ${count} حي` : ''} — يتحدّث تلقائياً عند صدور ربع جديد`;
     }
 
     el.innerHTML = '';

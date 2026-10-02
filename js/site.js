@@ -138,6 +138,7 @@ const I18N = {
     contract_term_from:"من", contract_term_to:"إلى",
     contract_rent_label:"الإيجار السنوي", contract_vat_label:"ضريبة القيمة المضافة", contract_vat_exempt_res:"معفى (عقد سكني)", contract_vat_not_reg:"بدون ضريبة (المؤجر غير مسجّل بالضريبة)", contract_total_with_vat:"الإجمالي السنوي شامل الضريبة", contract_deposit_label:"الضمان", contract_frequency_label:"عدد الدفعات سنوياً",
     contract_print_btn:"⬇️ تنزيل",
+    contract_share_btn:"📲 مشاركة العقد (واتساب وغيره)",
     type_residential:"سكني", type_commercial:"تجاري",
     opt_east:"شرقية (+5%)", opt_north:"شمالية (+4%)", opt_south:"جنوبية", opt_west:"غربية (-2%)",
     opt_upscale:"حي راقي (+25%)", opt_investment:"حي استثماري (+15%)", opt_mid:"حي متوسط",
@@ -254,6 +255,7 @@ const I18N = {
     contract_term_from:"from", contract_term_to:"to",
     contract_rent_label:"Annual rent", contract_vat_label:"VAT", contract_vat_exempt_res:"Exempt (residential lease)", contract_vat_not_reg:"No VAT (lessor not VAT-registered)", contract_total_with_vat:"Annual total incl. VAT", contract_deposit_label:"Deposit", contract_frequency_label:"Installments per year",
     contract_print_btn:"⬇️ Download",
+    contract_share_btn:"📲 Share contract (WhatsApp etc.)",
     type_residential:"Residential", type_commercial:"Commercial",
     opt_east:"East (+5%)", opt_north:"North (+4%)", opt_south:"South", opt_west:"West (-2%)",
     opt_upscale:"Upscale district (+25%)", opt_investment:"Investment district (+15%)", opt_mid:"Mid-range district",
@@ -3224,6 +3226,7 @@ ${t.contract_frequency_label}: ${frequencyDisplay}`;
     ? `تم إصدار هذا العقد عبر منصة همة المدينة العقارية بتاريخ ${new Date().toLocaleDateString('ar-SA')}`
     : `This contract was issued via the Himmat Al Madinah Real Estate platform on ${new Date().toLocaleDateString('en-GB')}`);
   document.getElementById('btn-print-contract').classList.remove('hide');
+  if (canShareContractFile()) document.getElementById('btn-share-contract').classList.remove('hide');
 
   // 2026-09-30: زر «إرسال العقد للتوثيق» صار يسوي كل شي بضغطة وحدة (حفظ +
   // إيميل للفريق + واتساب + generate_lead). قبل: واتساب والإيميل كانوا بزر
@@ -3297,8 +3300,11 @@ ${t.contract_frequency_label}: ${frequencyDisplay}`;
   const sendEmail = async () => {
     try {
       const turnstileToken = await getTurnstileToken();
+      // 2026-10-02: العقد كملف PDF مرفق بإيميل الفريق. فشل التوليد ما يمنع الإيميل (يرسل بدون مرفق).
+      let pdfAttach = null;
+      try { pdfAttach = await contractPdfForEmail(); } catch (e) { console.error('تعذّر تجهيز PDF للإيميل', e); }
       const { error } = await supa.functions.invoke('public-submit', {
-        body: { type: 'contract', payload: { contract: emailContract, summary: text }, turnstileToken },
+        body: { type: 'contract', payload: { contract: emailContract, summary: text, ...(pdfAttach ? { pdf: pdfAttach } : {}) }, turnstileToken },
       });
       if (error) { console.error('إيميل العقد رُفض', error); return false; }
       return true;
@@ -3361,7 +3367,8 @@ function loadScriptOnce(src){
     document.head.appendChild(el);
   });
 }
-async function downloadContractPdf(){
+/* 2026-10-02: بناء الـPDF صار دالة وحدة يستخدمها التنزيل + مشاركة الجوال + مرفق إيميل الفريق. */
+async function buildContractPdf(){
   await loadScriptOnce('lib/html2canvas-1.4.1.min.js');
   await loadScriptOnce('lib/jspdf-4.2.1.umd.min.js');
   const src = document.getElementById('contract-print-view');
@@ -3396,10 +3403,43 @@ async function downloadContractPdf(){
       }
     }
     const num = (document.getElementById('pv-number').textContent.match(/HMD-\d+/) || ['عقد'])[0];
-    pdf.save(`عقد-${num}.pdf`);
+    return { pdf, num };
   } finally {
     holder.remove();
   }
+}
+async function downloadContractPdf(){
+  const { pdf, num } = await buildContractPdf();
+  pdf.save(`عقد-${num}.pdf`);
+}
+// مرفق إيميل الفريق: base64 صِرف (بدون بادئة data:) + اسم ASCII آمن. الدالة تتحقق منه بالخادم.
+async function contractPdfForEmail(){
+  // مهلة 12 ثانية: بطء تحميل المكتبتين ما يؤخّر إيميل الفريق (يرسل بدون مرفق)
+  const { pdf, num } = await Promise.race([buildContractPdf(), new Promise((_, rej) => setTimeout(() => rej(new Error('مهلة تجهيز PDF')), 12000))]);
+  const uri = pdf.output('datauristring');
+  const b64 = uri.slice(uri.indexOf('base64,') + 7);
+  return { name: `contract-${/^HMD-\d+$/.test(num) ? num : 'new'}.pdf`, base64: b64 };
+}
+// مشاركة الجوال: ورقة المشاركة بملف الـPDF (واتساب/إيميل/ملفات...). غير مدعومة ← تنزيل عادي.
+function canShareContractFile(){
+  try {
+    return typeof navigator !== 'undefined' && typeof navigator.canShare === 'function' && typeof File === 'function'
+      && navigator.canShare({ files: [new File(['x'], 'c.pdf', { type: 'application/pdf' })] });
+  } catch { return false; }
+}
+async function shareContractPdf(){
+  const { pdf, num } = await buildContractPdf();
+  const file = new File([pdf.output('blob')], `عقد-${num}.pdf`, { type: 'application/pdf' });
+  if (canShareContractFile() && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: currentLang==='ar' ? `عقد ${num}` : `Contract ${num}` });
+      return;
+    } catch (err) {
+      if (err && err.name === 'AbortError') return;   // المستخدم أغلق ورقة المشاركة
+      console.error('share failed — ننزّل الملف بدلها', err);
+    }
+  }
+  pdf.save(`عقد-${num}.pdf`);
 }
 document.getElementById('btn-print-contract').addEventListener('click', async (e)=>{
   const btn = e.currentTarget;
@@ -3410,6 +3450,22 @@ document.getElementById('btn-print-contract').addEventListener('click', async (e
     await downloadContractPdf();
   } catch (err) {
     console.error('downloadContractPdf failed — نرجع لنافذة الطباعة', err);
+    window.print();
+  } finally {
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+});
+
+document.getElementById('btn-share-contract').addEventListener('click', async (e)=>{
+  const btn = e.currentTarget;
+  const label = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = currentLang==='ar' ? '⏳ جارٍ تجهيز الملف...' : '⏳ Preparing file...';
+  try {
+    await shareContractPdf();
+  } catch (err) {
+    console.error('shareContractPdf failed', err);
     window.print();
   } finally {
     btn.disabled = false;
