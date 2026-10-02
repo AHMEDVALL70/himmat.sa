@@ -2284,7 +2284,8 @@ function attachCustomFilterDropdown(input, getOptions){
   }
 
   function renderDropdown(){
-    const query = desc.get.call(input).trim();
+    // حقل فيه اختيار سابق (canon) = نعرض القائمة كاملة بدل تصفيتها باسم الحي المختار
+    const query = canon !== null ? '' : desc.get.call(input).trim();
     const options = getOptions();
     const matches = query ? options.filter(o => o.label.includes(query)) : options;
     closeDropdown();

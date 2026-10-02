@@ -523,6 +523,15 @@ const CHECKS = [
     if (!pick($("v-district"), lab)) return "ما لقيت الحي بالقائمة: " + lab;
     if (nat($("v-district")) !== lab) return `الحقل يعرض «${nat($("v-district"))}» بدل ${lab}`;
     if ($("v-district").value !== d) return `قيمة الحي البرمجية «${$("v-district").value}»`;
+    // إعادة فتح القائمة بعد الاختيار تعرض كل الأحياء، مو الحي المختار وما يشبهه فقط
+    $("v-district").dispatchEvent(new w.Event("focus"));
+        const cnt = () => $("v-district").parentElement.querySelectorAll(".custom-filter-dropdown-item").length;
+    const afterPick = cnt();
+    const saved = $("v-district").value;
+    $("v-district").value = ""; $("v-district").dispatchEvent(new w.Event("focus"));
+    const all = cnt();
+    $("v-district").value = saved;
+    if (all < 2 || afterPick !== all) return `القائمة بعد الاختيار تعرض ${afterPick} بدل ${all}`;
     w.applyLang("ar");
     if (nat($("v-district")) !== d || nat($("v-type")) !== "فيلا") return "الحقل ما رجع عربي بعد تغيير اللغة";
     w.applyLang("en");
