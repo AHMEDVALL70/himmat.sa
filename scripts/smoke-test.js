@@ -531,7 +531,7 @@ const CHECKS = [
     $("v-district").value = ""; $("v-district").dispatchEvent(new w.Event("focus"));
     const all = cnt();
     $("v-district").value = saved;
-    if (all < 2 || afterPick !== all) return `القائمة بعد الاختيار تعرض ${afterPick} بدل ${all}`;
+    if (all <= 50 || afterPick !== all) return `القائمة بعد الاختيار تعرض ${afterPick} بدل ${all}`;
     w.applyLang("ar");
     if (nat($("v-district")) !== d || nat($("v-type")) !== "فيلا") return "الحقل ما رجع عربي بعد تغيير اللغة";
     w.applyLang("en");

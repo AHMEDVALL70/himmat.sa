@@ -2293,7 +2293,7 @@ function attachCustomFilterDropdown(input, getOptions){
 
     dropdown = document.createElement('div');
     dropdown.className = 'custom-filter-dropdown';
-    matches.slice(0, 50).forEach(opt => {
+    matches.forEach(opt => {
       const item = document.createElement('div');
       item.className = 'custom-filter-dropdown-item';
       item.textContent = opt.label;
