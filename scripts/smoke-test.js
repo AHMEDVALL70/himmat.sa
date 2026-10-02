@@ -583,6 +583,20 @@ const CHECKS = [
     if ((SITE_JS.match(/footer_districts:/g) || []).length !== 2) return "مفتاح الترجمة footer_districts ليس بالعربي والإنجليزي";
     return true;
   }],
+  ["الأسماء البديلة للأحياء: كل اسم بديل يشير لحي موجود بقاعدة الوزارة، والجديدة تعمل بالمؤشر", async () => {
+    const pg = await loadPage("valuation.html", "/valuation");
+    const w = pg.w;
+    const names = new Set(JSON.parse(fs.readFileSync(path.join(__dirname, "district-names.json"), "utf8")));
+    const cases = [["مكة المكرمة", "الشبيكة", "الشبيكة الجديد"], ["مكة المكرمة", "الشامية", "الشامية الجديد"],
+      ["الرياض", "الملك عبدالله", "الملك عبد الله"], ["الرياض", "الشفا", "الشفاء"],
+      ["المدينة المنورة", "النسيم", "العيون"], ["المدينة المنورة", "الكردي", "الفتح"], ["المدينة المنورة", "مهزور", "وادي مهزور"]];
+    for (const [c, from, to] of cases) {
+      if (w.resolveDistrictAlias(c, from) !== to) return `${c}: ${from} لم يتحوّل إلى ${to}`;
+      if (!names.has(to)) return `الهدف ${to} غير موجود بأحياء الوزارة`;
+    }
+    if (w.resolveDistrictAlias("جدة", "الشبيكة") !== "الشبيكة") return "الاسم البديل تسرّب لمدينة ثانية";
+    return true;
+  }],
   ["sw.js: التنقّل فقط يمر عبره، وفشل الشبكة ما يسبّب رفضاً غير ملتقَط", async () => {
     const handlers = {};
     const self = { addEventListener: (t, f) => { handlers[t] = f; }, skipWaiting() {}, clients: { claim() {} } };

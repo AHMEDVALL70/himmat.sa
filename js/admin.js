@@ -905,6 +905,12 @@ const JOB_LABELS = {
     extra: s => s?.total != null ? ` (${s.total} بحث محفوظ، ${s.matched ?? 0} تطابق)` : '' },
   'purge-soft-deleted': { label: 'الحذف النهائي للمحذوفات (بعد 30 يوم) — يومياً', maxAgeHours: 48,
     extra: s => s?.offers_deleted != null ? ` (حُذف ${s.offers_deleted} عرض و${s.properties_deleted ?? 0} عقار)` : '' },
+  // 2026-10-02: العقود الفعّالة اللي انتهت وما عليها دفعات غير مسددة تتحوّل «منتهي» تلقائياً (schema.sql 3.16)
+  'expire-contracts': { label: 'انتهاء العقود تلقائياً — يومياً', maxAgeHours: 48,
+    extra: s => s?.expired != null ? ` (انتهى ${s.expired} عقد، وبقي ${s.kept_active_unpaid ?? 0} فعّال لوجود دفعات غير مسددة)` : '' },
+  // 2026-10-02: الدالة موجودة بوضع «تجربة» فقط — تُجدول بعد مراجعة أول نتيجة (schema.sql 3.17)
+  'purge-orphan-images': { label: 'تنظيف الصور اليتيمة من التخزين', unscheduled: true,
+    extra: s => s?.orphans != null ? ` (${s.mode === 'apply' ? 'حُذف ' + (s.deleted ?? 0) : 'تجربة: ' + s.orphans + ' يتيمة'} من ${s.total_files} ملف)` : '' },
   // 2026-09-30: صارت مجدولة — إيميل يومي للفريق ٩ الصبح بالرياض (نفس حماية نبّهني)
   'send-reminders': { label: 'تنبيهات الدفعات والعقود — يومياً ٩ ص', maxAgeHours: 48,
     extra: s => s?.today ? (s.emailed ? ` (أُرسل: ${s.overdue ?? 0} متأخرة، ${s.due3 ?? 0} خلال ٣ أيام، ${s.due15 ?? 0} خلال ١٥ يوم، ${s.ending ?? 0} عقد ينتهي)` : ' (ما فيه تنبيهات)') : '' },
