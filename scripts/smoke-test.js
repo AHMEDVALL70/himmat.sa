@@ -501,6 +501,34 @@ const CHECKS = [
     if (bad.length) return `اسم مترجم أو فيه عربي: ${bad[0].join(" → ")}`;
     return true;
   }],
+  ["الإنجليزي: الحقل يعرض الاسم المنقحر/الإنجليزي لكن قيمته البرمجية تبقى العربية (حي ونوع عقار) ويتحدّث مع تغيير اللغة", async () => {
+    const pg = await loadPage("valuation.html", "/valuation");
+    const w = pg.w, $ = (id) => w.document.getElementById(id);
+    w.applyLang("en");
+    $("v-city").value = C; $("v-city").dispatchEvent(new w.Event("change"));
+    const nat = (el) => Object.getOwnPropertyDescriptor(w.HTMLInputElement.prototype, "value").get.call(el);
+    const pick = (el, label) => {
+      el.dispatchEvent(new w.Event("focus"));
+      const it = [...el.parentElement.querySelectorAll(".custom-filter-dropdown-item")].find((x) => x.textContent === label);
+      if (!it) return false;
+      it.dispatchEvent(new w.MouseEvent("mousedown", { bubbles: true, cancelable: true }));
+      return true;
+    };
+    const villa = { en: w.typeLabel("فيلا") };
+    if (!pick($("v-type"), villa.en)) return "ما لقيت خيار Villa بالقائمة";
+    if (nat($("v-type")) !== villa.en) return `الحقل يعرض «${nat($("v-type"))}» بدل ${villa.en}`;
+    if ($("v-type").value !== "فيلا") return `القيمة البرمجية صارت «${$("v-type").value}»`;
+    const d = FX.known_district, lab = w.districtLabel(d);
+    if (lab === d) return "الحي بلا اسم إنجليزي: " + d;
+    if (!pick($("v-district"), lab)) return "ما لقيت الحي بالقائمة: " + lab;
+    if (nat($("v-district")) !== lab) return `الحقل يعرض «${nat($("v-district"))}» بدل ${lab}`;
+    if ($("v-district").value !== d) return `قيمة الحي البرمجية «${$("v-district").value}»`;
+    w.applyLang("ar");
+    if (nat($("v-district")) !== d || nat($("v-type")) !== "فيلا") return "الحقل ما رجع عربي بعد تغيير اللغة";
+    w.applyLang("en");
+    if (nat($("v-district")) !== lab) return "الحقل ما تحدّث للإنجليزي بعد تغيير اللغة";
+    return true;
+  }],
   ["sw.js: التنقّل فقط يمر عبره، وفشل الشبكة ما يسبّب رفضاً غير ملتقَط", async () => {
     const handlers = {};
     const self = { addEventListener: (t, f) => { handlers[t] = f; }, skipWaiting() {}, clients: { claim() {} } };

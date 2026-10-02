@@ -287,6 +287,7 @@ function applyLang(lang){
   renderFaq();
   renderLegalPages();
   populateTypeSelects();
+  document.querySelectorAll(".district-select, .type-select").forEach(i => i._relabel && i._relabel());
   updateValuationFieldsForType();
   updateAddPropertyFieldsForType();
   populateCitySelects();
@@ -2257,12 +2258,33 @@ function populateTypeSelects(){
 function attachCustomFilterDropdown(input, getOptions){
   let dropdown = null;
 
+  // الحقل يعرض الاسم بلغة الصفحة (Villa / Al Aaqool) لكن قيمته البرمجية (input.value)
+  // تبقى الاسم العربي الأصلي — فكل كود الحساب والحفظ يشتغل بدون تغيير (2026-10-02).
+  const desc = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value');
+  let canon = null;
+  Object.defineProperty(input, 'value', {
+    configurable: true,
+    get(){ return canon !== null ? canon : desc.get.call(input); },
+    set(v){
+      canon = null;
+      const hit = v ? getOptions().find(o => o.value === v) : null;
+      if (hit){ canon = hit.value; desc.set.call(input, hit.label); }
+      else desc.set.call(input, v);
+    }
+  });
+  input.addEventListener('input', () => { canon = null; });
+  input._relabel = () => {
+    if (canon === null) return;
+    const hit = getOptions().find(o => o.value === canon);
+    if (hit) desc.set.call(input, hit.label);
+  };
+
   function closeDropdown(){
     if (dropdown){ dropdown.remove(); dropdown = null; }
   }
 
   function renderDropdown(){
-    const query = input.value.trim();
+    const query = desc.get.call(input).trim();
     const options = getOptions();
     const matches = query ? options.filter(o => o.label.includes(query)) : options;
     closeDropdown();
@@ -2277,7 +2299,8 @@ function attachCustomFilterDropdown(input, getOptions){
       // mousedown (مو click) عشان يسجّل قبل ما حدث blur يشيل القائمة
       item.addEventListener('mousedown', (e) => {
         e.preventDefault();
-        input.value = opt.value;
+        canon = opt.value;
+        desc.set.call(input, opt.label);
         closeDropdown();
         input.dispatchEvent(new Event('change', { bubbles: true }));
       });
