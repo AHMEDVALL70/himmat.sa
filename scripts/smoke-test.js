@@ -538,6 +538,19 @@ const CHECKS = [
     if (nat($("v-district")) !== lab) return "الحقل ما تحدّث للإنجليزي بعد تغيير اللغة";
     return true;
   }],
+  ["صفحات الأحياء: المولّد يختار الأحياء بـ5 صفقات فأكثر بلا تعارض مسارات، والصفحة تحمل الأرقام الصحيحة والرابط الأساسي", async () => {
+    const g = require("./generate-district-pages.js");
+    const rows = JSON.parse(fs.readFileSync(path.join(__dirname, "district-prices-sample.json"), "utf8"));
+    const ctx = g.prepare(rows);
+    if (ctx.eligible.length !== rows.filter((r) => r.deals >= 5).length) return "عدد الأحياء المؤهَّلة غير صحيح";
+    if (ctx.eligible.some((r) => r.deals < 5)) return "حي بأقل من 5 صفقات دخل النشر";
+    const quba = ctx.eligible.find((r) => r.city === "المدينة المنورة" && r.district === "قباء");
+    const html = g.render(quba, { ...ctx, hasPage: () => false });
+    const want = [`<h1>سعر المتر في حي قباء — المدينة المنورة</h1>`, `${Math.round(quba.price).toLocaleString("en-US")} ريال`, `href="https://himmat.sa${g.encPath(g.pagePath(quba))}"`, "وزارة العدل", "/valuation?city="];
+    for (const w of want) if (!html.includes(w)) return "ينقص بالصفحة: " + w;
+    if (/undefined|NaN/.test(html)) return "الصفحة فيها undefined أو NaN";
+    return true;
+  }],
   ["sw.js: التنقّل فقط يمر عبره، وفشل الشبكة ما يسبّب رفضاً غير ملتقَط", async () => {
     const handlers = {};
     const self = { addEventListener: (t, f) => { handlers[t] = f; }, skipWaiting() {}, clients: { claim() {} } };
