@@ -60,15 +60,20 @@ jobs:
       - name: تشغيل سكربت توليد صفحات الأقسام
         run: node scripts/generate-section-pages.js
 
+      # 2026-10-02: صفحات الأحياء (/أحياء/...) + sitemap-districts.xml — تقرأ Supabase بمفتاح anon
+      # (قراءة فقط). لو القاعدة رجّعت بيانات ناقصة يتوقف السكربت بدون كتابة/حذف أي ملف.
+      - name: تشغيل سكربت توليد صفحات الأحياء
+        run: node scripts/generate-district-pages.js
+
       - name: حفظ التحديث (لو فيه تغيير فعلي بس)
         run: |
           git config user.name "himmat-snapshot-bot"
           git config user.email "actions@github.com"
-          git add index.html offer/ sitemap-offers.xml offers.html valuation.html contracts.html add-property.html services.html about.html contact.html faq.html analytics.html
+          git add index.html offer/ sitemap-offers.xml "أحياء/" sitemap-districts.xml offers.html valuation.html contracts.html add-property.html services.html about.html contact.html faq.html analytics.html
           if git diff --cached --quiet; then
             echo "لا تغيير بالبيانات — تخطي الحفظ."
           else
-            git commit -m "🤖 تحديث تلقائي: لقطة المحتوى + صفحات العروض"
+            git commit -m "🤖 تحديث تلقائي: لقطة المحتوى + صفحات العروض والأحياء"
             # لو انضاف كوميت على main أثناء التشغيل، نركّب فوقه بدل ما يفشل الدفع
             git pull --rebase origin main
             git push

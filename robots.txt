@@ -3,3 +3,4 @@ Allow: /
 
 Sitemap: https://himmat.sa/sitemap.xml
 Sitemap: https://himmat.sa/sitemap-offers.xml
+Sitemap: https://himmat.sa/sitemap-districts.xml

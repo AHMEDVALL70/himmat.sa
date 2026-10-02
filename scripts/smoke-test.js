@@ -551,6 +551,38 @@ const CHECKS = [
     if (/undefined|NaN/.test(html)) return "الصفحة فيها undefined أو NaN";
     return true;
   }],
+  ["صفحات الأحياء الكاملة: 574 صفحة بلا روابط داخلية مكسورة، العروض تظهر بالحي الصحيح فقط، والخريطة كاملة، والحماية ترفض بيانات ناقصة", async () => {
+    const g = require("./generate-district-pages.js");
+    const rows = JSON.parse(fs.readFileSync(path.join(__dirname, "district-prices-sample.json"), "utf8"));
+    const offers = [{ id: "OFFER-1", title: "فيلا اختبار", city: "المدينة المنورة", district: "قباء", price_final: 1500000 }];
+    const built = g.buildAll(rows, offers);
+    if (built.files.length !== built.count + 5) return `عدد الصفحات ${built.files.length} (مؤهَّل ${built.count} + مدن 4 + رئيسية)`;
+    if (built.entries.length !== built.files.length) return "عدد مدخلات الخريطة لا يطابق الصفحات";
+    const dirs = new Set(built.files.map((f) => f.dir));
+    const decode = (u) => decodeURIComponent(u);
+    for (const f of built.files) {
+      if (/undefined|NaN/.test(f.html)) return "undefined/NaN في " + f.dir;
+      for (const m of f.html.matchAll(/href="(\/[^"#?]*)"/g)) {
+        const u = decode(m[1]);
+        if (u.startsWith("/أحياء") && !dirs.has(u)) return `رابط مكسور ${u} في ${f.dir}`;
+      }
+    }
+    const get = (city, d) => built.files.find((f) => f.dir === `/أحياء/${city.replace(/ /g, "-")}/${d.replace(/ /g, "-")}/`).html;
+    if (!get("المدينة المنورة", "قباء").includes("/offer/OFFER-1/")) return "العرض ما ظهر بحي قباء";
+    if (get("المدينة المنورة", "العصبة").includes("OFFER-1")) return "العرض ظهر بحي ثاني";
+    if (!get("المدينة المنورة", "العصبة").includes("ما فيه عروض منشورة")) return "حي بلا عروض ما عرض الرسالة البديلة";
+    // الحماية: بيانات ناقصة = رفض قبل أي كتابة
+    let threw = false;
+    try { g.writeAll(g.buildAll(rows.slice(0, 20), [])); } catch { threw = true; }
+    if (!threw) return "writeAll قبل بيانات ناقصة (20 حياً)";
+    return true;
+  }],
+  ["رابط «أسعار الأحياء» بذيل كل الصفحات + ترجمته", async () => {
+    const files = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html") && !["404.html", "admin.html"].includes(f));
+    for (const f of files) if (!fs.readFileSync(path.join(ROOT, f), "utf8").includes('href="/أحياء/" data-i18n="footer_districts"')) return "ينقص الرابط في " + f;
+    if ((SITE_JS.match(/footer_districts:/g) || []).length !== 2) return "مفتاح الترجمة footer_districts ليس بالعربي والإنجليزي";
+    return true;
+  }],
   ["sw.js: التنقّل فقط يمر عبره، وفشل الشبكة ما يسبّب رفضاً غير ملتقَط", async () => {
     const handlers = {};
     const self = { addEventListener: (t, f) => { handlers[t] = f; }, skipWaiting() {}, clients: { claim() {} } };
