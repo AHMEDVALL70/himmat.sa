@@ -38,16 +38,16 @@ permissions:
 
 jobs:
   update-snapshot:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: سحب المستودع
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           # التاريخ الكامل لازم لـ scripts/update-sitemap-lastmod.js (تاريخ آخر إيداع لكل صفحة)
           fetch-depth: 0
 
       - name: تجهيز Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: "20"
 
