@@ -593,6 +593,19 @@ const CHECKS = [
     if (/undefined|NaN/.test(html)) return "الصفحة فيها undefined أو NaN";
     return true;
   }],
+  ["خريطة الموقع الرئيسية: lastmod يُحسب من Git لكل صفحة (يستثني البوت)، يعدّل النص فقط، والـAction يشغّل السكربت ويحفظ sitemap.xml", async () => {
+    const u = require("./update-sitemap-lastmod.js");
+    if (u.fileForLoc("https://himmat.sa/") !== "index.html" || u.fileForLoc("https://himmat.sa/offers") !== "offers.html") return "تحويل الرابط لملف خاطئ";
+    const xml = '<urlset><url>\n<loc>https://himmat.sa/</loc>\n<lastmod>2026-09-22</lastmod>\n<priority>1.0</priority></url><url><loc>https://himmat.sa/faq</loc><lastmod>2026-09-22</lastmod></url></urlset>';
+    const r = u.rewrite(xml, (f) => (f === "index.html" ? "2026-10-02" : null));
+    if (r.changed !== 1 || !r.xml.includes("<lastmod>2026-10-02</lastmod>\n<priority>1.0</priority>")) return "تعديل الصفحة الأولى غير صحيح";
+    if (!r.xml.includes("faq</loc><lastmod>2026-09-22</lastmod>")) return "صفحة بلا تاريخ Git تغيّرت (لازم تبقى كما هي)";
+    const wf = fs.readFileSync(path.join(ROOT, ".github", "workflows", "generate-snapshot.yml"), "utf8");
+    if (!/fetch-depth:\s*0/.test(wf) || !wf.includes("update-sitemap-lastmod.js") || !/git add [^\n]*\bsitemap\.xml\b/.test(wf)) return "الـAction ما يشغّل السكربت أو ما يحفظ sitemap.xml أو بدون fetch-depth: 0";
+    const src = fs.readFileSync(path.join(__dirname, "update-sitemap-lastmod.js"), "utf8");
+    if (!src.includes("--invert-grep") || !src.includes("himmat-snapshot-bot")) return "السكربت ما يستثني إيداعات البوت";
+    return true;
+  }],
   ["صفحات الأحياء الكاملة: 574 صفحة بلا روابط داخلية مكسورة، العروض تظهر بالحي الصحيح فقط، والخريطة كاملة، والحماية ترفض بيانات ناقصة", async () => {
     const g = require("./generate-district-pages.js");
     const rows = JSON.parse(fs.readFileSync(path.join(__dirname, "district-prices-sample.json"), "utf8"));
