@@ -914,6 +914,9 @@ const JOB_LABELS = {
   // 2026-10-02: الاستيراد الربع سنوي تلقائي (GitHub Action شهري؛ يسجّل فقط لما يطبّق أو يتوقف للمراجعة)
   'import-moj-quarter': { label: 'استيراد أسعار الأحياء من وزارة العدل (تلقائي عند صدور ربع جديد)',
     extra: s => s?.districts != null ? ` (${s.quarter}: ${s.districts} حي)` : (s?.updated != null ? ` (${s.quarter}: حُدّث ${s.updated} حي، ${s.unknown_in_db ?? 0} غير موجود)` : (s?.message ? ' — توقّف للمراجعة: ' + s.message : '')) },
+  // 2026-10-04: تقرير شهري بالإيميل للفريق — يوم 1 من كل شهر ٨ الصبح بتوقيت السعودية (schema.sql 3.19)
+  'send-monthly-report': { label: 'التقرير الشهري بالإيميل — شهرياً', maxAgeHours: 24 * 35,
+    extra: s => s?.month ? ` (تقرير ${s.month}${s.sent === false ? ' — تجربة بدون إرسال' : ''})` : '' },
   // 2026-09-30: صارت مجدولة — إيميل يومي للفريق ٩ الصبح بالرياض (نفس حماية نبّهني)
   'send-reminders': { label: 'تنبيهات الدفعات والعقود — يومياً ٩ ص', maxAgeHours: 48,
     extra: s => s?.today ? (s.emailed ? ` (أُرسل: ${s.overdue ?? 0} متأخرة، ${s.due3 ?? 0} خلال ٣ أيام، ${s.due15 ?? 0} خلال ١٥ يوم، ${s.ending ?? 0} عقد ينتهي)` : ' (ما فيه تنبيهات)') : '' },
