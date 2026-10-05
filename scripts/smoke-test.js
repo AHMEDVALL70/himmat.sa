@@ -808,6 +808,24 @@ const CHECKS = [
       return true;
     } finally { global.fetch = realFetch; console.error = realErr; }
   }],
+  // #41 CSS مضمَّن بالرئيسية: مطابق لـcss/site.css (المصدر الوحيد) ولا يوجد رابط خارجي للتنسيق
+  ["الرئيسية: CSS مضمَّن ومطابق لـcss/site.css، بمسارات مطلقة، وصفحات العروض المولَّدة ترثه", async () => {
+    let m;
+    try { m = require(path.join(ROOT, "scripts", "inline-css.js")); } catch (e) { return "تعذّر استيراد inline-css.js: " + e.message; }
+    const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+    const css = fs.readFileSync(path.join(ROOT, "css", "site.css"), "utf8");
+    if (/<link[^>]+css\/site\.css/.test(html)) return "ما زال رابط css/site.css الخارجي موجوداً بـindex.html";
+    const tags = html.match(/<style id="site-css">/g) || [];
+    if (tags.length !== 1) return `عدد وسوم <style id="site-css"> = ${tags.length} (المتوقع 1)`;
+    if (m.inlineCss(html, css) !== html) return "الـCSS المضمَّن لا يطابق css/site.css — شغّل: node scripts/inline-css.js";
+    const tag = m.buildStyleTag(css);
+    if (/url\(['"]?\.\.\//.test(tag)) return "مسار نسبي ../ داخل الـCSS المضمَّن";
+    if (!/url\(\/assets\/fonts\//.test(tag)) return "مسارات الخطوط المطلقة غير موجودة";
+    const g = require(path.join(ROOT, "scripts", "generate-offer-pages.js"));
+    const out = g.buildOfferHtml(html, { id: "3a144c74-3194-4e35-95d0-da19b724e625", title: "اختبار", description: "وصف", city: "المدينة المنورة", district: "العيون", price_final: 100, is_sold: false, created_at: "2026-01-01T00:00:00Z" });
+    if (!out.includes('<style id="site-css">')) return "صفحة العرض المولَّدة فقدت الـCSS المضمَّن";
+    return true;
+  }],
 ];
 
 (async () => {

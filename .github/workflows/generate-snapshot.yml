@@ -51,6 +51,11 @@ jobs:
         with:
           node-version: "20"
 
+      # 2026-10-05: تضمين css/site.css داخل index.html (أول خطوة — كل الصفحات المولَّدة تُنسخ من index.html
+      # فترث التضمين). آمن للتكرار؛ لو css/ تعدّل يُحدَّث الوسم تلقائياً.
+      - name: تضمين CSS بالصفحة الرئيسية
+        run: node scripts/inline-css.js
+
       - name: تشغيل سكربت توليد اللقطة
         run: node scripts/generate-snapshot.js
 
