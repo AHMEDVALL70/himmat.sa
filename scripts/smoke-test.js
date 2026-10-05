@@ -679,6 +679,23 @@ const CHECKS = [
     const ev = home.gtagEvents.find((e) => e.name === "whatsapp_click");
     return (ev && ev.params.link_location === "float") || `الأحداث: ${JSON.stringify(home.gtagEvents)}`;
   }],
+  ["الخطوط محلية: لا Google Fonts بالصفحات العامة، وكل ملف خط (preload و@font-face) موجود فعلاً", async () => {
+    const pages = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html") && f !== "admin.html");
+    const srcs = pages.map((f) => [f, fs.readFileSync(path.join(ROOT, f), "utf8")]);
+    srcs.push(["scripts/generate-district-pages.js", fs.readFileSync(path.join(ROOT, "scripts", "generate-district-pages.js"), "utf8")]);
+    for (const [f, t] of srcs) {
+      if (/fonts\.(googleapis|gstatic)\.com/.test(t)) return `${f} ما زال يشير إلى Google Fonts`;
+    }
+    const idx = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+    const pre = [...idx.matchAll(/<link rel="preload" href="(\/assets\/fonts\/[^"]+\.woff2)" as="font"[^>]*crossorigin>/g)].map((m) => m[1]);
+    if (pre.length < 8) return `preload للخطوط ${pre.length} فقط (المتوقع 8)`;
+    for (const u of pre) if (!fs.existsSync(path.join(ROOT, u.slice(1)))) return `ملف preload مفقود: ${u}`;
+    const css = fs.readFileSync(path.join(ROOT, "css", "site.css"), "utf8");
+    const urls = [...css.matchAll(/url\(\.\.\/assets\/fonts\/([^)]+\.woff2)\)/g)].map((m) => m[1]);
+    if (urls.length < 10) return `@font-face لـ ${urls.length} ملف فقط (المتوقع 10)`;
+    for (const u of urls) if (!fs.existsSync(path.join(ROOT, "assets", "fonts", u))) return `ملف خط مفقود: ${u}`;
+    return true;
+  }],
 ];
 
 (async () => {
