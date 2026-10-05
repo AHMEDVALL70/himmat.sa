@@ -754,6 +754,38 @@ const CHECKS = [
     if (!sent) return "ما أُرسل الطلب بعد وصول Turnstile المتأخر";
     return sent.opts.body.turnstileToken === "tok-late" || `الرمز المرسل: ${sent.opts.body.turnstileToken}`;
   }],
+  ["صفحات العروض: JSON-LD للعرض (RealEstateListing + Offer + BreadcrumbList) صحيح ومهرَّب، وحقوله الناقصة تُحذف", async () => {
+    let g;
+    try { g = require(path.join(ROOT, "scripts", "generate-offer-pages.js")); } catch (e) { return "تعذّر استيراد المولّد: " + e.message; }
+    if (typeof g.buildOfferHtml !== "function") return "المولّد لا يصدّر buildOfferHtml";
+    const tpl = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+    const parse = (html) => [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map((m) => JSON.parse(m[1]));
+    const base = { id: "abc", title: "فيلا </script><b>x", description: "وصف", price_final: "3100000.00", price_original: null, city: "المدينة المنورة", district: "العيون", property_type: "فيلا", area_sqm: "410.00", rooms: 6, is_sold: false, created_at: "2026-09-01T10:00:00Z", image_urls: ["https://x/y.jpg"] };
+    const html = g.buildOfferHtml(tpl, base);
+    if (html.includes("</script><b>")) return "نص العرض يغلق وسم script (تهريب ناقص)";
+    const ld = parse(html);
+    if (ld.length !== 3) return `عدد كتل JSON-LD = ${ld.length} (المتوقع 3: الشركة + العرض + المسار)`;
+    if (ld[0]["@type"] !== "RealEstateAgent") return "مخطط الشركة الأصلي اختفى";
+    const L = ld.find((x) => x["@type"] === "RealEstateListing");
+    const B = ld.find((x) => x["@type"] === "BreadcrumbList");
+    if (!L || !B) return "RealEstateListing أو BreadcrumbList مفقود";
+    if (L.url !== "https://himmat.sa/offer/abc/") return `رابط العرض: ${L.url}`;
+    if (!(L.offers && L.offers.price === 3100000 && L.offers.priceCurrency === "SAR")) return `Offer: ${JSON.stringify(L.offers)}`;
+    if (L.offers.availability !== "https://schema.org/InStock") return `التوفر: ${L.offers.availability}`;
+    if (!(L.about && L.about["@type"] === "Accommodation" && L.about.floorSize.value === 410 && L.about.numberOfRooms === 6)) return `about: ${JSON.stringify(L.about)}`;
+    if (L.about.address.addressLocality !== "المدينة المنورة" || L.about.address.addressCountry !== "SA") return "عنوان العقار ناقص";
+    if (B.itemListElement.length !== 3 || B.itemListElement[1].item !== "https://himmat.sa/offers" || B.itemListElement[2].item !== L.url) return "مسار الفتات غير صحيح";
+    // مباع → SoldOut
+    const sold = parse(g.buildOfferHtml(tpl, { ...base, is_sold: true })).find((x) => x["@type"] === "RealEstateListing");
+    if (sold.offers.availability !== "https://schema.org/SoldOut") return "العرض المباع لا يظهر SoldOut";
+    // بلا سعر/مساحة/غرف → تُحذف الحقول (لا قيم فارغة ولا NaN)
+    const bare = parse(g.buildOfferHtml(tpl, { ...base, price_final: null, price_original: null, area_sqm: null, rooms: null, created_at: null })).find((x) => x["@type"] === "RealEstateListing");
+    if (bare.offers || bare.about.floorSize || bare.about.numberOfRooms || bare.datePosted) return `حقول ناقصة لم تُحذف: ${JSON.stringify(bare)}`;
+    // أرض → Place بخاصية مساحة
+    const land = parse(g.buildOfferHtml(tpl, { ...base, property_type: "أرض سكنية" })).find((x) => x["@type"] === "RealEstateListing");
+    if (land.about["@type"] !== "Place" || !land.about.additionalProperty || land.about.additionalProperty.value !== 410) return `الأرض: ${JSON.stringify(land.about)}`;
+    return true;
+  }],
 ];
 
 (async () => {

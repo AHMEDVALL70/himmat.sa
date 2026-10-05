@@ -84,6 +84,79 @@ function firstImage(offer) {
   return FALLBACK_IMAGE;
 }
 
+// ---------------------------------------------------------------------------
+// بيانات منظَّمة (Schema.org) لكل عرض — 2026-10-05.
+// RealEstateListing (النوع الدلالي الصحيح للعقار؛ ليس Product لأنه يوحي بمنتج تجاري بشحن/إرجاع)
+// + Offer (السعر بالريال وحالة التوفر) + BreadcrumbList. أي حقل ناقص يُحذف ولا يُكتب فارغاً.
+// ملاحظة: جوجل لا تعرض نتائج مميّزة لـRealEstateListing؛ الفائدة فهم أدق للصفحة، أما مسار الفتات فيظهر عادة.
+// ---------------------------------------------------------------------------
+function positiveNumber(v) {
+  const n = Number(v);
+  return Number.isFinite(n) && n > 0 ? n : null;
+}
+
+function buildJsonLd(offer) {
+  const url = `${SITE_ORIGIN}/offer/${offer.id}/`;
+  const image = firstImage(offer);
+  const price = positiveNumber(offer.price_final) || positiveNumber(offer.price_original);
+  const area = positiveNumber(offer.area_sqm);
+  const rooms = positiveNumber(offer.rooms);
+  const isLand = /أرض|ارض/.test(String(offer.property_type || ""));
+
+  const address = {
+    "@type": "PostalAddress",
+    addressLocality: offer.city,
+    streetAddress: offer.district,
+    addressCountry: "SA",
+  };
+  const about = isLand
+    ? { "@type": "Place", name: offer.property_type || "أرض", address }
+    : { "@type": "Accommodation", name: offer.property_type || "عقار", address };
+  if (isLand) {
+    if (area) about.additionalProperty = { "@type": "PropertyValue", name: "المساحة", value: area, unitCode: "MTK" };
+  } else {
+    if (area) about.floorSize = { "@type": "QuantitativeValue", value: area, unitCode: "MTK" };
+    if (rooms) about.numberOfRooms = rooms;
+  }
+
+  const listing = {
+    "@context": "https://schema.org",
+    "@type": "RealEstateListing",
+    name: offer.title,
+    url,
+    description: buildDescription(offer),
+    image,
+    about,
+  };
+  if (offer.created_at) listing.datePosted = offer.created_at;
+  if (price) {
+    listing.offers = {
+      "@type": "Offer",
+      price,
+      priceCurrency: "SAR",
+      availability: offer.is_sold ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
+      url,
+      seller: { "@type": "RealEstateAgent", name: "همة المدينة العقارية", url: `${SITE_ORIGIN}/` },
+    };
+  }
+
+  const breadcrumb = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "الرئيسية", item: `${SITE_ORIGIN}/` },
+      { "@type": "ListItem", position: 2, name: "العروض", item: `${SITE_ORIGIN}/offers` },
+      { "@type": "ListItem", position: 3, name: offer.title, item: url },
+    ],
+  };
+  return [listing, breadcrumb];
+}
+
+// تهريب "<" كي لا يقدر نص عرض (عنوان/وصف) يغلق وسم <script> ويحقن HTML.
+function jsonLdScript(obj) {
+  return `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, "\\u003c")}</script>`;
+}
+
 function buildOfferHtml(template, offer) {
   const title = `${offer.title} — ${offer.district}، ${offer.city} | همة المدينة العقارية`;
   const description = buildDescription(offer);
@@ -139,6 +212,8 @@ function buildOfferHtml(template, offer) {
     '<link rel="canonical" href="https://himmat.sa/">',
     `<link rel="canonical" href="${url}">`
   );
+  // المخطط الأصلي (RealEstateAgent للشركة) يبقى كما هو؛ نضيف بعده مخطط العرض والمسار الهرمي.
+  html = html.replace("</head>", buildJsonLd(offer).map(jsonLdScript).join("\n") + "\n</head>");
   return html;
 }
 
@@ -155,7 +230,7 @@ async function main() {
 
   const offers = await supaSelect(
     "offers",
-    "select=id,title,description,price_final,price_original,city,district,property_type,image_url,image_urls&is_published=eq.true&deleted_at=is.null"
+    "select=id,title,description,price_final,price_original,city,district,property_type,area_sqm,rooms,is_sold,created_at,image_url,image_urls&is_published=eq.true&deleted_at=is.null"
   );
 
   if (!fs.existsSync(OFFERS_DIR)) fs.mkdirSync(OFFERS_DIR, { recursive: true });
@@ -185,7 +260,11 @@ async function main() {
   console.log(`تم توليد ${offers.length} صفحة عرض، وحذف ${removed.length} صفحة قديمة.`);
 }
 
-main().catch((err) => {
-  console.error("فشل توليد صفحات العروض:", err);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((err) => {
+    console.error("فشل توليد صفحات العروض:", err);
+    process.exit(1);
+  });
+}
+
+module.exports = { buildOfferHtml, buildJsonLd };
