@@ -696,6 +696,24 @@ const CHECKS = [
     for (const u of urls) if (!fs.existsSync(path.join(ROOT, "assets", "fonts", u))) return `ملف خط مفقود: ${u}`;
     return true;
   }],
+  ["الهيرو: صورتا WebP موجودتان وصغيرتان، والخلفية تستعملهما، وpreload لهما بالصفحات العامة", async () => {
+    const small = path.join(ROOT, "assets", "images", "hero-madinah-800.webp");
+    const big = path.join(ROOT, "assets", "images", "hero-madinah-1600.webp");
+    if (!fs.existsSync(small) || !fs.existsSync(big)) return "ملف WebP للهيرو مفقود";
+    if (fs.statSync(small).size > 120 * 1024) return "هيرو الجوال أكبر من 120KB";
+    if (fs.statSync(big).size > 300 * 1024) return "هيرو الشاشة الكبيرة أكبر من 300KB";
+    const css = fs.readFileSync(path.join(ROOT, "css", "site.css"), "utf8");
+    if (!/\.hero::before\{[^}]*hero-madinah-800\.webp/.test(css)) return "خلفية الهيرو لا تستعمل نسخة الجوال WebP";
+    if (!/min-width:821px\)\{\.hero::before\{background-image:url\('\.\.\/assets\/images\/hero-madinah-1600\.webp'\)/.test(css)) return "لا توجد نسخة الشاشة الكبيرة داخل media";
+    const pages = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html") && f !== "admin.html" && f !== "404.html"); // 404.html مجرد محوّل بلا CSS ولا هيرو
+    const srcs = pages.map((f) => [f, fs.readFileSync(path.join(ROOT, f), "utf8")]);
+    srcs.push(["scripts/generate-district-pages.js", fs.readFileSync(path.join(ROOT, "scripts", "generate-district-pages.js"), "utf8")]);
+    for (const [f, t] of srcs) {
+      if (!/rel="preload" as="image" href="\/assets\/images\/hero-madinah-800\.webp" fetchpriority="high" media="\(max-width:820px\)"/.test(t)) return `${f}: لا preload لهيرو الجوال`;
+      if (!/rel="preload" as="image" href="\/assets\/images\/hero-madinah-1600\.webp" fetchpriority="high" media="\(min-width:821px\)"/.test(t)) return `${f}: لا preload لهيرو الشاشة الكبيرة`;
+    }
+    return true;
+  }],
 ];
 
 (async () => {

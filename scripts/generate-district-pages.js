@@ -85,6 +85,8 @@ function shell({ title, desc, canonical, ld, main }) {
 <link rel="manifest" href="/site.webmanifest">
 <script type="application/ld+json">${JSON.stringify(ld)}</script>
 <script>try{var t=localStorage.getItem('himmat-theme');if(t)document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="preload" as="image" href="/assets/images/hero-madinah-800.webp" fetchpriority="high" media="(max-width:820px)">
+<link rel="preload" as="image" href="/assets/images/hero-madinah-1600.webp" fetchpriority="high" media="(min-width:821px)">
 <link rel="preload" href="/assets/fonts/almarai-arabic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/almarai-arabic-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/almarai-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -93,7 +95,7 @@ function shell({ title, desc, canonical, ld, main }) {
 <link rel="preload" href="/assets/fonts/tajawal-arabic-900-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/tajawal-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/tajawal-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/site.css?v=20261005a">
+<link rel="stylesheet" href="/css/site.css?v=20261005b">
 <style>
 .dp{padding-block:36px 56px}.dp h1{font-size:30px;margin:6px 0 4px}.dp .crumbs{font-size:13px;opacity:.75;margin-bottom:6px}
 .dp .crumbs a{text-decoration:underline}.dp .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:22px 0}
