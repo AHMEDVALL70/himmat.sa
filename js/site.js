@@ -4027,8 +4027,38 @@ const TURNSTILE_SITE_KEY = '0x4AAAAAAEu3S6icGpBIUVnz';
    — نطلب توكن جديد قبل كل رسالة للمساعد الذكي (التوكن صالح لاستخدام وحيد
    وينتهي بسرعة). لو السكربت ما تحمّل لأي سبب (حجب إعلانات، مشكلة شبكة)،
    نرجّع null ونكمل عادي — الـWorker يتعامل مع هالحالة بلطف من طرفه. */
+/* تحميل سكربت Turnstile عند الحاجة (2026-10-05): كان يُحمَّل مع كل صفحة (27KB) ويزاحم الرسم الأول.
+   الآن يُحقن بعد اكتمال الصفحة/عند أول تفاعل، ولو احتاجه نموذج قبل ذلك ينتظره هنا بدل ما يرجّع null.
+   لو فشل التحميل (حجب إعلانات/شبكة) يرجّع false خلال المهلة وتبقى رسالة الفشل الحالية كما هي. */
+let turnstileTag = null, turnstileLoadFailed = false;
+function ensureTurnstile(timeoutMs = 10000){
+  if (window.turnstile) return Promise.resolve(true);
+  return new Promise((resolve)=>{
+    if (!turnstileTag){
+      turnstileLoadFailed = false;
+      turnstileTag = document.createElement('script');
+      turnstileTag.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+      turnstileTag.async = true;
+      turnstileTag.onerror = ()=>{ turnstileLoadFailed = true; turnstileTag = null; };
+      document.head.appendChild(turnstileTag);
+    }
+    const t0 = Date.now();
+    const iv = setInterval(()=>{
+      if (window.turnstile){ clearInterval(iv); resolve(true); }
+      else if (turnstileLoadFailed || Date.now() - t0 > timeoutMs){ clearInterval(iv); resolve(false); }
+    }, 50);
+  });
+}
+(function scheduleTurnstileLoad(){
+  const go = ()=>{ ensureTurnstile().catch(()=>{}); };
+  const idle = ()=>{ if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 4000 }); else setTimeout(go, 3000); };
+  if (document.readyState === 'complete') idle(); else window.addEventListener('load', idle, { once: true });
+  ['pointerdown','keydown','touchstart','scroll'].forEach((e)=> window.addEventListener(e, go, { once: true, passive: true }));
+})();
+
 let turnstileWidgetId = null;
-function getTurnstileToken(timeoutMs = 8000){
+function getTurnstileToken(timeoutMs = 8000){ return ensureTurnstile().then((ok)=> ok ? getTurnstileTokenCore(timeoutMs) : null); }
+function getTurnstileTokenCore(timeoutMs = 8000){
   return new Promise((resolve)=>{
     if (!window.turnstile){ resolve(null); return; }
     const container = document.getElementById('turnstile-container');
@@ -4058,7 +4088,8 @@ function getTurnstileToken(timeoutMs = 8000){
 
 /* ينشئ رمز Turnstile بودجت مستقل (حاوية خاصة به) — يسمح بتوليد رمزين بالتوازي أو مبكراً
    بدون ما يلغي أحدهما الآخر (الدالة المشتركة أعلاه تمسح الودجت السابق). الرمز لاستخدام واحد. */
-function createTurnstileToken(timeoutMs = 15000){
+function createTurnstileToken(timeoutMs = 15000){ return ensureTurnstile().then((ok)=> ok ? createTurnstileTokenCore(timeoutMs) : null); }
+function createTurnstileTokenCore(timeoutMs = 15000){
   return new Promise((resolve)=>{
     if (!window.turnstile){ resolve(null); return; }
     const box = document.createElement('div');

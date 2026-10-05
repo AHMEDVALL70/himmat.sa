@@ -94,6 +94,16 @@ function loadPage(file, urlPath) {
     w.HTMLElement.prototype.scrollIntoView = function () {};
     const T = tables();
     w.supabase = fakeSupabase(T);
+    // سكربت Turnstile يُحقن عند الحاجة (2026-10-05). jsdom لا يحمّل سكربتات خارجية، فنحاكي «حُجب/فشل»
+    // بإطلاق error فوراً (مثل حاجب إعلانات) لتبقى الفحوصات القديمة (بلا ودجت) سريعة. الفحص الخاص
+    // بالتحميل الكسول يطفئ هذا بـ w.__noTurnstileErr = true.
+    new w.MutationObserver((muts) => {
+      for (const m of muts) for (const n of m.addedNodes) {
+        if (n.tagName === "SCRIPT" && /challenges\.cloudflare\.com/.test(n.src || "") && !w.__noTurnstileErr) {
+          setTimeout(() => n.dispatchEvent(new w.Event("error")), 0);
+        }
+      }
+    }).observe(w.document.head, { childList: true });
     try {
       w.eval(SITE_JS);
     } catch (e) { errors.push("site.js: " + e.message); }
@@ -713,6 +723,36 @@ const CHECKS = [
       if (!/rel="preload" as="image" href="\/assets\/images\/hero-madinah-1600\.webp" fetchpriority="high" media="\(min-width:821px\)"/.test(t)) return `${f}: لا preload لهيرو الشاشة الكبيرة`;
     }
     return true;
+  }],
+  ["تأجيل الطرف الثالث: لا GA ولا Turnstile يحجبان التحميل، وTurnstile يُحمَّل عند الحاجة وتنتظره النماذج", async () => {
+    const pages = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html") && f !== "admin.html" && f !== "404.html");
+    for (const f of pages) {
+      const t = fs.readFileSync(path.join(ROOT, f), "utf8");
+      if (/<script[^>]*src="https:\/\/www\.googletagmanager\.com/.test(t)) return `${f}: سكربت GA ما زال بوسم مباشر`;
+      if (/<script[^>]*src="https:\/\/challenges\.cloudflare\.com/.test(t)) return `${f}: سكربت Turnstile ما زال بوسم مباشر`;
+      if (!/requestIdleCallback\(go/.test(t)) return `${f}: محمّل GA المؤجَّل غير موجود`;
+      if (!/function gtag\(\)\{dataLayer\.push\(arguments\);\}/.test(t)) return `${f}: دالة gtag الفورية مفقودة`;
+      if (/<link rel="preconnect" href="https:\/\/wlebcvwsleoieodjtrcf\.supabase\.co">/.test(t)) return `${f}: preconnect لـSupabase بلا crossorigin`;
+    }
+    // سلوك: النموذج يطلب توكن قبل ما يوجد window.turnstile → يُحقن السكربت وينتظر، ثم يُرسل بالرمز الذي يصل متأخراً
+    const g = await loadPage("add-property.html", "/add-property");
+    g.w.__noTurnstileErr = true;
+    delete g.w.turnstile;
+    const $ = (id) => g.w.document.getElementById(id);
+    $("add-type").value = "شقة"; $("add-type").dispatchEvent(new g.w.Event("change"));
+    $("add-city").value = "المدينة المنورة"; $("add-district").value = "العزيزية"; $("add-price").value = "900000"; $("add-area").value = "300";
+    $("add-name") && ($("add-name").value = "اختبار"); $("add-phone") && ($("add-phone").value = "0500000000");
+    const i0 = g.invoke.length;
+    $("btn-add-property").click();
+    await new Promise((r) => setTimeout(r, 300));
+    const tag = [...g.w.document.head.querySelectorAll("script")].find((x) => /challenges\.cloudflare\.com/.test(x.src));
+    if (!tag) return "لم يُحقن سكربت Turnstile عند الحاجة";
+    if (g.invoke.slice(i0).some((x) => x.name === "public-submit")) return "أُرسل الطلب قبل وصول Turnstile";
+    g.w.turnstile = { render: (c, o) => { setTimeout(() => o.callback("tok-late"), 5); return "w"; }, remove() {} };
+    await new Promise((r) => setTimeout(r, 600));
+    const sent = g.invoke.slice(i0).find((x) => x.name === "public-submit");
+    if (!sent) return "ما أُرسل الطلب بعد وصول Turnstile المتأخر";
+    return sent.opts.body.turnstileToken === "tok-late" || `الرمز المرسل: ${sent.opts.body.turnstileToken}`;
   }],
 ];
 
