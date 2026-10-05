@@ -4056,15 +4056,31 @@ function ensureTurnstile(timeoutMs = 10000){
   ['pointerdown','keydown','touchstart','scroll'].forEach((e)=> window.addEventListener(e, go, { once: true, passive: true }));
 })();
 
-/* قياس تجربة الزوّار الفعلية Core Web Vitals (2026-10-05): LCP وCLS وINP وFCP وTTFB تُرسَل لـGA4 كأحداث.
-   المكتبة web-vitals مستضافة عندنا (lib/web-vitals.iife.js، 3.3KB مضغوطة) وتُحقن بعد اكتمال الصفحة وفترة الخمول،
-   فلا تزاحم الرسم الأول ولا تغيّر درجة PageSpeed. المقاييس تُقرأ من سجل المتصفح (buffered) فالتأجيل لا يفقدها.
-   الأحداث: اسم الحدث = اسم المقياس، value = الفرق (CLS×1000 مقرَّباً)، metric_value = القيمة الأصلية،
-   metric_rating = good|needs-improvement|poor. تُعرض في GA4 → Explore. فشل التحميل (حجب إعلانات) صامت. */
+/* قياس تجربة الزوّار الفعلية Core Web Vitals (2026-10-05): LCP وCLS وINP وFCP وTTFB.
+   مسارا إرسال: (1) أحداث GA4 باسم المقياس، (2) دفعة واحدة مجهولة لـWorker (/vitals) تُخزَّن بجدول web_vitals
+   ويعرض p75 منها داخل لوحة الإدارة. المكتبة web-vitals مستضافة عندنا (lib/web-vitals.iife.js، 3.3KB مضغوطة)
+   وتُحقن بعد اكتمال الصفحة وفترة الخمول (أو أول تفاعل)، فلا تزاحم الرسم الأول؛ المقاييس تُقرأ من سجل المتصفح (buffered).
+   - تُتجاهل أدوات الفحص الآلي (Lighthouse/PageSpeed/Headless) حتى لا تلوّث أرقام الزوّار الحقيقيين.
+   - الدفعة تُرسَل مرة واحدة عند أول إخفاء للصفحة (sendBeacon نص عادي = بلا preflight)، لكل مقياس مرة واحدة.
+   - الصفحة = أول قسم فُتح عند التحميل (التنقّل الداخلي لا يعيد القياس). فشل أي جزء صامت ولا يكسر الصفحة. */
+const VITALS_URL = 'https://himmat-ai-backend.ahmedvall.workers.dev/vitals';
 (function scheduleWebVitals(){
-  let started = false;
+  if (/Lighthouse|HeadlessChrome|PageSpeed/i.test(navigator.userAgent || '')) return;
+  let started = false, flushed = false;
+  const got = {}; // آخر قيمة لكل مقياس: { LCP: {value, rating}, ... }
+  const pageKey = (()=>{
+    try {
+      const seg = decodeURIComponent((location.pathname || '/').replace(/^\/+|\/+$/g, '').split('/')[0] || '');
+      if (!seg) return 'home';
+      if (seg === 'offer') return 'offer-detail';
+      if (seg === 'أحياء') return 'district';
+      return PAGES.includes(seg) ? seg : null;
+    } catch(e) { return null; }
+  })();
+  const device = (window.matchMedia && window.matchMedia('(max-width: 820px)').matches) ? 'mobile' : 'desktop';
   const send = (m)=>{
     try {
+      got[m.name] = { value: m.value, rating: m.rating };
       if (typeof window.gtag !== 'function') return;
       window.gtag('event', m.name, {
         value: Math.round(m.name === 'CLS' ? m.delta * 1000 : m.delta),
@@ -4078,6 +4094,18 @@ function ensureTurnstile(timeoutMs = 10000){
       });
     } catch(e) { /* القياس لا يكسر الصفحة أبداً */ }
   };
+  const flush = ()=>{
+    if (flushed) return;
+    try {
+      const metrics = Object.keys(got).map((name)=>({ name, value: got[name].value, rating: got[name].rating || null }));
+      if (!metrics.length) return;
+      flushed = true;
+      const payload = JSON.stringify({ page: pageKey, device, metrics });
+      if (!(navigator.sendBeacon && navigator.sendBeacon(VITALS_URL, payload))) {
+        fetch(VITALS_URL, { method: 'POST', body: payload, keepalive: true }).catch(()=>{});
+      }
+    } catch(e) { /* تجاهل */ }
+  };
   const go = ()=>{
     if (started) return; started = true;
     try {
@@ -4089,6 +4117,9 @@ function ensureTurnstile(timeoutMs = 10000){
           const wv = window.webVitals;
           if (!wv) return;
           wv.onFCP(send); wv.onLCP(send); wv.onCLS(send); wv.onINP(send); wv.onTTFB(send);
+          // نُسجّل مستمعنا بعد مستمعي المكتبة (تُسجَّل أعلاه) فتكون قيمها النهائية جاهزة وقت الإخفاء
+          document.addEventListener('visibilitychange', ()=>{ if (document.visibilityState === 'hidden') flush(); });
+          window.addEventListener('pagehide', flush);
         } catch(e) { /* تجاهل */ }
       };
       s.onerror = ()=>{};

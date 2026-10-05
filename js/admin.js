@@ -889,6 +889,7 @@ async function loadDashboard(){
   }
   loadJobStatus();
   loadMostViewed();
+  loadWebVitals();
 }
 
 /* 2026-09-29: حالة الوظائف التلقائية — القائمة تطابق الجدولات الحية فعلاً
@@ -969,6 +970,59 @@ async function loadJobStatus(){
   } catch (e) {
     el.textContent = '⚠️ تعذّر تحميل حالة الوظائف.';
     console.error('loadJobStatus failed', e);
+  }
+}
+
+/* 2026-10-05: سرعة الموقع الفعلية (Core Web Vitals) — p75 من جدول web_vitals عبر الدالة web_vitals_summary
+   (supabase/migration_web_vitals.sql). حدود Google: جيد ≤ good، ضعيف > poor، بينهما يحتاج تحسين.
+   المعيار الرسمي يُقيَّم على p75؛ وتحت VITALS_MIN_SAMPLES عيّنة نعرض الرقم بلون رمادي مع تنبيه (غير موثوق بعد). */
+const VITALS_META = {
+  LCP:  { label: 'أكبر محتوى مرئي (LCP)', good: 2500, poor: 4000, unit: 'ms' },
+  INP:  { label: 'سرعة الاستجابة للنقر (INP)', good: 200, poor: 500, unit: 'ms' },
+  CLS:  { label: 'ثبات التخطيط (CLS)', good: 0.1, poor: 0.25, unit: '' },
+  FCP:  { label: 'أول ظهور للمحتوى (FCP)', good: 1800, poor: 3000, unit: 'ms' },
+  TTFB: { label: 'استجابة الخادم (TTFB)', good: 800, poor: 1800, unit: 'ms' },
+};
+const VITALS_MIN_SAMPLES = 30;
+function formatVital(metric, v){
+  if (v == null || Number.isNaN(v)) return '—';
+  if (metric === 'CLS') return Number(v).toFixed(3);
+  return v >= 1000 ? (v / 1000).toFixed(2) + ' ث' : Math.round(v) + ' م.ث';
+}
+function vitalCell(metric, row){
+  if (!row) return '<td style="color:var(--text-600)">لا بيانات</td>';
+  const m = VITALS_META[metric];
+  const lowSample = row.samples < VITALS_MIN_SAMPLES;
+  const color = lowSample ? 'var(--text-600)' : (row.p75 <= m.good ? '#16a34a' : (row.p75 > m.poor ? '#dc2626' : '#d97706'));
+  const icon = lowSample ? '⚪' : (row.p75 <= m.good ? '🟢' : (row.p75 > m.poor ? '🔴' : '🟠'));
+  const pct = (n) => row.samples ? Math.round((n / row.samples) * 100) : 0;
+  return `<td><b style="color:${color}">${icon} ${formatVital(metric, row.p75)}</b>
+    <div style="font-size:11.5px;color:var(--text-600)">${row.samples} عيّنة · جيد ${pct(row.good)}% · ضعيف ${pct(row.poor)}%${lowSample ? ' · عيّنة قليلة' : ''}</div></td>`;
+}
+async function loadWebVitals(){
+  const el = document.getElementById('web-vitals-box');
+  if (!el) return;
+  try {
+    const { data, error } = await supa.rpc('web_vitals_summary', { p_days: 28 });
+    if (error) throw error;
+    const by = {};
+    (data || []).forEach(r => { by[r.metric + '|' + r.device] = r; });
+    if (!(data || []).length){
+      el.innerHTML = '<span style="color:var(--text-600)">لا توجد قياسات بعد — تظهر هنا بعد أول زيارات حقيقية (بعد نشر المعالج وتشغيل قاعدة البيانات).</span>';
+      return;
+    }
+    el.innerHTML = `<table>
+      <thead><tr><th>المقياس</th><th>الجوال (p75)</th><th>الحاسوب (p75)</th><th>حدّ Google «جيد»</th></tr></thead>
+      <tbody>${Object.entries(VITALS_META).map(([k, m]) => `<tr>
+        <td>${m.label}</td>${vitalCell(k, by[k + '|mobile'])}${vitalCell(k, by[k + '|desktop'])}
+        <td style="color:var(--text-600)">≤ ${k === 'CLS' ? m.good : (m.good >= 1000 ? (m.good / 1000) + ' ث' : m.good + ' م.ث')}</td></tr>`).join('')}</tbody>
+    </table>`;
+  } catch (e) {
+    console.error('loadWebVitals failed', e);
+    const missing = /web_vitals_summary|schema cache|does not exist|404/i.test(String(e?.message || e?.code || ''));
+    el.innerHTML = missing
+      ? '⚠️ لم تُفعَّل بعد: شغّل ملف supabase/migration_web_vitals.sql من SQL Editor.'
+      : '⚠️ تعذّر تحميل سرعة الموقع الفعلية.';
   }
 }
 

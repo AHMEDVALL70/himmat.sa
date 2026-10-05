@@ -76,12 +76,13 @@ function fakeSupabase(T) {
   };
 }
 
-function loadPage(file, urlPath) {
+function loadPage(file, urlPath, extra = {}) {
   return new Promise((resolve) => {
     const dom = new JSDOM(fs.readFileSync(path.join(ROOT, file), "utf8"), {
       runScripts: "outside-only", url: "https://himmat.sa" + urlPath, pretendToBeVisual: true,
     });
     const w = dom.window;
+    if (extra.userAgent) Object.defineProperty(w.navigator, "userAgent", { value: extra.userAgent, configurable: true });
     const errors = [];
     const gtagEvents = [];
     w.addEventListener("error", (e) => errors.push(e.message));
@@ -859,6 +860,95 @@ const CHECKS = [
     // فشل gtag لا يكسر الصفحة
     g.w.gtag = () => { throw new Error("boom"); };
     try { reg.LCP({ name: "LCP", delta: 1, value: 1, id: "x", rating: "good" }); } catch (e) { return "استثناء من القياس تسرّب للصفحة"; }
+    return true;
+  }],
+  // #43 Web Vitals → Worker: دفعة واحدة مجهولة عند الإخفاء، مرة واحدة لكل مقياس، وتُتجاهل أدوات الفحص الآلي
+  ["Web Vitals: دفعة /vitals واحدة عند إخفاء الصفحة (صفحة/جهاز صحيحان)، بلا تكرار، وLighthouse لا يُقاس", async () => {
+    const start = async (file, urlPath, extra, mut) => {
+      const g = await loadPage(file, urlPath, extra);
+      const beacons = [];
+      g.w.navigator.sendBeacon = (u, d) => { beacons.push({ u, d }); return true; };
+      g.w.dispatchEvent(new g.w.Event("pointerdown"));
+      const tag = [...g.w.document.head.querySelectorAll("script")].find((x) => /web-vitals/.test(x.src));
+      return { g, beacons, tag };
+    };
+    const hide = (w) => { Object.defineProperty(w.document, "visibilityState", { value: "hidden", configurable: true }); w.document.dispatchEvent(new w.Event("visibilitychange")); };
+    // 1) مسار طبيعي
+    const a = await start("offers.html", "/offers");
+    if (!a.tag) return "المكتبة لم تُحقن";
+    const reg = {};
+    a.g.w.webVitals = {};
+    for (const n of ["FCP", "LCP", "CLS", "INP", "TTFB"]) a.g.w.webVitals["on" + n] = (cb) => { reg[n] = cb; };
+    a.tag.dispatchEvent(new a.g.w.Event("load"));
+    reg.LCP({ name: "LCP", delta: 2100, value: 2100, id: "i1", rating: "good" });
+    reg.CLS({ name: "CLS", delta: 0.04, value: 0.04, id: "i2", rating: "good" });
+    if (a.beacons.length) return "أُرسلت دفعة قبل إخفاء الصفحة";
+    hide(a.g.w);
+    if (a.beacons.length !== 1) return `عدد الدفعات بعد الإخفاء = ${a.beacons.length} (المتوقع 1)`;
+    if (!/himmat-ai-backend\.ahmedvall\.workers\.dev\/vitals$/.test(a.beacons[0].u)) return "عنوان الإرسال خاطئ: " + a.beacons[0].u;
+    const p = JSON.parse(a.beacons[0].d);
+    if (p.page !== "offers" || p.device !== "desktop") return "صفحة/جهاز خاطئان: " + a.beacons[0].d;
+    const names = p.metrics.map((m) => m.name).sort().join(",");
+    if (names !== "CLS,LCP") return "المقاييس المرسلة خاطئة: " + names;
+    if (p.metrics.find((m) => m.name === "LCP").value !== 2100) return "قيمة LCP خاطئة";
+    hide(a.g.w); a.g.w.dispatchEvent(new a.g.w.Event("pagehide"));
+    if (a.beacons.length !== 1) return "تكرّر الإرسال عند إخفاء ثانٍ";
+    // 2) الرئيسية = home (والعروض المولَّدة offer/<id>/ = offer-detail)، والجوال = mobile
+    const b = await start("index.html", "/");
+    b.g.w.matchMedia = (q) => ({ matches: /max-width: 820px/.test(q), addEventListener() {}, addListener() {} });
+    // الجهاز يُحسب عند التحميل؛ نتحقق فقط من مفتاح الصفحة هنا
+    const regB = {}; b.g.w.webVitals = {};
+    for (const n of ["FCP", "LCP", "CLS", "INP", "TTFB"]) b.g.w.webVitals["on" + n] = (cb) => { regB[n] = cb; };
+    b.tag.dispatchEvent(new b.g.w.Event("load"));
+    regB.TTFB({ name: "TTFB", delta: 80, value: 80, id: "t", rating: "good" });
+    hide(b.g.w);
+    if (JSON.parse(b.beacons[0].d).page !== "home") return "مفتاح صفحة الرئيسية خاطئ: " + b.beacons[0].d;
+    // 3) بلا أي قيمة لا يُرسل شيء
+    const c = await start("index.html", "/");
+    c.g.w.webVitals = { onFCP() {}, onLCP() {}, onCLS() {}, onINP() {}, onTTFB() {} };
+    c.tag.dispatchEvent(new c.g.w.Event("load")); hide(c.g.w);
+    if (c.beacons.length) return "أُرسلت دفعة فارغة";
+    // 4) أدوات الفحص الآلي لا تُقاس (لا حقن ولا إرسال)
+    const d = await start("index.html", "/", { userAgent: "Mozilla/5.0 (Linux; Android 11) Chrome/130 Mobile Safari/537.36 Chrome-Lighthouse" });
+    if (d.tag) return "Lighthouse يجب ألا يُحقن له قياس الزوّار";
+    return true;
+  }],
+  // #44 بطاقة لوحة الإدارة: عنصرها موجود، تستدعي الدالة الصحيحة، وتعرض الألوان/الحالات الصحيحة
+  ["لوحة الإدارة: بطاقة سرعة الموقع الفعلية تعرض p75 بألوانه، العيّنة القليلة، والغياب، ورسالة التفعيل", async () => {
+    const html = fs.readFileSync(path.join(ROOT, "admin.html"), "utf8");
+    const js = fs.readFileSync(path.join(ROOT, "js", "admin.js"), "utf8");
+    if (!/id="web-vitals-box"/.test(html)) return "عنصر web-vitals-box غير موجود بـadmin.html";
+    if (!/loadDashboard[\s\S]*?loadWebVitals\(\);\s*\}/.test(js)) return "loadWebVitals لا تُستدعى من loadDashboard";
+    const a = js.indexOf("const VITALS_META"), b = js.indexOf("async function loadMostViewed");
+    if (a < 0 || b < 0 || b < a) return "كود البطاقة غير موجود بـadmin.js";
+    const code = js.slice(a, b);
+    const run = async (rpc) => {
+      const dom = new JSDOM('<div id="web-vitals-box"></div>', { runScripts: "outside-only" });
+      const w = dom.window;
+      w.supa = { rpc };
+      w.console.error = () => {};
+      w.eval(code + "; window.__load = loadWebVitals;");
+      await w.__load();
+      return w.document.getElementById("web-vitals-box").innerHTML;
+    };
+    const rows = [
+      { metric: "LCP", device: "mobile", samples: 120, p75: 2000, p50: 1500, good: 100, needs: 15, poor: 5 },
+      { metric: "LCP", device: "desktop", samples: 60, p75: 5200, p50: 3000, good: 20, needs: 10, poor: 30 },
+      { metric: "INP", device: "mobile", samples: 40, p75: 300, p50: 150, good: 20, needs: 15, poor: 5 },
+      { metric: "CLS", device: "mobile", samples: 5, p75: 0.05, p50: 0.02, good: 5, needs: 0, poor: 0 },
+    ];
+    const ok = await run(async (name, args) => (name === "web_vitals_summary" && args.p_days === 28 ? { data: rows, error: null } : { data: null, error: { message: "wrong call" } }));
+    if (!/🟢 2\.00 ث/.test(ok)) return "LCP جوال 2000 يجب أن يكون 🟢 «2.00 ث»: " + ok.slice(0, 300);
+    if (!/🔴 5\.20 ث/.test(ok)) return "LCP حاسوب 5200 يجب أن يكون 🔴";
+    if (!/🟠 300 م\.ث/.test(ok)) return "INP 300 يجب أن يكون 🟠 (يحتاج تحسين)";
+    if (!/⚪ 0\.050/.test(ok) || !/عيّنة قليلة/.test(ok)) return "عيّنة قليلة (5) يجب أن تظهر رمادية مع تنبيه";
+    if (!/لا بيانات/.test(ok)) return "الغياب (FCP/TTFB) يجب أن يظهر «لا بيانات»";
+    const empty = await run(async () => ({ data: [], error: null }));
+    if (!/لا توجد قياسات بعد/.test(empty)) return "حالة بلا بيانات خاطئة";
+    const missing = await run(async () => ({ data: null, error: { message: "Could not find the function public.web_vitals_summary(p_days) in the schema cache" } }));
+    if (!/migration_web_vitals\.sql/.test(missing)) return "رسالة التفعيل غير ظاهرة عند غياب الدالة";
+    const other = await run(async () => ({ data: null, error: { message: "network down" } }));
+    if (!/تعذّر تحميل سرعة الموقع/.test(other)) return "رسالة الخطأ العامة خاطئة";
     return true;
   }],
 ];
