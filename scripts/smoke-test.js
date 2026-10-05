@@ -690,21 +690,19 @@ const CHECKS = [
     const ev = home.gtagEvents.find((e) => e.name === "whatsapp_click");
     return (ev && ev.params.link_location === "float") || `الأحداث: ${JSON.stringify(home.gtagEvents)}`;
   }],
-  ["الخطوط محلية: لا Google Fonts بالصفحات العامة، وكل ملف خط (preload و@font-face) موجود فعلاً", async () => {
+  ["الخطوط: خطوط النظام العربية فقط — لا Google Fonts ولا @font-face ولا preload للخطوط بأي صفحة عامة أو مولِّد الأحياء", async () => {
     const pages = fs.readdirSync(ROOT).filter((f) => f.endsWith(".html") && f !== "admin.html");
     const srcs = pages.map((f) => [f, fs.readFileSync(path.join(ROOT, f), "utf8")]);
     srcs.push(["scripts/generate-district-pages.js", fs.readFileSync(path.join(ROOT, "scripts", "generate-district-pages.js"), "utf8")]);
+    srcs.push(["css/site.css", fs.readFileSync(path.join(ROOT, "css", "site.css"), "utf8").replace(/\/\*[\s\S]*?\*\//g, "")]);
     for (const [f, t] of srcs) {
       if (/fonts\.(googleapis|gstatic)\.com/.test(t)) return `${f} ما زال يشير إلى Google Fonts`;
+      if (/@font-face/.test(t)) return `${f} فيه @font-face (يعيد تذبذب PageSpeed)`;
+      if (/rel="preload"[^>]*as="font"/.test(t)) return `${f} فيه preload لخط`;
     }
-    const idx = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
-    const pre = [...idx.matchAll(/<link rel="preload" href="(\/assets\/fonts\/[^"]+\.woff2)" as="font"[^>]*crossorigin>/g)].map((m) => m[1]);
-    if (pre.length < 8) return `preload للخطوط ${pre.length} فقط (المتوقع 8)`;
-    for (const u of pre) if (!fs.existsSync(path.join(ROOT, u.slice(1)))) return `ملف preload مفقود: ${u}`;
-    const css = fs.readFileSync(path.join(ROOT, "css", "site.css"), "utf8");
-    const urls = [...css.matchAll(/url\(\.\.\/assets\/fonts\/([^)]+\.woff2)\)/g)].map((m) => m[1]);
-    if (urls.length < 10) return `@font-face لـ ${urls.length} ملف فقط (المتوقع 10)`;
-    for (const u of urls) if (!fs.existsSync(path.join(ROOT, "assets", "fonts", u))) return `ملف خط مفقود: ${u}`;
+    const css = srcs.find(([f]) => f === "css/site.css")[1];
+    const fam = css.match(/--font-body:([^;]+);/);
+    if (!fam || !/system-ui/.test(fam[1]) || !/Tahoma/.test(fam[1]) || !/Noto Sans Arabic/.test(fam[1])) return "قائمة خطوط النظام (system-ui/Tahoma/Noto Sans Arabic) غير مكتملة: " + (fam && fam[1]);
     return true;
   }],
   ["الهيرو: صورتا WebP موجودتان وصغيرتان، والخلفية تستعملهما، وpreload لهما بالصفحات العامة", async () => {
@@ -821,7 +819,7 @@ const CHECKS = [
     if (m.inlineCss(html, css) !== html) return "الـCSS المضمَّن لا يطابق css/site.css — شغّل: node scripts/inline-css.js";
     const tag = m.buildStyleTag(css);
     if (/url\(['"]?\.\.\//.test(tag)) return "مسار نسبي ../ داخل الـCSS المضمَّن";
-    if (!/url\(\/assets\/fonts\//.test(tag)) return "مسارات الخطوط المطلقة غير موجودة";
+    if (/url\(\/assets\/fonts\//.test(tag)) return "مسار خط ويب داخل الـCSS المضمَّن";
     const g = require(path.join(ROOT, "scripts", "generate-offer-pages.js"));
     const out = g.buildOfferHtml(html, { id: "3a144c74-3194-4e35-95d0-da19b724e625", title: "اختبار", description: "وصف", city: "المدينة المنورة", district: "العيون", price_final: 100, is_sold: false, created_at: "2026-01-01T00:00:00Z" });
     if (!out.includes('<style id="site-css">')) return "صفحة العرض المولَّدة فقدت الـCSS المضمَّن";
