@@ -786,6 +786,28 @@ const CHECKS = [
     if (land.about["@type"] !== "Place" || !land.about.additionalProperty || land.about.additionalProperty.value !== 410) return `الأرض: ${JSON.stringify(land.about)}`;
     return true;
   }],
+  // #40 فرملة المولّدات: فشل HTTP يجب أن يوقف المولّد (لا يرجع [] فيحذف صفحات العروض)، و200 مع [] حالة سليمة
+  ["فرملة المولّدات: supaSelect يرمي عند HTTP غير ناجح ويقبل 200 + []", async () => {
+    const realFetch = global.fetch;
+    const realErr = console.error;
+    try {
+      console.error = () => {};
+      for (const file of ["generate-offer-pages.js", "generate-snapshot.js"]) {
+        const g = require(path.join(ROOT, "scripts", file));
+        if (typeof g.supaSelect !== "function") return file + ": supaSelect غير مُصدَّر";
+        for (const status of [500, 403, 404]) {
+          global.fetch = async () => ({ ok: false, status, text: async () => "boom", json: async () => ({}) });
+          let threw = false;
+          try { await g.supaSelect("offers", "select=id"); } catch (e) { threw = /offers/.test(e.message) && new RegExp(String(status)).test(e.message); }
+          if (!threw) return `${file}: HTTP ${status} لم يُوقف المولّد`;
+        }
+        global.fetch = async () => ({ ok: true, status: 200, text: async () => "[]", json: async () => [] });
+        const r = await g.supaSelect("offers", "select=id");
+        if (!Array.isArray(r) || r.length !== 0) return `${file}: 200 + [] لم تُرجع مصفوفة فارغة`;
+      }
+      return true;
+    } finally { global.fetch = realFetch; console.error = realErr; }
+  }],
 ];
 
 (async () => {

@@ -25,9 +25,11 @@ async function supaSelect(table, query) {
       Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
     },
   });
+  // فرملة: أي استجابة غير ناجحة تُوقف المولّد بدل أن تُرجع [] (فالمصفوفة الفارغة تعني «لا عروض» وتحذف الصفحات).
+  // الاستجابة 200 مع [] تبقى حالة سليمة (لا توجد عروض فعلاً).
   if (!res.ok) {
-    console.error(`فشل جلب ${table}:`, res.status, await res.text().catch(() => ""));
-    return [];
+    const body = await res.text().catch(() => "");
+    throw new Error(`فشل جلب ${table}: HTTP ${res.status} ${body}`.trim());
   }
   return res.json();
 }
@@ -121,7 +123,11 @@ async function main() {
   console.log("تم تحديث اللقطة الجاهزة بنجاح داخل index.html");
 }
 
-main().catch((err) => {
-  console.error("فشل توليد اللقطة الجاهزة:", err);
-  process.exit(1);
-});
+if (require.main === module) {
+  main().catch((err) => {
+    console.error("فشل توليد اللقطة الجاهزة:", err);
+    process.exit(1);
+  });
+}
+
+module.exports = { supaSelect };
