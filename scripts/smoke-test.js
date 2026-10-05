@@ -826,6 +826,41 @@ const CHECKS = [
     if (!out.includes('<style id="site-css">')) return "صفحة العرض المولَّدة فقدت الـCSS المضمَّن";
     return true;
   }],
+  // #42 قياس Core Web Vitals الفعلي: مؤجَّل، مستضاف عندنا، ويرسل أحداثاً صحيحة لـGA4
+  ["Web Vitals: المكتبة مستضافة عندنا، تُحقن مرة واحدة فقط بعد التفاعل/الخمول، وتُرسل LCP/CLS لـGA4 بالشكل الصحيح", async () => {
+    const lib = path.join(ROOT, "lib", "web-vitals.iife.js");
+    if (!fs.existsSync(lib)) return "lib/web-vitals.iife.js غير موجود";
+    const src = fs.readFileSync(lib, "utf8");
+    if (src.length > 20000 || !/onINP/.test(src) || !/onLCP/.test(src) || !/onCLS/.test(src)) return "ملف المكتبة غير سليم";
+    for (const f of fs.readdirSync(ROOT).filter((x) => x.endsWith(".html"))) {
+      if (/<script[^>]*web-vitals/.test(fs.readFileSync(path.join(ROOT, f), "utf8"))) return `${f}: المكتبة محمّلة بوسم مباشر (يجب أن تُحقن مؤجَّلة)`;
+    }
+    const g = await loadPage("index.html", "/");
+    const tags = () => [...g.w.document.head.querySelectorAll("script")].filter((x) => /web-vitals/.test(x.src));
+    if (tags().length) return "المكتبة حُقنت قبل أي تفاعل/خمول";
+    g.w.dispatchEvent(new g.w.Event("pointerdown"));
+    g.w.dispatchEvent(new g.w.Event("keydown"));
+    if (tags().length !== 1) return `عدد وسوم المكتبة بعد التفاعل = ${tags().length} (المتوقع 1)`;
+    if (!/\/lib\/web-vitals\.iife\.js$/.test(tags()[0].src)) return "مسار المكتبة خاطئ: " + tags()[0].src;
+    const reg = {};
+    g.w.webVitals = {};
+    for (const n of ["FCP", "LCP", "CLS", "INP", "TTFB"]) g.w.webVitals["on" + n] = (cb) => { reg[n] = cb; };
+    tags()[0].dispatchEvent(new g.w.Event("load"));
+    const missing = ["FCP", "LCP", "CLS", "INP", "TTFB"].filter((n) => !reg[n]);
+    if (missing.length) return "لم تُسجَّل المقاييس: " + missing.join(",");
+    const n0 = g.gtagEvents.length;
+    reg.LCP({ name: "LCP", delta: 1234.4, value: 1234.4, id: "v1-a", rating: "good", navigationType: "navigate" });
+    reg.CLS({ name: "CLS", delta: 0.0432, value: 0.0432, id: "v1-b", rating: "good", navigationType: "navigate" });
+    const ev = g.gtagEvents.slice(n0);
+    const lcp = ev.find((e) => e.name === "LCP"), cls = ev.find((e) => e.name === "CLS");
+    if (!lcp || !cls) return "لم تُرسَل أحداث LCP/CLS لـGA4: " + JSON.stringify(ev);
+    if (lcp.params.value !== 1234 || lcp.params.metric_rating !== "good" || lcp.params.metric_id !== "v1-a" || lcp.params.non_interaction !== true) return "شكل حدث LCP خاطئ: " + JSON.stringify(lcp.params);
+    if (cls.params.value !== 43) return "CLS يجب أن يُضرب بـ1000 ويُقرَّب: " + JSON.stringify(cls.params);
+    // فشل gtag لا يكسر الصفحة
+    g.w.gtag = () => { throw new Error("boom"); };
+    try { reg.LCP({ name: "LCP", delta: 1, value: 1, id: "x", rating: "good" }); } catch (e) { return "استثناء من القياس تسرّب للصفحة"; }
+    return true;
+  }],
 ];
 
 (async () => {

@@ -4056,6 +4056,50 @@ function ensureTurnstile(timeoutMs = 10000){
   ['pointerdown','keydown','touchstart','scroll'].forEach((e)=> window.addEventListener(e, go, { once: true, passive: true }));
 })();
 
+/* قياس تجربة الزوّار الفعلية Core Web Vitals (2026-10-05): LCP وCLS وINP وFCP وTTFB تُرسَل لـGA4 كأحداث.
+   المكتبة web-vitals مستضافة عندنا (lib/web-vitals.iife.js، 3.3KB مضغوطة) وتُحقن بعد اكتمال الصفحة وفترة الخمول،
+   فلا تزاحم الرسم الأول ولا تغيّر درجة PageSpeed. المقاييس تُقرأ من سجل المتصفح (buffered) فالتأجيل لا يفقدها.
+   الأحداث: اسم الحدث = اسم المقياس، value = الفرق (CLS×1000 مقرَّباً)، metric_value = القيمة الأصلية،
+   metric_rating = good|needs-improvement|poor. تُعرض في GA4 → Explore. فشل التحميل (حجب إعلانات) صامت. */
+(function scheduleWebVitals(){
+  let started = false;
+  const send = (m)=>{
+    try {
+      if (typeof window.gtag !== 'function') return;
+      window.gtag('event', m.name, {
+        value: Math.round(m.name === 'CLS' ? m.delta * 1000 : m.delta),
+        metric_id: m.id,
+        metric_value: m.value,
+        metric_delta: m.delta,
+        metric_rating: m.rating,
+        metric_navigation_type: m.navigationType,
+        non_interaction: true,
+        transport_type: 'beacon'
+      });
+    } catch(e) { /* القياس لا يكسر الصفحة أبداً */ }
+  };
+  const go = ()=>{
+    if (started) return; started = true;
+    try {
+      const s = document.createElement('script');
+      s.src = '/lib/web-vitals.iife.js';
+      s.async = true;
+      s.onload = ()=>{
+        try {
+          const wv = window.webVitals;
+          if (!wv) return;
+          wv.onFCP(send); wv.onLCP(send); wv.onCLS(send); wv.onINP(send); wv.onTTFB(send);
+        } catch(e) { /* تجاهل */ }
+      };
+      s.onerror = ()=>{};
+      document.head.appendChild(s);
+    } catch(e) { /* تجاهل */ }
+  };
+  const idle = ()=>{ if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 5000 }); else setTimeout(go, 4000); };
+  if (document.readyState === 'complete') idle(); else window.addEventListener('load', idle, { once: true });
+  ['pointerdown','keydown','touchstart','scroll'].forEach((e)=> window.addEventListener(e, go, { once: true, passive: true }));
+})();
+
 let turnstileWidgetId = null;
 function getTurnstileToken(timeoutMs = 8000){ return ensureTurnstile().then((ok)=> ok ? getTurnstileTokenCore(timeoutMs) : null); }
 function getTurnstileTokenCore(timeoutMs = 8000){
