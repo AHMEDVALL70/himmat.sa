@@ -887,9 +887,12 @@ async function loadDashboard(){
     console.error('loadDashboard failed', e);
     showToast('⚠️ تعذّر تحميل لوحة القيادة');
   }
-  loadJobStatus();
   loadMostViewed();
-  loadWebVitals();
+  // حالة الوظائف وسرعة الزوّار: للمالك فقط (الواجهة + سياسات القاعدة is_owner)
+  if (currentUserRole === 'owner'){
+    loadJobStatus();
+    loadWebVitals();
+  }
 }
 
 /* 2026-09-29: حالة الوظائف التلقائية — القائمة تطابق الجدولات الحية فعلاً

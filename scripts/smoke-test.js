@@ -951,6 +951,22 @@ const CHECKS = [
     if (!/تعذّر تحميل سرعة الموقع/.test(other)) return "رسالة الخطأ العامة خاطئة";
     return true;
   }],
+  // #45 صلاحيات: الحالة والسرعة وإضافة المدن/الأحياء للمالك وحده
+  ["لوحة الإدارة: بطاقتا حالة الوظائف وسرعة الزوّار وإضافة المدن/الأحياء للمالك فقط (واجهة + عدم التحميل لغيره)", async () => {
+    const html = fs.readFileSync(path.join(ROOT, "admin.html"), "utf8");
+    const js = fs.readFileSync(path.join(ROOT, "js", "admin.js"), "utf8");
+    const css = fs.readFileSync(path.join(ROOT, "css", "admin.css"), "utf8");
+    const card = (id) => { const i = html.indexOf('id="' + id + '"'); const o = html.lastIndexOf('<div class="card"', i); return html.slice(o, html.indexOf(">", o)); };
+    if (!/data-owner-only/.test(card("job-status-list"))) return "بطاقة حالة الوظائف ليست data-owner-only";
+    if (!/data-owner-only/.test(card("web-vitals-box"))) return "بطاقة سرعة الزوّار ليست data-owner-only";
+    if (!/body\[data-role="editor"\] \[data-owner-only\]\s*\{\s*display:none/.test(css) || !/body\[data-role="viewer"\] \[data-owner-only\]/.test(css)) return "قاعدة CSS لإخفاء owner-only عن المحرّر/المشاهد غير موجودة";
+    const m = html.match(/<section class="tab-panel" id="panel-cities">[\s\S]*?<\/section>/);
+    if (!m) return "لوحة المدن غير موجودة";
+    const adds = (m[0].match(/<div class="card" style="flex:1 1 320px;padding:20px"[^>]*>/g) || []);
+    if (adds.length !== 3 || adds.some(t => !/data-owner-only/.test(t))) return "بطاقات إضافة المدن/الأحياء الثلاث يجب أن تكون owner-only";
+    if (!/if \(currentUserRole === 'owner'\)\{\s*loadJobStatus\(\);\s*loadWebVitals\(\);\s*\}/.test(js)) return "loadDashboard تحمّل الحالة/السرعة لغير المالك";
+    return true;
+  }],
 ];
 
 (async () => {
