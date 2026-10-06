@@ -965,6 +965,25 @@ const CHECKS = [
     if (!/if \(currentUserRole === 'owner'\)\{\s*loadJobStatus\(\);\s*loadWebVitals\(\);\s*\}/.test(js)) return "loadDashboard تحمّل الحالة/السرعة لغير المالك";
     return true;
   }],
+  // #46 بطاقة الوظائف: مراقب الصحة مدرج، ملخّصه صحيح، وتنبيه التوقف خاص به
+  ["لوحة الإدارة: مراقب الصحة ضمن حالة الوظائف (ملخص سليم/فيه تعطّل، ورسالة توقف ساعية)", async () => {
+    const js = fs.readFileSync(path.join(ROOT, "js", "admin.js"), "utf8");
+    const a = js.indexOf("const JOB_LABELS"), b = js.indexOf("async function loadJobStatus");
+    if (a < 0 || b < a) return "JOB_LABELS غير موجودة";
+    const dom = new JSDOM("<div></div>", { runScripts: "outside-only" });
+    dom.window.eval(js.slice(a, b) + "; window.__J = JOB_LABELS;");
+    const j = dom.window.__J["health-check"];
+    if (!j) return "health-check غير مدرج بـJOB_LABELS";
+    if (j.maxAgeHours !== 3) return "المهلة يجب أن تكون 3 ساعات: " + j.maxAgeHours;
+    const ok = j.extra({ failed: false, checks: [{ ok: true }, { ok: true }, { ok: true }] });
+    if (!/3\/3 سليم/.test(ok) || /تعطّل/.test(ok)) return "ملخص السليم خاطئ: " + ok;
+    const bad = j.extra({ failed: true, checks: [{ ok: true }, { ok: false }, { ok: true }] });
+    if (!/2\/3 سليم/.test(bad) || !/فيه تعطّل/.test(bad)) return "ملخص التعطّل خاطئ: " + bad;
+    if (j.extra(null) !== "" || j.extra({}) !== "") return "extra يجب أن يرجع نصاً فارغاً بلا ملخص";
+    if (!/كل ساعة/.test(j.lateNote || "")) return "رسالة التوقف الساعية غير موجودة";
+    if (!/cfg\.lateNote \|\|/.test(js)) return "loadJobStatus لا تستعمل lateNote";
+    return true;
+  }],
 ];
 
 (async () => {

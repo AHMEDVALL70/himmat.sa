@@ -921,6 +921,10 @@ const JOB_LABELS = {
   // 2026-10-04: تقرير شهري بالإيميل للفريق — يوم 1 من كل شهر ٨ الصبح بتوقيت السعودية (schema.sql 3.19)
   'send-monthly-report': { label: 'التقرير الشهري بالإيميل — شهرياً', maxAgeHours: 24 * 35,
     extra: s => s?.month ? ` (تقرير ${s.month}${s.sent === false ? ' — تجربة بدون إرسال' : ''})` : '' },
+  // 2026-10-06: مراقب الصحة الساعي (موقع/Worker/قاعدة) — يرسل إيميلاً للفريق عند التعطل (schema.sql 3.21)
+  'health-check': { label: 'مراقب الصحة (الموقع / الـWorker / قاعدة البيانات) — كل ساعة', maxAgeHours: 3,
+    lateNote: ' — توقّف المراقب! المفروض يشتغل كل ساعة',
+    extra: s => Array.isArray(s?.checks) ? ` (${s.checks.filter(c => c.ok).length}/${s.checks.length} سليم${s.failed ? ' — فيه تعطّل!' : ''})` : '' },
   // 2026-09-30: صارت مجدولة — إيميل يومي للفريق ٩ الصبح بالرياض (نفس حماية نبّهني)
   'send-reminders': { label: 'تنبيهات الدفعات والعقود — يومياً ٩ ص', maxAgeHours: 48,
     extra: s => s?.today ? (s.emailed ? ` (أُرسل: ${s.overdue ?? 0} متأخرة، ${s.due3 ?? 0} خلال ٣ أيام، ${s.due15 ?? 0} خلال ١٥ يوم، ${s.ending ?? 0} عقد ينتهي)` : ' (ما فيه تنبيهات)') : '' },
@@ -944,7 +948,7 @@ async function loadJobStatus(){
       const late = cfg.maxAgeHours && ageH > cfg.maxAgeHours;
       const icon = late ? '⚠️' : (run.status === 'success' ? '✅' : (run.status === 'partial' ? '⚠️' : '❌'));
       const when = new Date(run.finished_at).toLocaleString('ar-SA');
-      const suffix = cfg.unscheduled ? ' — غير مجدولة حالياً' : (late ? ' — متأخرة! المفروض تشتغل يومياً' : '');
+      const suffix = cfg.unscheduled ? ' — غير مجدولة حالياً' : (late ? (cfg.lateNote || ' — متأخرة! المفروض تشتغل يومياً') : '');
       return `${icon} ${cfg.label} — آخر تشغيل: ${when}${cfg.extra ? cfg.extra(run.summary) : ''}${suffix}`;
     }));
 
