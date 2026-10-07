@@ -658,6 +658,88 @@ async function exportToExcel(filename, headers, rows){
   XLSX.writeFile(workbook, filename);
 }
 
+/* EXPORT-PURE-START — تصدير العقود (ورقتان: العقود + الدفعات)، دالة بحتة تُختبر بـsmoke
+   التصدير للمالك فقط (data-owner-only + فحص الدور بالمعالج). لا يشمل رقم الهوية ولا تاريخ الميلاد (أقل بيانات شخصية لازمة). */
+const CONTRACT_EXPORT_STATUS = { ACTIVE:'ساري', EXPIRED:'منتهي', CANCELLED:'ملغى' };
+const PAYMENT_EXPORT_STATUS = { PAID:'مدفوعة', OVERDUE:'متأخرة', PENDING:'قيد الانتظار' };
+function buildContractsExport(contracts, installments){
+  const num = v => (v === null || v === undefined || v === '' || !Number.isFinite(Number(v))) ? '' : Number(v);
+  const day = v => v ? String(v).slice(0, 10) : '';
+  const by = new Map();
+  for (const i of (installments || [])){
+    if (!by.has(i.contract_id)) by.set(i.contract_id, []);
+    by.get(i.contract_id).push(i);
+  }
+  const contractRows = [], instRows = [];
+  for (const c of (contracts || [])){
+    const list = (by.get(c.id) || []).slice().sort((x, y) => (x.installment_number || 0) - (y.installment_number || 0) || String(x.due_date).localeCompare(String(y.due_date)));
+    const paid = list.filter(i => i.payment_status === 'PAID');
+    const unpaidSum = list.filter(i => i.payment_status !== 'PAID').reduce((t, i) => t + (Number(i.total_installment) || 0), 0);
+    contractRows.push([
+      c.contract_number || '', c.contract_type || '', CONTRACT_EXPORT_STATUS[c.status] || c.status || '',
+      c.lessor?.full_name || '', c.lessor?.phone || '', c.lessee?.full_name || '', c.lessee?.phone || '',
+      c.city || '', c.district || '', c.unit_type || '', c.floor_number || '', num(c.area_sqm), c.deed_number || '',
+      day(c.start_date), day(c.end_date), num(c.annual_rent), num(c.total_amount), num(c.vat_amount), num(c.security_deposit),
+      list.length, paid.length, Math.round(unpaidSum * 100) / 100, day(c.created_at),
+    ]);
+    for (const i of list){
+      instRows.push([
+        c.contract_number || '', c.lessee?.full_name || '', num(i.installment_number), day(i.due_date),
+        num(i.base_amount), num(i.vat_amount), num(i.total_installment),
+        PAYMENT_EXPORT_STATUS[i.payment_status] || i.payment_status || '', day(i.paid_at),
+      ]);
+    }
+  }
+  return [
+    { name: 'العقود', headers: ['رقم العقد','نوع العقد','الحالة','المؤجر','جوال المؤجر','المستأجر','جوال المستأجر','المدينة','الحي','نوع الوحدة','الدور','المساحة (م²)','رقم الصك','بداية العقد','نهاية العقد','الإيجار السنوي','الإجمالي','الضريبة','التأمين','عدد الدفعات','المسدّدة','المتبقي غير المسدّد','تاريخ الإنشاء'], rows: contractRows },
+    { name: 'الدفعات', headers: ['رقم العقد','المستأجر','رقم الدفعة','تاريخ الاستحقاق','المبلغ الأساسي','الضريبة','الإجمالي','حالة السداد','تاريخ السداد'], rows: instRows },
+  ];
+}
+/* EXPORT-PURE-END */
+
+/* تصدير مصنّف بعدة أوراق (اتجاه الصفحة من اليمين لليسار) — منفصل عن exportToExcel حتى لا يتغيّر تصدير العقارات/الاستفسارات */
+async function exportWorkbook(filename, sheets){
+  try {
+    await ensureXlsxLoaded();
+  } catch (e) {
+    console.error(e);
+    alert('تعذّر تحميل مكتبة التصدير — تحقق من اتصالك بالإنترنت وحاول مرة ثانية.');
+    return false;
+  }
+  const workbook = XLSX.utils.book_new();
+  for (const sh of sheets){
+    const ws = XLSX.utils.aoa_to_sheet([sh.headers, ...sh.rows]);
+    ws['!cols'] = sh.headers.map(h => ({ wch: Math.max(12, String(h).length + 2) }));
+    XLSX.utils.book_append_sheet(workbook, ws, sh.name);
+  }
+  workbook.Workbook = { Views: [{ RTL: true }] };
+  XLSX.writeFile(workbook, filename);
+  return true;
+}
+
+document.getElementById('btn-export-contracts')?.addEventListener('click', async (ev)=>{
+  if (currentUserRole !== 'owner') return; // التصدير للمالك فقط
+  const contracts = window.__CONTRACTS_LIST || [];
+  if (!contracts.length){ alert('لا توجد عقود لتصديرها حالياً.'); return; }
+  const btn = ev.currentTarget; btn.disabled = true;
+  try {
+    // الدفعات على صفحات (حد الخادم 1000 صف للطلب) كي لا يُقتطع التصدير بصمت
+    const ids = contracts.map(c => c.id), inst = [];
+    for (let from = 0; ; from += 1000){
+      const { data, error } = await supa.from('contract_installments').select('*')
+        .in('contract_id', ids).order('due_date', { ascending: true }).order('id', { ascending: true }).range(from, from + 999);
+      if (error) throw error;
+      inst.push(...(data || []));
+      if (!data || data.length < 1000) break;
+    }
+    const ok = await exportWorkbook(`عقود-${new Date().toISOString().slice(0,10)}.xlsx`, buildContractsExport(contracts, inst));
+    if (ok) showToast(`تم تصدير ${contracts.length} عقد و${inst.length} دفعة` + (contracts.length >= 100 ? ' — القائمة محدودة بأحدث 100 عقد' : ''));
+  } catch (e) {
+    console.error('export contracts failed', e);
+    alert('تعذّر تصدير العقود: ' + (e.message || e));
+  } finally { btn.disabled = false; }
+});
+
 document.getElementById('btn-export-props')?.addEventListener('click', async ()=>{
   const rows = Object.values(window.__PROPERTIES_CACHE || {});
   if (!rows.length){ alert('لا توجد بيانات لتصديرها حالياً.'); return; }
@@ -1702,10 +1784,12 @@ try {
       );
     }
     if (!rows.length){
+      window.__CONTRACTS_LIST = [];
       tbody.innerHTML = `<tr class="empty-row"><td colspan="12">لا توجد عقود مطابقة.</td></tr>`;
       return;
     }
 
+    window.__CONTRACTS_LIST = rows; // ما هو معروض الآن (بعد البحث وإخفاء الملغاة) — مصدر تصدير Excel
     rows.forEach(c => { contractsCache[c.id] = c; });
 
     tbody.innerHTML = rows.map(c => `
@@ -1733,6 +1817,7 @@ try {
       </tr>`).join('');
   } catch (e) {
     console.error('loadContracts failed', e);
+    window.__CONTRACTS_LIST = []; // لا نصدّر قائمة قديمة بعد فشل التحميل
     tbody.innerHTML = `<tr class="empty-row"><td colspan="12">⚠️ تعذّر تحميل العقود.</td></tr>`;
   }
 }

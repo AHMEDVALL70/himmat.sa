@@ -113,7 +113,7 @@
           <option value="all">الكل</option>
         </select>
         <button class="btn btn-ghost" id="btn-refresh-props">تحديث</button>
-        <button class="btn btn-ghost" id="btn-export-props">⬇️ تصدير Excel</button>
+        <button class="btn btn-ghost" id="btn-export-props" data-owner-only>⬇️ تصدير Excel</button>
       </div>
       <div class="card" style="padding:0;overflow-x:auto">
         <table>
@@ -191,7 +191,7 @@
           <option value="all">الكل</option>
         </select>
         <button class="btn btn-ghost" id="btn-refresh-inq">تحديث</button>
-        <button class="btn btn-ghost" id="btn-export-inq">⬇️ تصدير Excel</button>
+        <button class="btn btn-ghost" id="btn-export-inq" data-owner-only>⬇️ تصدير Excel</button>
         <label style="display:flex;align-items:center;gap:6px;font-size:13px;white-space:nowrap">
           <input type="checkbox" id="inq-show-deleted"> إظهار المحذوفة
         </label>
@@ -215,6 +215,7 @@
           <input type="checkbox" id="contracts-show-cancelled"> إظهار الملغاة
         </label>
         <button class="btn btn-ghost" id="btn-refresh-contracts">تحديث</button>
+        <button class="btn btn-ghost" id="btn-export-contracts" data-owner-only>⬇️ تصدير Excel</button>
       </div>
       <div class="card" style="padding:0;overflow-x:auto">
         <table>
@@ -398,6 +399,6 @@
 
 <div id="turnstile-container" style="display:none"></div>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script src="js/admin.js?v=20261007b"></script>
+<script src="js/admin.js?v=20261007c"></script>
 </body>
 </html>

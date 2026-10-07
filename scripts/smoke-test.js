@@ -1026,6 +1026,65 @@ const CHECKS = [
     if (!/أسبوع/.test(j.lateNote || "")) return "رسالة التأخر الأسبوعية غير موجودة";
     return true;
   }],
+  // #49 تصدير Excel: أزرار العقارات/الاستفسارات/العقود للمالك فقط، وتصدير العقود ورقتان صحيحتان (بيانات، أرقام، دفعات، حماية الصيغ)
+  ["لوحة الإدارة: أزرار تصدير Excel الثلاثة للمالك فقط + تصدير العقود (ورقتا العقود والدفعات، ملف xlsx صالح)", async () => {
+    const html = fs.readFileSync(path.join(ROOT, "admin.html"), "utf8");
+    const js = fs.readFileSync(path.join(ROOT, "js", "admin.js"), "utf8");
+    for (const id of ["btn-export-props", "btn-export-inq", "btn-export-contracts"]) {
+      const m = html.match(new RegExp('<button[^>]*id="' + id + '"[^>]*>'));
+      if (!m) return "الزر " + id + " غير موجود";
+      if (!/data-owner-only/.test(m[0])) return "الزر " + id + " يجب أن يكون owner-only";
+    }
+    const panel = html.match(/<section class="tab-panel" id="panel-contracts">[\s\S]*?<\/section>/);
+    if (!panel || !/btn-export-contracts/.test(panel[0])) return "زر تصدير العقود يجب أن يكون داخل لوحة العقود";
+    const h = js.match(/getElementById\('btn-export-contracts'\)\?\.addEventListener\('click'[\s\S]*?\n\}\);/);
+    if (!h) return "معالج تصدير العقود غير موجود";
+    if (!/currentUserRole !== 'owner'\) return/.test(h[0])) return "المعالج لا يتحقق من أن المستخدم مالك";
+    if (!/\.range\(from, from \+ 999\)/.test(h[0]) || !/data\.length < 1000/.test(h[0])) return "جلب الدفعات لا يتصفّح الصفحات (قد يُقتطع بصمت)";
+    if (!/window\.__CONTRACTS_LIST = \[\]; \/\/ لا نصدّر/.test(js)) return "القائمة لا تُصفَّر بعد فشل التحميل";
+    const a = js.indexOf("/* EXPORT-PURE-START"), b = js.indexOf("/* EXPORT-PURE-END */");
+    if (a < 0 || b < a) return "قسم الدالة البحتة غير موجود";
+    const dom = new JSDOM("<div></div>", { runScripts: "outside-only" });
+    dom.window.eval(js.slice(a, b) + "; window.__B = buildContractsExport;");
+    const build = dom.window.__B;
+    const contracts = [
+      { id: "c1", contract_number: "C-001", contract_type: "سكني", status: "ACTIVE", lessor: { full_name: "مؤجر", phone: "050" }, lessee: { full_name: "=HYPERLINK(\"http://x\")", phone: "055" },
+        city: "المدينة", district: "العزيزية", unit_type: "شقة", floor_number: "أول", area_sqm: "120.50", deed_number: "D1", start_date: "2026-01-01", end_date: "2027-01-01",
+        annual_rent: "24000.00", total_amount: "27600.00", vat_amount: "3600.00", security_deposit: "2000", created_at: "2026-01-01T10:00:00Z" },
+      { id: "c2", contract_number: "C-002", status: "CANCELLED", lessor: null, lessee: undefined, annual_rent: null, area_sqm: null, created_at: "2026-02-01T10:00:00Z" },
+    ];
+    const inst = [
+      { contract_id: "c1", installment_number: 2, due_date: "2026-07-01", base_amount: "12000", vat_amount: "1800", total_installment: "13800", payment_status: "PENDING", paid_at: null },
+      { contract_id: "c1", installment_number: 1, due_date: "2026-01-01", base_amount: "12000", vat_amount: "1800", total_installment: "13800", payment_status: "PAID", paid_at: "2026-01-03T09:00:00Z" },
+      { contract_id: "zz", installment_number: 1, due_date: "2026-01-01", base_amount: "1", vat_amount: "1", total_installment: "1", payment_status: "PAID" },
+    ];
+    const sheets = build(contracts, inst);
+    if (sheets.length !== 2 || sheets[0].name !== "العقود" || sheets[1].name !== "الدفعات") return "أسماء الأوراق خاطئة";
+    for (const sh of sheets) for (const r of sh.rows) if (r.length !== sh.headers.length) return "عدد أعمدة صف لا يطابق الترويسة بورقة " + sh.name;
+    const r1 = sheets[0].rows[0], H = sheets[0].headers;
+    const col = n => H.indexOf(n);
+    if (r1[col("الحالة")] !== "ساري" || typeof r1[col("الإيجار السنوي")] !== "number" || r1[col("الإيجار السنوي")] !== 24000) return "الأرقام يجب أن تكون أرقاماً: " + JSON.stringify(r1);
+    if (r1[col("عدد الدفعات")] !== 2 || r1[col("المسدّدة")] !== 1 || r1[col("المتبقي غير المسدّد")] !== 13800) return "حساب الدفعات خاطئ: " + JSON.stringify(r1);
+    if (r1[col("بداية العقد")] !== "2026-01-01" || r1[col("تاريخ الإنشاء")] !== "2026-01-01") return "صيغة التاريخ خاطئة";
+    const r2 = sheets[0].rows[1];
+    if (r2[col("الحالة")] !== "ملغى" || r2[col("المؤجر")] !== "" || r2[col("المستأجر")] !== "" || r2[col("الإيجار السنوي")] !== "" || r2[col("عدد الدفعات")] !== 0) return "عقد بلا أطراف/دفعات يجب أن يمر بقيم فارغة: " + JSON.stringify(r2);
+    if (sheets[1].rows.length !== 2) return "دفعات عقد غير مدرج (zz) يجب ألا تظهر: " + sheets[1].rows.length;
+    if (sheets[1].rows[0][2] !== 1 || sheets[1].rows[1][2] !== 2) return "الدفعات يجب أن تُرتَّب برقم الدفعة";
+    if (sheets[1].rows[0][7] !== "مدفوعة" || sheets[1].rows[0][8] !== "2026-01-03") return "حالة/تاريخ السداد خاطئ";
+    const flat = JSON.stringify(sheets);
+    if (/undefined|NaN|null/.test(flat)) return "ظهور undefined/NaN/null في البيانات";
+    if (/national_id|date_of_birth/.test(JSON.stringify(sheets.map(s => s.headers)))) return "لا يجب تصدير رقم الهوية/تاريخ الميلاد";
+    // ملف xlsx حقيقي: يُكتب ويُقرأ، والنص الذي يبدأ بـ= يبقى نصاً (لا صيغة)
+    const XLSX = require(path.join(ROOT, "lib", "xlsx.min.js"));
+    const wb = XLSX.utils.book_new();
+    for (const sh of sheets) XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([sh.headers, ...sh.rows]), sh.name);
+    const back = XLSX.read(XLSX.write(wb, { type: "buffer", bookType: "xlsx" }), { type: "buffer" });
+    if (back.SheetNames.join("|") !== "العقود|الدفعات") return "الملف المكتوب أوراقه خاطئة: " + back.SheetNames;
+    const cellName = back.Sheets["العقود"]["F2"];
+    if (!cellName || cellName.t !== "s" || cellName.f) return "خلية تبدأ بـ= يجب أن تبقى نصاً بلا صيغة: " + JSON.stringify(cellName);
+    if (back.Sheets["العقود"]["P2"].t !== "n" || back.Sheets["العقود"]["P2"].v !== 24000) return "خلية الإيجار يجب أن تكون رقماً";
+    return true;
+  }],
 ];
 
 (async () => {
