@@ -1005,6 +1005,27 @@ const CHECKS = [
     if (!/أسبوع/.test(j.lateNote || "")) return "رسالة التأخر الأسبوعية غير موجودة";
     return true;
   }],
+  // #48 بطاقة الوظائف: التقرير الأسبوعي مدرج، مهلته 9 أيام، ملخصه يعرض الأسبوع والتجربة والمتابعة والفشل
+  ["لوحة الإدارة: التقرير الأسبوعي ضمن حالة الوظائف (ملخص الأسبوع/التجربة/الاستفسارات المنتظرة/الفشل)", async () => {
+    const js = fs.readFileSync(path.join(ROOT, "js", "admin.js"), "utf8");
+    const a = js.indexOf("const JOB_LABELS"), b = js.indexOf("async function loadJobStatus");
+    if (a < 0 || b < a) return "JOB_LABELS غير موجودة";
+    const dom = new JSDOM("<div></div>", { runScripts: "outside-only" });
+    dom.window.eval(js.slice(a, b) + "; window.__J = JOB_LABELS;");
+    const j = dom.window.__J["send-weekly-report"];
+    if (!j) return "send-weekly-report غير مدرج بـJOB_LABELS";
+    if (j.maxAgeHours !== 24 * 9) return "المهلة يجب أن تكون 9 أيام: " + j.maxAgeHours;
+    const ok = j.extra({ week: "2026-10-04", sent: true, pending_inquiries: 3 });
+    if (!/2026-10-04/.test(ok) || !/3 استفسار بانتظار المتابعة/.test(ok) || /تجربة/.test(ok)) return "ملخص الإرسال خاطئ: " + ok;
+    const dry = j.extra({ week: "2026-10-04", sent: false, pending_inquiries: 0 });
+    if (!/تجربة بدون إرسال/.test(dry) || /بانتظار/.test(dry)) return "ملخص التجربة خاطئ: " + dry;
+    const f1 = j.extra({ error: "Resend 403" }), f2 = j.extra({ message: "boom" });
+    if (!/فشل: Resend 403/.test(f1) || !/فشل: boom/.test(f2)) return "ملخص الفشل خاطئ: " + f1 + " | " + f2;
+    if (j.extra(null) !== "" || j.extra({}) !== "") return "extra يجب أن يرجع نصاً فارغاً بلا ملخص";
+    if (/undefined|NaN/.test(ok + dry + f1 + f2)) return "ظهور undefined/NaN";
+    if (!/أسبوع/.test(j.lateNote || "")) return "رسالة التأخر الأسبوعية غير موجودة";
+    return true;
+  }],
 ];
 
 (async () => {

@@ -921,6 +921,10 @@ const JOB_LABELS = {
   // 2026-10-04: تقرير شهري بالإيميل للفريق — يوم 1 من كل شهر ٨ الصبح بتوقيت السعودية (schema.sql 3.19)
   'send-monthly-report': { label: 'التقرير الشهري بالإيميل — شهرياً', maxAgeHours: 24 * 35,
     extra: s => s?.month ? ` (تقرير ${s.month}${s.sent === false ? ' — تجربة بدون إرسال' : ''})` : '' },
+  // 2026-10-07: تقرير أسبوعي بالإيميل للفريق — كل أحد ٨ ص بتوقيت الرياض (schema.sql 3.23)
+  'send-weekly-report': { label: 'التقرير الأسبوعي بالإيميل — أسبوعياً', maxAgeHours: 24 * 9,
+    lateNote: ' — متأخر! المفروض يُرسل كل أسبوع',
+    extra: s => s?.week ? ` (أسبوع ${s.week}${s.sent === false ? ' — تجربة بدون إرسال' : ''}${s.pending_inquiries ? '، ' + s.pending_inquiries + ' استفسار بانتظار المتابعة' : ''})` : (s?.error || s?.message ? ' — فشل: ' + (s.error || s.message) : '') },
   // 2026-10-06: مراقب الصحة الساعي (موقع/Worker/قاعدة) — يرسل إيميلاً للفريق عند التعطل (schema.sql 3.21)
   'health-check': { label: 'مراقب الصحة (الموقع / الـWorker / قاعدة البيانات) — كل ساعة', maxAgeHours: 3,
     lateNote: ' — توقّف المراقب! المفروض يشتغل كل ساعة',
