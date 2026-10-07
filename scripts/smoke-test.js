@@ -984,6 +984,27 @@ const CHECKS = [
     if (!/cfg\.lateNote \|\|/.test(js)) return "loadJobStatus لا تستعمل lateNote";
     return true;
   }],
+  // #47 بطاقة الوظائف: النسخ الاحتياطي الأسبوعي مدرج، مهلته أسبوعية، وملخصه يعرض الملف والحجم والملاحظات
+  ["لوحة الإدارة: النسخ الاحتياطي الأسبوعي ضمن حالة الوظائف (ملخص الملف/الحجم/الفشل ومهلة 9 أيام)", async () => {
+    const js = fs.readFileSync(path.join(ROOT, "js", "admin.js"), "utf8");
+    const a = js.indexOf("const JOB_LABELS"), b = js.indexOf("async function loadJobStatus");
+    if (a < 0 || b < a) return "JOB_LABELS غير موجودة";
+    const dom = new JSDOM("<div></div>", { runScripts: "outside-only" });
+    dom.window.eval(js.slice(a, b) + "; window.__J = JOB_LABELS;");
+    const j = dom.window.__J["weekly-backup"];
+    if (!j) return "weekly-backup غير مدرج بـJOB_LABELS";
+    if (j.maxAgeHours !== 24 * 9) return "المهلة يجب أن تكون 9 أيام: " + j.maxAgeHours;
+    const ok = j.extra({ file: "backup-2026-10-11.json.gz", rows: 3600, tables: 18, bytes_gz: 153600, problems: [] });
+    if (!/backup-2026-10-11\.json\.gz/.test(ok) || !/3600 صف/.test(ok) || !/18 جدول/.test(ok) || !/150 KB/.test(ok) || /ملاحظات/.test(ok)) return "ملخص النجاح خاطئ: " + ok;
+    const warn = j.extra({ file: "f.json.gz", rows: 1, tables: 18, bytes_gz: 10, problems: ["x"] });
+    if (!/1 KB/.test(warn) || !/فيه ملاحظات/.test(warn)) return "ملخص الملاحظات خاطئ: " + warn;
+    const fail = j.extra({ error: "رفع الملف: boom" });
+    if (!/فشل: رفع الملف: boom/.test(fail)) return "ملخص الفشل خاطئ: " + fail;
+    if (j.extra(null) !== "" || j.extra({}) !== "") return "extra يجب أن يرجع نصاً فارغاً بلا ملخص";
+    if (/undefined|NaN/.test(ok + warn + fail)) return "ظهور undefined/NaN";
+    if (!/أسبوع/.test(j.lateNote || "")) return "رسالة التأخر الأسبوعية غير موجودة";
+    return true;
+  }],
 ];
 
 (async () => {

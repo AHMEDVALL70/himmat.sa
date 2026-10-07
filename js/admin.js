@@ -925,6 +925,10 @@ const JOB_LABELS = {
   'health-check': { label: 'مراقب الصحة (الموقع / الـWorker / قاعدة البيانات) — كل ساعة', maxAgeHours: 3,
     lateNote: ' — توقّف المراقب! المفروض يشتغل كل ساعة',
     extra: s => Array.isArray(s?.checks) ? ` (${s.checks.filter(c => c.ok).length}/${s.checks.length} سليم${s.failed ? ' — فيه تعطّل!' : ''})` : '' },
+  // 2026-10-07: نسخ احتياطي أسبوعي لصفوف القاعدة بمخزن خاص (schema.sql 3.22) — الأحد ٣:٢٠ ص بالدوحة
+  'weekly-backup': { label: 'النسخ الاحتياطي الأسبوعي لقاعدة البيانات (مخزن خاص، آخر 8 نسخ) — أسبوعياً', maxAgeHours: 24 * 9,
+    lateNote: ' — متأخر! المفروض ينسخ كل أسبوع',
+    extra: s => s?.file ? ` (${s.file}: ${s.rows ?? '؟'} صف من ${s.tables ?? '؟'} جدول، ${s.bytes_gz != null ? Math.max(1, Math.round(s.bytes_gz / 1024)) + ' KB' : '؟'}${s.problems && s.problems.length ? ' — فيه ملاحظات!' : ''})` : (s?.error ? ' — فشل: ' + s.error : '') },
   // 2026-09-30: صارت مجدولة — إيميل يومي للفريق ٩ الصبح بالرياض (نفس حماية نبّهني)
   'send-reminders': { label: 'تنبيهات الدفعات والعقود — يومياً ٩ ص', maxAgeHours: 48,
     extra: s => s?.today ? (s.emailed ? ` (أُرسل: ${s.overdue ?? 0} متأخرة، ${s.due3 ?? 0} خلال ٣ أيام، ${s.due15 ?? 0} خلال ١٥ يوم، ${s.ending ?? 0} عقد ينتهي)` : ' (ما فيه تنبيهات)') : '' },
