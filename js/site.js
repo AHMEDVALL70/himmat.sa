@@ -2,8 +2,8 @@
 /* ============================================================================
    0) Supabase connection
      ========================================================================== */
-const SUPABASE_URL = "https://wlebcvwsleoieodjtrcf.supabase.co";       // مثال: https://xxxxx.supabase.co
-const SUPABASE_ANON_KEY = "sb_publishable_KhUpsOF0OxVQWyWLakXx2g_yDsUlnxV";
+const SUPABASE_URL = "https://yljruwcdmfvnamkbbosa.supabase.co";       // مثال: https://xxxxx.supabase.co
+const SUPABASE_ANON_KEY = "sb_publishable_NPOfcfF3gLb2ITzLPTeIAw__MKG7UvJ";
 
 let supa = null;
 let dbReady = false;

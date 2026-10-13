@@ -731,7 +731,7 @@ const CHECKS = [
       if (/<script[^>]*src="https:\/\/challenges\.cloudflare\.com/.test(t)) return `${f}: سكربت Turnstile ما زال بوسم مباشر`;
       if (!/requestIdleCallback\(go/.test(t)) return `${f}: محمّل GA المؤجَّل غير موجود`;
       if (!/function gtag\(\)\{dataLayer\.push\(arguments\);\}/.test(t)) return `${f}: دالة gtag الفورية مفقودة`;
-      if (/<link rel="preconnect" href="https:\/\/wlebcvwsleoieodjtrcf\.supabase\.co">/.test(t)) return `${f}: preconnect لـSupabase بلا crossorigin`;
+      if (/<link rel="preconnect" href="https:\/\/yljruwcdmfvnamkbbosa\.supabase\.co">/.test(t)) return `${f}: preconnect لـSupabase بلا crossorigin`;
     }
     // سلوك: النموذج يطلب توكن قبل ما يوجد window.turnstile → يُحقن السكربت وينتظر، ثم يُرسل بالرمز الذي يصل متأخراً
     const g = await loadPage("add-property.html", "/add-property");

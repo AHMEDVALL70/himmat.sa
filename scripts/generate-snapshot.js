@@ -15,8 +15,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const SUPABASE_URL = "https://wlebcvwsleoieodjtrcf.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_KhUpsOF0OxVQWyWLakXx2g_yDsUlnxV";
+const SUPABASE_URL = "https://yljruwcdmfvnamkbbosa.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_NPOfcfF3gLb2ITzLPTeIAw__MKG7UvJ";
 
 async function supaSelect(table, query) {
   const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}?${query}`, {

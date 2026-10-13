@@ -31,8 +31,8 @@
 const fs = require("fs");
 const path = require("path");
 
-const SUPABASE_URL = "https://wlebcvwsleoieodjtrcf.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_KhUpsOF0OxVQWyWLakXx2g_yDsUlnxV";
+const SUPABASE_URL = "https://yljruwcdmfvnamkbbosa.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_NPOfcfF3gLb2ITzLPTeIAw__MKG7UvJ";
 const ROOT = path.join(__dirname, "..");
 const OFFERS_DIR = path.join(ROOT, "offer");
 const MANIFEST_PATH = path.join(OFFERS_DIR, ".manifest.json");

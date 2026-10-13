@@ -17,8 +17,8 @@ document.addEventListener('input', (e)=>{
   }
 });
 
-const SUPABASE_URL = "https://wlebcvwsleoieodjtrcf.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_KhUpsOF0OxVQWyWLakXx2g_yDsUlnxV";
+const SUPABASE_URL = "https://yljruwcdmfvnamkbbosa.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_NPOfcfF3gLb2ITzLPTeIAw__MKG7UvJ";
 const supa = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // مفتاح Turnstile العام — نفسه المستخدم بالموقع الرئيسي (الودجت يدعم حتى 10
