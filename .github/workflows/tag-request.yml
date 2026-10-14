@@ -20,9 +20,8 @@ on:
       - "tag-request/**"
       - "delete-request/**"
 
-concurrency:
-  group: ref-requests
-  cancel-in-progress: false
+# بلا concurrency عمداً: GitHub يُبقي تشغيلاً «منتظراً» واحداً فقط لكل مجموعة ويلغي
+# الأقدم، فطلبان متتاليان كان يُلغى أحدهما (حصل 2026-10-14). كل طلب يلمس مراجع مستقلة.
 
 permissions:
   contents: write
