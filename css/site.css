@@ -333,7 +333,8 @@ nav.links a.active::after{content:"";position:absolute;right:0;left:0;bottom:-16
 /* Services */
 .service-card{padding:24px}
 .service-card .ic{width:46px;height:46px;border-radius:12px;background:var(--gold-100);display:flex;align-items:center;justify-content:center;color:var(--navy-900);margin-bottom:14px}
-.service-card h4{margin:0 0 6px}
+.service-card h3,.service-card h4{margin:0 0 6px}
+.service-card h3{font-size:1em;font-family:inherit}
 .service-card p{color:var(--text-600);font-size:14px;margin:0}
 
 /* Tabs */
@@ -515,7 +516,11 @@ nav.links a.active::after{content:"";position:absolute;right:0;left:0;bottom:-16
 .assist-input button:hover{background:var(--navy-700)}
 
 footer.site{background:#101827;color:var(--text-600);padding:48px 0 100px;margin-top:40px}
-footer.site h4{color:#fff;margin:0 0 10px}
+footer.site h3,footer.site h4{color:#fff;margin:0 0 10px}
+/* 2026-10-14: عناوين التذييل و«رحلتك معنا» و«من نحن» و«المؤشر» وبطاقات الخدمات صارت h3 (ترتيب عناوين صحيح لقارئ الشاشة بعد h2)
+   بنفس شكل h4 السابق تماماً: حجم 1em، خط النص العادي، وهوامش h4 الافتراضية لعناوين الرحلة. */
+footer.site h3{font-size:1em;font-family:inherit}
+.as-h4{font-size:1em;font-family:inherit;margin-block:1.33em}
 footer.site a{color:var(--text-600);transition:color .15s ease}
 footer.site a:hover{color:var(--gold-500)}
 footer.site .bottom{border-top:1px solid rgba(255,255,255,.12);margin-top:26px;padding-top:16px;font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}

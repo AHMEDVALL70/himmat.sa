@@ -1106,6 +1106,30 @@ const CHECKS = [
     if (j.extra(null) !== "" || j.extra({}) !== "") return "extra يجب أن يرجع نصاً فارغاً بلا ملخص";
     if (/undefined|NaN/.test(applied + dry)) return "ظهور undefined/NaN";
     return true;
+  }],  // #51 (2026-10-14) الخرائط وترتيب العناوين: خريطة الخدمات كانت تعرض الرياض (بقايا قالب)،
+  // وخريطة التواصل بلا عنوان؛ والإطارات بلا title، وعناوين h4 بعد h2 (قفزة مستوى) — Lighthouse.
+  ["الخرائط بالمدينة المنورة وبعنوان وصفي، ولا قفزة في مستوى العناوين (h2→h4) بالأقسام والتذييل وبطاقات الخدمات", async (P) => {
+    const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+    if (/24\.8047853|46\.6833618/.test(html)) return "إحداثيات الرياض ما زالت في index.html";
+    const frames = html.match(/<iframe[^>]*google\.com\/maps[^>]*>/g) || [];
+    if (frames.length !== 2) return "المتوقع خريطتان، الموجود: " + frames.length;
+    for (const f of frames) if (!/\stitle="[^"]{5,}"/.test(f)) return "خريطة بلا title: " + f.slice(0, 90);
+    if (!frames.some(f => /q=%D8%A7%D9%84%D9%85%D8%AF%D9%8A%D9%86%D8%A9/.test(f))) return "خريطة الخدمات لا تعرض المدينة المنورة";
+    if (/<h4[^>]*data-i18n="journey[1-4]_title"/.test(html) || (html.match(/<h3 class="as-h4" data-i18n="journey[1-4]_title"/g) || []).length !== 4) return "عناوين «رحلتك معنا» يجب أن تكون h3.as-h4 (4)";
+    for (const id of ["about", "analytics"]) {
+      const a = html.indexOf('<section id="' + id + '"'); const b = html.indexOf("</section>", a);
+      if (a < 0) return "القسم غير موجود: " + id;
+      if (/<h4[\s>]/.test(html.slice(a, b))) return "ما زال h4 مباشر داخل قسم " + id;
+    }
+    const fa = html.indexOf('<footer class="site">'), fb = html.indexOf("</footer>", fa);
+    if (/<h4[\s>]/.test(html.slice(fa, fb))) return "ما زال h4 في التذييل";
+    const js = fs.readFileSync(path.join(ROOT, "js", "site.js"), "utf8");
+    const rs = js.slice(js.indexOf("function renderServices"), js.indexOf("function renderServices") + 900);
+    if (/<h4>/.test(rs) || !/<h3>\$\{s\.h\}<\/h3>/.test(rs)) return "بطاقات الخدمات يجب أن تكون h3";
+    const css = fs.readFileSync(path.join(ROOT, "css", "site.css"), "utf8");
+    for (const rule of [".as-h4{font-size:1em;font-family:inherit;margin-block:1.33em}", "footer.site h3{font-size:1em;font-family:inherit}", ".service-card h3{font-size:1em;font-family:inherit}"])
+      if (!css.includes(rule)) return "قاعدة CSS للحفاظ على الشكل مفقودة: " + rule;
+    return true;
   }],
 ];
 

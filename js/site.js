@@ -872,7 +872,7 @@ function renderServices(){
   document.getElementById('services-grid').innerHTML = list.map(s=>`
     <div class="card service-card fade-up">
       <div class="ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SERVICE_ICONS[s.icon] || ''}</svg></div>
-      <h4>${s.h}</h4>
+      <h3>${s.h}</h3>
       <p>${s.p}</p>
     </div>`).join('');
   observeFadeUps();
