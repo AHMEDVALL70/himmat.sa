@@ -1,0 +1,1599 @@
+build	Set up job	﻿2026-10-14T16:05:53.4363387Z Current runner version: '2.337.0'
+build	Set up job	2026-10-14T16:05:53.4384360Z ##[group]Runner Image Provisioner
+build	Set up job	2026-10-14T16:05:53.4385071Z Hosted Compute Agent
+build	Set up job	2026-10-14T16:05:53.4385606Z Version: 20261012.601
+build	Set up job	2026-10-14T16:05:53.4386166Z Commit: f3dc54e1fb89da6852db922499a0233137369e1d
+build	Set up job	2026-10-14T16:05:53.4386753Z Build Date: 2026-10-12T17:48:21Z
+build	Set up job	2026-10-14T16:05:53.4387373Z Worker ID: {12c46c53-6611-4f89-96f9-7c76db54ea89}
+build	Set up job	2026-10-14T16:05:53.4387948Z Region: mexicocentral
+build	Set up job	2026-10-14T16:05:53.4388453Z Cloud: Azure
+build	Set up job	2026-10-14T16:05:53.4388934Z ##[endgroup]
+build	Set up job	2026-10-14T16:05:53.4390305Z ##[group]Operating System
+build	Set up job	2026-10-14T16:05:53.4391121Z Ubuntu
+build	Set up job	2026-10-14T16:05:53.4391557Z 24.04.5
+build	Set up job	2026-10-14T16:05:53.4391961Z LTS
+build	Set up job	2026-10-14T16:05:53.4392472Z ##[endgroup]
+build	Set up job	2026-10-14T16:05:53.4392924Z ##[group]Runner Image
+build	Set up job	2026-10-14T16:05:53.4393490Z Image: ubuntu-24.04
+build	Set up job	2026-10-14T16:05:53.4393973Z Version: 20261012.334.1
+build	Set up job	2026-10-14T16:05:53.4394824Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261012.334/images/ubuntu/Ubuntu2404-Readme.md
+build	Set up job	2026-10-14T16:05:53.4396259Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261012.334
+build	Set up job	2026-10-14T16:05:53.4397113Z ##[endgroup]
+build	Set up job	2026-10-14T16:05:53.4398063Z ##[group]GITHUB_TOKEN Permissions
+build	Set up job	2026-10-14T16:05:53.4399868Z Contents: read
+build	Set up job	2026-10-14T16:05:53.4400393Z Metadata: read
+build	Set up job	2026-10-14T16:05:53.4400966Z Pages: write
+build	Set up job	2026-10-14T16:05:53.4401483Z ##[endgroup]
+build	Set up job	2026-10-14T16:05:53.4403127Z Secret source: Actions
+build	Set up job	2026-10-14T16:05:53.4403989Z Cache mode: read
+build	Set up job	2026-10-14T16:05:53.4404541Z Prepare workflow directory
+build	Set up job	2026-10-14T16:05:53.4661698Z Prepare all required actions
+build	Set up job	2026-10-14T16:05:53.4700378Z Getting action download info
+build	Set up job	2026-10-14T16:05:53.7904545Z Download action repository 'actions/checkout@v7.0.1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+build	Set up job	2026-10-14T16:05:53.9734784Z Download action repository 'actions/upload-pages-artifact@v3' (SHA:56afc609e74202658d3ffba0e8f6dda462b719fa)
+build	Set up job	2026-10-14T16:05:54.3033842Z Getting action download info
+build	Set up job	2026-10-14T16:05:54.4313679Z Download action repository 'actions/upload-artifact@v4' (SHA:ea165f8d65b6e75b540449e92b4886f43607fa02)
+build	Set up job	2026-10-14T16:05:54.6110665Z Complete job name: build
+build	Checkout	﻿2026-10-14T16:05:54.6707846Z ##[group]Run actions/checkout@v7.0.1
+build	Checkout	2026-10-14T16:05:54.6708550Z with:
+build	Checkout	2026-10-14T16:05:54.6708883Z   ref: main
+build	Checkout	2026-10-14T16:05:54.6709221Z   submodules: recursive
+build	Checkout	2026-10-14T16:05:54.6709640Z   repository: AHMEDVALL70/himmat.sa
+build	Checkout	2026-10-14T16:05:54.6713048Z   token: ***
+build	Checkout	2026-10-14T16:05:54.6713409Z   ssh-strict: true
+build	Checkout	2026-10-14T16:05:54.6713761Z   ssh-user: git
+build	Checkout	2026-10-14T16:05:54.6714116Z   persist-credentials: true
+build	Checkout	2026-10-14T16:05:54.6714514Z   clean: true
+build	Checkout	2026-10-14T16:05:54.6714871Z   sparse-checkout-cone-mode: true
+build	Checkout	2026-10-14T16:05:54.6715301Z   fetch-depth: 1
+build	Checkout	2026-10-14T16:05:54.6715640Z   fetch-tags: false
+build	Checkout	2026-10-14T16:05:54.6716010Z   show-progress: true
+build	Checkout	2026-10-14T16:05:54.6716376Z   lfs: false
+build	Checkout	2026-10-14T16:05:54.6716710Z   set-safe-directory: true
+build	Checkout	2026-10-14T16:05:54.6717154Z   allow-unsafe-pr-checkout: false
+build	Checkout	2026-10-14T16:05:54.6717781Z ##[endgroup]
+build	Checkout	2026-10-14T16:05:54.7534088Z Syncing repository: AHMEDVALL70/himmat.sa
+build	Checkout	2026-10-14T16:05:54.7536183Z ##[group]Getting Git version info
+build	Checkout	2026-10-14T16:05:54.7537172Z Working directory is '/home/runner/work/himmat.sa/himmat.sa'
+build	Checkout	2026-10-14T16:05:54.7538514Z [command]/usr/bin/git version
+build	Checkout	2026-10-14T16:05:54.7555783Z git version 2.55.0
+build	Checkout	2026-10-14T16:05:54.7583564Z ##[endgroup]
+build	Checkout	2026-10-14T16:05:54.7588738Z Temporarily overriding HOME='/home/runner/work/_temp/e77ee03c-b780-4f5f-a17e-5ae9fde30753' before making global git config changes
+build	Checkout	2026-10-14T16:05:54.7590649Z Adding repository directory to the temporary git global config as a safe directory
+build	Checkout	2026-10-14T16:05:54.7592551Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/himmat.sa/himmat.sa
+build	Checkout	2026-10-14T16:05:54.7631913Z Deleting the contents of '/home/runner/work/himmat.sa/himmat.sa'
+build	Checkout	2026-10-14T16:05:54.7635873Z ##[group]Determining repository object format
+build	Checkout	2026-10-14T16:05:55.1181213Z ##[endgroup]
+build	Checkout	2026-10-14T16:05:55.1183588Z ##[group]Initializing the repository
+build	Checkout	2026-10-14T16:05:55.1188049Z [command]/usr/bin/git init /home/runner/work/himmat.sa/himmat.sa
+build	Checkout	2026-10-14T16:05:55.1277000Z hint: Using 'master' as the name for the initial branch. This default branch name
+build	Checkout	2026-10-14T16:05:55.1278734Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+build	Checkout	2026-10-14T16:05:55.1280325Z hint: to use in all of your new repositories, which will suppress this warning,
+build	Checkout	2026-10-14T16:05:55.1281766Z hint: call:
+build	Checkout	2026-10-14T16:05:55.1282508Z hint:
+build	Checkout	2026-10-14T16:05:55.1283544Z hint: 	git config --global init.defaultBranch <name>
+build	Checkout	2026-10-14T16:05:55.1284699Z hint:
+build	Checkout	2026-10-14T16:05:55.1285802Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+build	Checkout	2026-10-14T16:05:55.1287628Z hint: 'development'. The just-created branch can be renamed via this command:
+build	Checkout	2026-10-14T16:05:55.1289179Z hint:
+build	Checkout	2026-10-14T16:05:55.1290063Z hint: 	git branch -m <name>
+build	Checkout	2026-10-14T16:05:55.1291298Z hint:
+build	Checkout	2026-10-14T16:05:55.1292634Z hint: Disable this message with "git config set advice.defaultBranchName false"
+build	Checkout	2026-10-14T16:05:55.1297485Z Initialized empty Git repository in /home/runner/work/himmat.sa/himmat.sa/.git/
+build	Checkout	2026-10-14T16:05:55.1312051Z [command]/usr/bin/git remote add origin https://github.com/AHMEDVALL70/himmat.sa
+build	Checkout	2026-10-14T16:05:55.1362781Z ##[endgroup]
+build	Checkout	2026-10-14T16:05:55.1365104Z ##[group]Disabling automatic garbage collection
+build	Checkout	2026-10-14T16:05:55.1367044Z [command]/usr/bin/git config --local gc.auto 0
+build	Checkout	2026-10-14T16:05:55.1405446Z ##[endgroup]
+build	Checkout	2026-10-14T16:05:55.1407612Z ##[group]Setting up auth
+build	Checkout	2026-10-14T16:05:55.1409199Z Removing SSH command configuration
+build	Checkout	2026-10-14T16:05:55.1411160Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+build	Checkout	2026-10-14T16:05:55.1445771Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+build	Checkout	2026-10-14T16:05:55.1714094Z Removing HTTP extra header
+build	Checkout	2026-10-14T16:05:55.1720892Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+build	Checkout	2026-10-14T16:05:55.1755377Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+build	Checkout	2026-10-14T16:05:55.1939902Z Removing includeIf entries pointing to credentials config files
+build	Checkout	2026-10-14T16:05:55.1943125Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+build	Checkout	2026-10-14T16:05:55.1973875Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+build	Checkout	2026-10-14T16:05:55.2164639Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-780e3fbc-2f25-4f71-92ce-4b93567a2858.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+build	Checkout	2026-10-14T16:05:55.2199464Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/himmat.sa/himmat.sa/.git.path /home/runner/work/_temp/git-credentials-780e3fbc-2f25-4f71-92ce-4b93567a2858.config
+build	Checkout	2026-10-14T16:05:55.2230641Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/himmat.sa/himmat.sa/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-780e3fbc-2f25-4f71-92ce-4b93567a2858.config
+build	Checkout	2026-10-14T16:05:55.2263812Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-780e3fbc-2f25-4f71-92ce-4b93567a2858.config
+build	Checkout	2026-10-14T16:05:55.2295322Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-780e3fbc-2f25-4f71-92ce-4b93567a2858.config
+build	Checkout	2026-10-14T16:05:55.2323787Z ##[endgroup]
+build	Checkout	2026-10-14T16:05:55.2325157Z ##[group]Fetching the repository
+build	Checkout	2026-10-14T16:05:55.2331525Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +refs/heads/main*:refs/remotes/origin/main* +refs/tags/main*:refs/tags/main*
+build	Checkout	2026-10-14T16:05:56.5128455Z From https://github.com/AHMEDVALL70/himmat.sa
+build	Checkout	2026-10-14T16:05:56.5128996Z  * [new branch]      main       -> origin/main
+build	Checkout	2026-10-14T16:05:56.5133906Z ##[endgroup]
+build	Checkout	2026-10-14T16:05:56.5134406Z ##[group]Determining the checkout info
+build	Checkout	2026-10-14T16:05:56.5141194Z [command]/usr/bin/git branch --list --remote origin/main
+build	Checkout	2026-10-14T16:05:56.5171121Z   origin/main
+build	Checkout	2026-10-14T16:05:56.5174287Z ##[endgroup]
+build	Checkout	2026-10-14T16:05:56.5177959Z [command]/usr/bin/git sparse-checkout disable
+build	Checkout	2026-10-14T16:05:56.5224883Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+build	Checkout	2026-10-14T16:05:56.5256214Z ##[group]Checking out the ref
+build	Checkout	2026-10-14T16:05:56.5259700Z [command]/usr/bin/git checkout --progress --force -B main refs/remotes/origin/main
+build	Checkout	2026-10-14T16:05:56.5784396Z Switched to a new branch 'main'
+build	Checkout	2026-10-14T16:05:56.5791284Z branch 'main' set up to track 'origin/main'.
+build	Checkout	2026-10-14T16:05:56.5794232Z ##[endgroup]
+build	Checkout	2026-10-14T16:05:56.5794752Z ##[group]Setting up auth for fetching submodules
+build	Checkout	2026-10-14T16:05:56.5800409Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-780e3fbc-2f25-4f71-92ce-4b93567a2858.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+build	Checkout	2026-10-14T16:05:56.5840007Z [command]/usr/bin/git config --global include.path /home/runner/work/_temp/git-credentials-780e3fbc-2f25-4f71-92ce-4b93567a2858.config
+build	Checkout	2026-10-14T16:05:56.5872643Z [command]/usr/bin/git config --global --unset-all url.https://github.com/.insteadOf
+build	Checkout	2026-10-14T16:05:56.5904129Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf git@github.com:
+build	Checkout	2026-10-14T16:05:56.7599450Z [command]/usr/bin/git config --global --add url.https://github.com/.insteadOf org-246114291@github.com:
+build	Checkout	2026-10-14T16:05:56.7635607Z ##[endgroup]
+build	Checkout	2026-10-14T16:05:56.7636192Z ##[group]Fetching submodules
+build	Checkout	2026-10-14T16:05:56.7646018Z [command]/usr/bin/git submodule sync --recursive
+build	Checkout	2026-10-14T16:05:56.7860891Z [command]/usr/bin/git -c protocol.version=2 submodule update --init --force --depth=1 --recursive
+build	Checkout	2026-10-14T16:05:56.8076867Z [command]/usr/bin/git submodule foreach --recursive git config --local gc.auto 0
+build	Checkout	2026-10-14T16:05:56.8273050Z ##[endgroup]
+build	Checkout	2026-10-14T16:05:56.8273561Z ##[group]Persisting credentials for submodules
+build	Checkout	2026-10-14T16:05:56.8278278Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'url\.https\:\/\/github\.com\/\.insteadOf' && git config --local --unset-all 'url.https://github.com/.insteadOf' || :"
+build	Checkout	2026-10-14T16:05:56.8474042Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+build	Checkout	2026-10-14T16:05:56.8672134Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'git@github.com:'
+build	Checkout	2026-10-14T16:05:56.8882882Z [command]/usr/bin/git submodule foreach --recursive git config --local --add 'url.https://github.com/.insteadOf' 'org-246114291@github.com:'
+build	Checkout	2026-10-14T16:05:56.9092581Z ##[endgroup]
+build	Checkout	2026-10-14T16:05:56.9129829Z [command]/usr/bin/git log -1 --format=%H
+build	Checkout	2026-10-14T16:05:56.9156086Z 55614a6007e6146039504282c85a502b11135445
+build	Upload artifact	﻿2026-10-14T16:05:56.9386995Z ##[group]Run actions/upload-pages-artifact@v3
+build	Upload artifact	2026-10-14T16:05:56.9387261Z with:
+build	Upload artifact	2026-10-14T16:05:56.9387419Z   path: .
+build	Upload artifact	2026-10-14T16:05:56.9387584Z   name: github-pages
+build	Upload artifact	2026-10-14T16:05:56.9387767Z   retention-days: 1
+build	Upload artifact	2026-10-14T16:05:56.9387934Z ##[endgroup]
+build	Upload artifact	2026-10-14T16:05:56.9437763Z ##[start-action display=Archive artifact;id=__actions_upload-pages-artifact.__run]
+build	Upload artifact	2026-10-14T16:05:56.9549129Z ##[group]Run echo ::group::Archive artifact
+build	Upload artifact	2026-10-14T16:05:56.9549444Z ^[[36;1mecho ::group::Archive artifact^[[0m
+build	Upload artifact	2026-10-14T16:05:56.9549678Z ^[[36;1mtar \^[[0m
+build	Upload artifact	2026-10-14T16:05:56.9549887Z ^[[36;1m  --dereference --hard-dereference \^[[0m
+build	Upload artifact	2026-10-14T16:05:56.9550145Z ^[[36;1m  --directory "$INPUT_PATH" \^[[0m
+build	Upload artifact	2026-10-14T16:05:56.9550742Z ^[[36;1m  -cvf "$RUNNER_TEMP/artifact.tar" \^[[0m
+build	Upload artifact	2026-10-14T16:05:56.9550977Z ^[[36;1m  --exclude=.git \^[[0m
+build	Upload artifact	2026-10-14T16:05:56.9551178Z ^[[36;1m  --exclude=.github \^[[0m
+build	Upload artifact	2026-10-14T16:05:56.9551365Z ^[[36;1m  .^[[0m
+build	Upload artifact	2026-10-14T16:05:56.9551528Z ^[[36;1mecho ::endgroup::^[[0m
+build	Upload artifact	2026-10-14T16:05:56.9577406Z shell: /usr/bin/sh -e {0}
+build	Upload artifact	2026-10-14T16:05:56.9577625Z env:
+build	Upload artifact	2026-10-14T16:05:56.9577788Z   INPUT_PATH: .
+build	Upload artifact	2026-10-14T16:05:56.9577965Z ##[endgroup]
+build	Upload artifact	2026-10-14T16:05:56.9627811Z ##[group]Archive artifact
+build	Upload artifact	2026-10-14T16:05:56.9642998Z ./
+build	Upload artifact	2026-10-14T16:05:56.9643298Z ./analytics.html
+build	Upload artifact	2026-10-14T16:05:56.9644593Z ./js/
+build	Upload artifact	2026-10-14T16:05:56.9644837Z ./js/admin.js
+build	Upload artifact	2026-10-14T16:05:56.9645725Z ./js/site.js
+build	Upload artifact	2026-10-14T16:05:56.9648647Z ./icons/
+build	Upload artifact	2026-10-14T16:05:56.9648912Z ./icons/favicon-16x16.png
+build	Upload artifact	2026-10-14T16:05:56.9649205Z ./icons/favicon.ico
+build	Upload artifact	2026-10-14T16:05:56.9649485Z ./icons/favicon-32x32.png
+build	Upload artifact	2026-10-14T16:05:56.9649763Z ./icons/icon-512.png
+build	Upload artifact	2026-10-14T16:05:56.9652219Z ./icons/apple-touch-icon.png
+build	Upload artifact	2026-10-14T16:05:56.9652648Z ./icons/icon-192.png
+build	Upload artifact	2026-10-14T16:05:56.9653457Z ./about.html
+build	Upload artifact	2026-10-14T16:05:56.9654829Z ./contact.html
+build	Upload artifact	2026-10-14T16:05:56.9656119Z ./CNAME
+build	Upload artifact	2026-10-14T16:05:56.9656339Z ./lib/
+build	Upload artifact	2026-10-14T16:05:56.9656583Z ./lib/web-vitals.iife.js
+build	Upload artifact	2026-10-14T16:05:56.9656891Z ./lib/LICENSE-web-vitals.txt
+build	Upload artifact	2026-10-14T16:05:56.9657205Z ./lib/supabase.min.js
+build	Upload artifact	2026-10-14T16:05:56.9658946Z ./lib/jspdf-4.2.1.umd.min.js
+build	Upload artifact	2026-10-14T16:05:56.9662353Z ./lib/xlsx.min.js
+build	Upload artifact	2026-10-14T16:05:56.9665806Z ./lib/html2canvas-1.4.1.min.js
+build	Upload artifact	2026-10-14T16:05:56.9667594Z ./sitemap-districts.xml
+build	Upload artifact	2026-10-14T16:05:56.9669084Z ./services.html
+build	Upload artifact	2026-10-14T16:05:56.9670336Z ./offers.html
+build	Upload artifact	2026-10-14T16:05:56.9671702Z ./site.webmanifest
+build	Upload artifact	2026-10-14T16:05:56.9671958Z ./offer/
+build	Upload artifact	2026-10-14T16:05:56.9672223Z ./offer/3a144c74-3194-4e35-95d0-da19b724e625/
+build	Upload artifact	2026-10-14T16:05:56.9672638Z ./offer/3a144c74-3194-4e35-95d0-da19b724e625/index.html
+build	Upload artifact	2026-10-14T16:05:56.9673652Z ./offer/.manifest.json
+build	Upload artifact	2026-10-14T16:05:56.9674035Z ./css/
+build	Upload artifact	2026-10-14T16:05:56.9674286Z ./css/site.css
+build	Upload artifact	2026-10-14T16:05:56.9674614Z ./css/admin.css
+build	Upload artifact	2026-10-14T16:05:56.9674925Z ./.nojekyll
+build	Upload artifact	2026-10-14T16:05:56.9675156Z ./assets/
+build	Upload artifact	2026-10-14T16:05:56.9675348Z ./assets/images/
+build	Upload artifact	2026-10-14T16:05:56.9675545Z ./assets/images/hero-madinah-1600.webp
+build	Upload artifact	2026-10-14T16:05:56.9676839Z ./assets/images/hero-madinah.jpg
+build	Upload artifact	2026-10-14T16:05:56.9680982Z ./assets/images/hero-madinah-800.webp
+build	Upload artifact	2026-10-14T16:05:56.9681335Z ./assets/fonts/
+build	Upload artifact	2026-10-14T16:05:56.9681537Z ./assets/fonts/tajawal-latin-700-normal.woff2
+build	Upload artifact	2026-10-14T16:05:56.9681821Z ./assets/fonts/tajawal-arabic-900-normal.woff2
+build	Upload artifact	2026-10-14T16:05:56.9690937Z ./assets/fonts/tajawal-arabic-500-normal.woff2
+build	Upload artifact	2026-10-14T16:05:56.9701026Z ./assets/fonts/LICENSE-almarai.txt
+build	Upload artifact	2026-10-14T16:05:56.9701391Z ./assets/fonts/tajawal-arabic-700-normal.woff2
+build	Upload artifact	2026-10-14T16:05:56.9701818Z ./assets/fonts/almarai-arabic-700-normal.woff2
+build	Upload artifact	2026-10-14T16:05:56.9702216Z ./assets/fonts/tajawal-latin-500-normal.woff2
+build	Upload artifact	2026-10-14T16:05:56.9702580Z ./assets/fonts/LICENSE-tajawal.txt
+build	Upload artifact	2026-10-14T16:05:56.9702930Z ./assets/fonts/almarai-arabic-400-normal.woff2
+build	Upload artifact	2026-10-14T16:05:56.9703308Z ./assets/fonts/tajawal-latin-900-normal.woff2
+build	Upload artifact	2026-10-14T16:05:56.9703688Z ./assets/fonts/almarai-latin-700-normal.woff2
+build	Upload artifact	2026-10-14T16:05:56.9704070Z ./assets/fonts/almarai-latin-400-normal.woff2
+build	Upload artifact	2026-10-14T16:05:56.9704680Z ./.gitignore
+build	Upload artifact	2026-10-14T16:05:56.9704917Z ./Himmat-Almedina.webp
+build	Upload artifact	2026-10-14T16:05:56.9705180Z ./index.html
+build	Upload artifact	2026-10-14T16:05:56.9705397Z ./scripts/
+build	Upload artifact	2026-10-14T16:05:56.9705664Z ./scripts/district-prices-sample.json
+build	Upload artifact	2026-10-14T16:05:56.9706022Z ./scripts/generate-snapshot.js
+build	Upload artifact	2026-10-14T16:05:56.9706367Z ./scripts/generate-district-pages.js
+build	Upload artifact	2026-10-14T16:05:56.9706648Z ./scripts/smoke-test.js
+build	Upload artifact	2026-10-14T16:05:56.9706849Z ./scripts/generate-section-pages.js
+build	Upload artifact	2026-10-14T16:05:56.9707075Z ./scripts/update-sitemap-lastmod.js
+build	Upload artifact	2026-10-14T16:05:56.9707281Z ./scripts/inline-css.js
+build	Upload artifact	2026-10-14T16:05:56.9707475Z ./scripts/smoke-fixtures.json
+build	Upload artifact	2026-10-14T16:05:56.9707679Z ./scripts/district-names.json
+build	Upload artifact	2026-10-14T16:05:56.9708010Z ./scripts/generate-offer-pages.js
+build	Upload artifact	2026-10-14T16:05:56.9708367Z ./أحياء/
+build	Upload artifact	2026-10-14T16:05:56.9708557Z ./أحياء/الرياض/
+build	Upload artifact	2026-10-14T16:05:56.9708755Z ./أحياء/الرياض/العريجاء/
+build	Upload artifact	2026-10-14T16:05:56.9708986Z ./أحياء/الرياض/العريجاء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9709206Z ./أحياء/الرياض/الشرق/
+build	Upload artifact	2026-10-14T16:05:56.9709417Z ./أحياء/الرياض/الشرق/index.html
+build	Upload artifact	2026-10-14T16:05:56.9709632Z ./أحياء/الرياض/الشميسي/
+build	Upload artifact	2026-10-14T16:05:56.9709840Z ./أحياء/الرياض/الشميسي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9710057Z ./أحياء/الرياض/المصيف/
+build	Upload artifact	2026-10-14T16:05:56.9710253Z ./أحياء/الرياض/المصيف/index.html
+build	Upload artifact	2026-10-14T16:05:56.9710461Z ./أحياء/الرياض/قرطبة/
+build	Upload artifact	2026-10-14T16:05:56.9710901Z ./أحياء/الرياض/قرطبة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9711118Z ./أحياء/الرياض/الربيع/
+build	Upload artifact	2026-10-14T16:05:56.9711321Z ./أحياء/الرياض/الربيع/index.html
+build	Upload artifact	2026-10-14T16:05:56.9711534Z ./أحياء/الرياض/الخزامى/
+build	Upload artifact	2026-10-14T16:05:56.9711746Z ./أحياء/الرياض/الخزامى/index.html
+build	Upload artifact	2026-10-14T16:05:56.9711961Z ./أحياء/الرياض/الفيحاء/
+build	Upload artifact	2026-10-14T16:05:56.9712176Z ./أحياء/الرياض/الفيحاء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9712387Z ./أحياء/الرياض/الازدهار/
+build	Upload artifact	2026-10-14T16:05:56.9712598Z ./أحياء/الرياض/الازدهار/index.html
+build	Upload artifact	2026-10-14T16:05:56.9712816Z ./أحياء/الرياض/الروابي/
+build	Upload artifact	2026-10-14T16:05:56.9713015Z ./أحياء/الرياض/الروابي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9713241Z ./أحياء/الرياض/النظيم/
+build	Upload artifact	2026-10-14T16:05:56.9713439Z ./أحياء/الرياض/النظيم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9713649Z ./أحياء/الرياض/النرجس/
+build	Upload artifact	2026-10-14T16:05:56.9713838Z ./أحياء/الرياض/النرجس/index.html
+build	Upload artifact	2026-10-14T16:05:56.9714048Z ./أحياء/الرياض/السعادة/
+build	Upload artifact	2026-10-14T16:05:56.9714242Z ./أحياء/الرياض/السعادة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9714444Z ./أحياء/الرياض/الغدير/
+build	Upload artifact	2026-10-14T16:05:56.9714636Z ./أحياء/الرياض/الغدير/index.html
+build	Upload artifact	2026-10-14T16:05:56.9714846Z ./أحياء/الرياض/العزيزية/
+build	Upload artifact	2026-10-14T16:05:56.9715059Z ./أحياء/الرياض/العزيزية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9715428Z ./أحياء/الرياض/الملك-عبدالعزيز/
+build	Upload artifact	2026-10-14T16:05:56.9715686Z ./أحياء/الرياض/الملك-عبدالعزيز/index.html
+build	Upload artifact	2026-10-14T16:05:56.9715940Z ./أحياء/الرياض/عتيقة/
+build	Upload artifact	2026-10-14T16:05:56.9716139Z ./أحياء/الرياض/عتيقة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9716343Z ./أحياء/الرياض/الصفاء/
+build	Upload artifact	2026-10-14T16:05:56.9716536Z ./أحياء/الرياض/الصفاء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9716750Z ./أحياء/الرياض/ام-الحمام/
+build	Upload artifact	2026-10-14T16:05:56.9716967Z ./أحياء/الرياض/ام-الحمام/index.html
+build	Upload artifact	2026-10-14T16:05:56.9717206Z ./أحياء/الرياض/الشفاء/
+build	Upload artifact	2026-10-14T16:05:56.9717408Z ./أحياء/الرياض/الشفاء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9717629Z ./أحياء/الرياض/السليمانية/
+build	Upload artifact	2026-10-14T16:05:56.9717843Z ./أحياء/الرياض/السليمانية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9718066Z ./أحياء/الرياض/الشرفية/
+build	Upload artifact	2026-10-14T16:05:56.9718271Z ./أحياء/الرياض/الشرفية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9718484Z ./أحياء/الرياض/الصحافة/
+build	Upload artifact	2026-10-14T16:05:56.9718678Z ./أحياء/الرياض/الصحافة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9718884Z ./أحياء/الرياض/طويق/
+build	Upload artifact	2026-10-14T16:05:56.9719082Z ./أحياء/الرياض/طويق/index.html
+build	Upload artifact	2026-10-14T16:05:56.9719291Z ./أحياء/الرياض/الفيصلية/
+build	Upload artifact	2026-10-14T16:05:56.9719494Z ./أحياء/الرياض/الفيصلية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9719719Z ./أحياء/الرياض/ثليم/
+build	Upload artifact	2026-10-14T16:05:56.9719914Z ./أحياء/الرياض/ثليم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9720120Z ./أحياء/الرياض/البرية/
+build	Upload artifact	2026-10-14T16:05:56.9720311Z ./أحياء/الرياض/البرية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9720755Z ./أحياء/الرياض/هيت/
+build	Upload artifact	2026-10-14T16:05:56.9721078Z ./أحياء/الرياض/هيت/index.html
+build	Upload artifact	2026-10-14T16:05:56.9721568Z ./أحياء/الرياض/عريض/
+build	Upload artifact	2026-10-14T16:05:56.9721853Z ./أحياء/الرياض/عريض/index.html
+build	Upload artifact	2026-10-14T16:05:56.9722160Z ./أحياء/الرياض/طيبة/
+build	Upload artifact	2026-10-14T16:05:56.9722437Z ./أحياء/الرياض/طيبة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9722758Z ./أحياء/الرياض/العمل/
+build	Upload artifact	2026-10-14T16:05:56.9723052Z ./أحياء/الرياض/العمل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9723381Z ./أحياء/الرياض/الصناعية/
+build	Upload artifact	2026-10-14T16:05:56.9723679Z ./أحياء/الرياض/الصناعية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9723895Z ./أحياء/الرياض/الورود/
+build	Upload artifact	2026-10-14T16:05:56.9724089Z ./أحياء/الرياض/الورود/index.html
+build	Upload artifact	2026-10-14T16:05:56.9724298Z ./أحياء/الرياض/المعيزلية/
+build	Upload artifact	2026-10-14T16:05:56.9724511Z ./أحياء/الرياض/المعيزلية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9724847Z ./أحياء/الرياض/الاندلس/
+build	Upload artifact	2026-10-14T16:05:56.9725042Z ./أحياء/الرياض/الاندلس/index.html
+build	Upload artifact	2026-10-14T16:05:56.9725251Z ./أحياء/الرياض/المرقب/
+build	Upload artifact	2026-10-14T16:05:56.9725446Z ./أحياء/الرياض/المرقب/index.html
+build	Upload artifact	2026-10-14T16:05:56.9725651Z ./أحياء/الرياض/المرجان/
+build	Upload artifact	2026-10-14T16:05:56.9725862Z ./أحياء/الرياض/المرجان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9726100Z ./أحياء/الرياض/الملك-فيصل/
+build	Upload artifact	2026-10-14T16:05:56.9726314Z ./أحياء/الرياض/الملك-فيصل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9726551Z ./أحياء/الرياض/النفل/
+build	Upload artifact	2026-10-14T16:05:56.9726751Z ./أحياء/الرياض/النفل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9726957Z ./أحياء/الرياض/الرمال/
+build	Upload artifact	2026-10-14T16:05:56.9727158Z ./أحياء/الرياض/الرمال/index.html
+build	Upload artifact	2026-10-14T16:05:56.9727366Z ./أحياء/الرياض/المناخ/
+build	Upload artifact	2026-10-14T16:05:56.9727563Z ./أحياء/الرياض/المناخ/index.html
+build	Upload artifact	2026-10-14T16:05:56.9727767Z ./أحياء/الرياض/العود/
+build	Upload artifact	2026-10-14T16:05:56.9727961Z ./أحياء/الرياض/العود/index.html
+build	Upload artifact	2026-10-14T16:05:56.9728159Z ./أحياء/الرياض/حطين/
+build	Upload artifact	2026-10-14T16:05:56.9728352Z ./أحياء/الرياض/حطين/index.html
+build	Upload artifact	2026-10-14T16:05:56.9728566Z ./أحياء/الرياض/ديراب/
+build	Upload artifact	2026-10-14T16:05:56.9728753Z ./أحياء/الرياض/ديراب/index.html
+build	Upload artifact	2026-10-14T16:05:56.9728949Z ./أحياء/الرياض/المنار/
+build	Upload artifact	2026-10-14T16:05:56.9729142Z ./أحياء/الرياض/المنار/index.html
+build	Upload artifact	2026-10-14T16:05:56.9729348Z ./أحياء/الرياض/المهدية/
+build	Upload artifact	2026-10-14T16:05:56.9729546Z ./أحياء/الرياض/المهدية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9729780Z ./أحياء/الرياض/الربوة/
+build	Upload artifact	2026-10-14T16:05:56.9729970Z ./أحياء/الرياض/الربوة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9730173Z ./أحياء/الرياض/الريان/
+build	Upload artifact	2026-10-14T16:05:56.9730369Z ./أحياء/الرياض/الريان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9730794Z ./أحياء/الرياض/المغرزات/
+build	Upload artifact	2026-10-14T16:05:56.9730998Z ./أحياء/الرياض/المغرزات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9731221Z ./أحياء/الرياض/العقيق/
+build	Upload artifact	2026-10-14T16:05:56.9731422Z ./أحياء/الرياض/العقيق/index.html
+build	Upload artifact	2026-10-14T16:05:56.9731627Z ./أحياء/الرياض/القادسية/
+build	Upload artifact	2026-10-14T16:05:56.9731826Z ./أحياء/الرياض/القادسية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9732049Z ./أحياء/الرياض/أم-الحمام-الغربي/
+build	Upload artifact	2026-10-14T16:05:56.9732279Z ./أحياء/الرياض/أم-الحمام-الغربي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9732529Z ./أحياء/الرياض/المشرق/
+build	Upload artifact	2026-10-14T16:05:56.9732723Z ./أحياء/الرياض/المشرق/index.html
+build	Upload artifact	2026-10-14T16:05:56.9732926Z ./أحياء/الرياض/دعكنة/
+build	Upload artifact	2026-10-14T16:05:56.9733114Z ./أحياء/الرياض/دعكنة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9733313Z ./أحياء/الرياض/المروج/
+build	Upload artifact	2026-10-14T16:05:56.9733634Z ./أحياء/الرياض/المروج/index.html
+build	Upload artifact	2026-10-14T16:05:56.9733834Z ./أحياء/الرياض/نمار/
+build	Upload artifact	2026-10-14T16:05:56.9734025Z ./أحياء/الرياض/نمار/index.html
+build	Upload artifact	2026-10-14T16:05:56.9734230Z ./أحياء/الرياض/الفاروق/
+build	Upload artifact	2026-10-14T16:05:56.9734430Z ./أحياء/الرياض/الفاروق/index.html
+build	Upload artifact	2026-10-14T16:05:56.9734645Z ./أحياء/الرياض/بدر/
+build	Upload artifact	2026-10-14T16:05:56.9734842Z ./أحياء/الرياض/بدر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9735049Z ./أحياء/الرياض/عرقة/
+build	Upload artifact	2026-10-14T16:05:56.9735241Z ./أحياء/الرياض/عرقة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9735461Z ./أحياء/الرياض/حلة-بن-دايل/
+build	Upload artifact	2026-10-14T16:05:56.9735685Z ./أحياء/الرياض/حلة-بن-دايل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9735925Z ./أحياء/الرياض/الشعلة/
+build	Upload artifact	2026-10-14T16:05:56.9736121Z ./أحياء/الرياض/الشعلة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9736475Z ./أحياء/الرياض/الحزم/
+build	Upload artifact	2026-10-14T16:05:56.9736676Z ./أحياء/الرياض/الحزم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9736882Z ./أحياء/الرياض/الغروب/
+build	Upload artifact	2026-10-14T16:05:56.9737084Z ./أحياء/الرياض/الغروب/index.html
+build	Upload artifact	2026-10-14T16:05:56.9737303Z ./أحياء/الرياض/الملك-عبد-الله/
+build	Upload artifact	2026-10-14T16:05:56.9737551Z ./أحياء/الرياض/الملك-عبد-الله/index.html
+build	Upload artifact	2026-10-14T16:05:56.9737798Z ./أحياء/الرياض/اليرموك/
+build	Upload artifact	2026-10-14T16:05:56.9738003Z ./أحياء/الرياض/اليرموك/index.html
+build	Upload artifact	2026-10-14T16:05:56.9738210Z ./أحياء/الرياض/عليشة/
+build	Upload artifact	2026-10-14T16:05:56.9738413Z ./أحياء/الرياض/عليشة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9738623Z ./أحياء/الرياض/النخيل/
+build	Upload artifact	2026-10-14T16:05:56.9738820Z ./أحياء/الرياض/النخيل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9739029Z ./أحياء/الرياض/الرابية/
+build	Upload artifact	2026-10-14T16:05:56.9739237Z ./أحياء/الرياض/الرابية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9739455Z ./أحياء/الرياض/index.html
+build	Upload artifact	2026-10-14T16:05:56.9739654Z ./أحياء/الرياض/عكاظ/
+build	Upload artifact	2026-10-14T16:05:56.9739850Z ./أحياء/الرياض/عكاظ/index.html
+build	Upload artifact	2026-10-14T16:05:56.9740097Z ./أحياء/الرياض/مطار-الملك-خالد-الدولي/
+build	Upload artifact	2026-10-14T16:05:56.9740386Z ./أحياء/الرياض/مطار-الملك-خالد-الدولي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9740913Z ./أحياء/الرياض/المرسلات/
+build	Upload artifact	2026-10-14T16:05:56.9741247Z ./أحياء/الرياض/المرسلات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9741591Z ./أحياء/الرياض/المصفاة/
+build	Upload artifact	2026-10-14T16:05:56.9741925Z ./أحياء/الرياض/المصفاة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9742280Z ./أحياء/الرياض/البطحاء/
+build	Upload artifact	2026-10-14T16:05:56.9742633Z ./أحياء/الرياض/البطحاء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9742919Z ./أحياء/الرياض/جرير/
+build	Upload artifact	2026-10-14T16:05:56.9743202Z ./أحياء/الرياض/جرير/index.html
+build	Upload artifact	2026-10-14T16:05:56.9743530Z ./أحياء/الرياض/الناصرية/
+build	Upload artifact	2026-10-14T16:05:56.9743882Z ./أحياء/الرياض/الناصرية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9744146Z ./أحياء/الرياض/السويدي/
+build	Upload artifact	2026-10-14T16:05:56.9744490Z ./أحياء/الرياض/السويدي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9744841Z ./أحياء/الرياض/النور/
+build	Upload artifact	2026-10-14T16:05:56.9745134Z ./أحياء/الرياض/النور/index.html
+build	Upload artifact	2026-10-14T16:05:56.9745392Z ./أحياء/الرياض/السلام/
+build	Upload artifact	2026-10-14T16:05:56.9745593Z ./أحياء/الرياض/السلام/index.html
+build	Upload artifact	2026-10-14T16:05:56.9745820Z ./أحياء/الرياض/المحمدية/
+build	Upload artifact	2026-10-14T16:05:56.9746069Z ./أحياء/الرياض/المحمدية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9746425Z ./أحياء/الرياض/القيروان/
+build	Upload artifact	2026-10-14T16:05:56.9746718Z ./أحياء/الرياض/القيروان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9747039Z ./أحياء/الرياض/الفوطة/
+build	Upload artifact	2026-10-14T16:05:56.9747509Z ./أحياء/الرياض/الفوطة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9747859Z ./أحياء/الرياض/الدريهمية/
+build	Upload artifact	2026-10-14T16:05:56.9748156Z ./أحياء/الرياض/الدريهمية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9748534Z ./أحياء/الرياض/الضباط/
+build	Upload artifact	2026-10-14T16:05:56.9748817Z ./أحياء/الرياض/الضباط/index.html
+build	Upload artifact	2026-10-14T16:05:56.9749120Z ./أحياء/الرياض/شبرا/
+build	Upload artifact	2026-10-14T16:05:56.9749380Z ./أحياء/الرياض/شبرا/index.html
+build	Upload artifact	2026-10-14T16:05:56.9749712Z ./أحياء/الرياض/النزهة/
+build	Upload artifact	2026-10-14T16:05:56.9750050Z ./أحياء/الرياض/النزهة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9750413Z ./أحياء/الرياض/أحد/
+build	Upload artifact	2026-10-14T16:05:56.9750830Z ./أحياء/الرياض/أحد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9751146Z ./أحياء/الرياض/الوادي/
+build	Upload artifact	2026-10-14T16:05:56.9751346Z ./أحياء/الرياض/الوادي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9751689Z ./أحياء/الرياض/الوزارات/
+build	Upload artifact	2026-10-14T16:05:56.9751906Z ./أحياء/الرياض/الوزارات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9752121Z ./أحياء/الرياض/الفرسان/
+build	Upload artifact	2026-10-14T16:05:56.9752327Z ./أحياء/الرياض/الفرسان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9752543Z ./أحياء/الرياض/الزهراء/
+build	Upload artifact	2026-10-14T16:05:56.9752758Z ./أحياء/الرياض/الزهراء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9752969Z ./أحياء/الرياض/الزاهر/
+build	Upload artifact	2026-10-14T16:05:56.9753171Z ./أحياء/الرياض/الزاهر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9753387Z ./أحياء/الرياض/الخير/
+build	Upload artifact	2026-10-14T16:05:56.9753587Z ./أحياء/الرياض/الخير/index.html
+build	Upload artifact	2026-10-14T16:05:56.9753796Z ./أحياء/الرياض/المونسية/
+build	Upload artifact	2026-10-14T16:05:56.9754038Z ./أحياء/الرياض/المونسية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9754254Z ./أحياء/الرياض/الملقا/
+build	Upload artifact	2026-10-14T16:05:56.9754452Z ./أحياء/الرياض/الملقا/index.html
+build	Upload artifact	2026-10-14T16:05:56.9754656Z ./أحياء/الرياض/السحاب/
+build	Upload artifact	2026-10-14T16:05:56.9754851Z ./أحياء/الرياض/السحاب/index.html
+build	Upload artifact	2026-10-14T16:05:56.9755058Z ./أحياء/الرياض/الديرة/
+build	Upload artifact	2026-10-14T16:05:56.9755272Z ./أحياء/الرياض/الديرة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9755489Z ./أحياء/الرياض/الفلاح/
+build	Upload artifact	2026-10-14T16:05:56.9755688Z ./أحياء/الرياض/الفلاح/index.html
+build	Upload artifact	2026-10-14T16:05:56.9755896Z ./أحياء/الرياض/النخبة/
+build	Upload artifact	2026-10-14T16:05:56.9756096Z ./أحياء/الرياض/النخبة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9756308Z ./أحياء/الرياض/غبيراء/
+build	Upload artifact	2026-10-14T16:05:56.9756512Z ./أحياء/الرياض/غبيراء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9756727Z ./أحياء/الرياض/المصانع/
+build	Upload artifact	2026-10-14T16:05:56.9756933Z ./أحياء/الرياض/المصانع/index.html
+build	Upload artifact	2026-10-14T16:05:56.9757147Z ./أحياء/الرياض/القدس/
+build	Upload artifact	2026-10-14T16:05:56.9757345Z ./أحياء/الرياض/القدس/index.html
+build	Upload artifact	2026-10-14T16:05:56.9757564Z ./أحياء/الرياض/الخالدية/
+build	Upload artifact	2026-10-14T16:05:56.9757769Z ./أحياء/الرياض/الخالدية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9757991Z ./أحياء/الرياض/الملك-سلمان/
+build	Upload artifact	2026-10-14T16:05:56.9758218Z ./أحياء/الرياض/الملك-سلمان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9758450Z ./أحياء/الرياض/الندى/
+build	Upload artifact	2026-10-14T16:05:56.9758649Z ./أحياء/الرياض/الندى/index.html
+build	Upload artifact	2026-10-14T16:05:56.9758860Z ./أحياء/الرياض/الشهداء/
+build	Upload artifact	2026-10-14T16:05:56.9759077Z ./أحياء/الرياض/الشهداء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9759287Z ./أحياء/الرياض/جبره/
+build	Upload artifact	2026-10-14T16:05:56.9759482Z ./أحياء/الرياض/جبره/index.html
+build	Upload artifact	2026-10-14T16:05:56.9759691Z ./أحياء/الرياض/الراية/
+build	Upload artifact	2026-10-14T16:05:56.9759895Z ./أحياء/الرياض/الراية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9760103Z ./أحياء/الرياض/الحائر/
+build	Upload artifact	2026-10-14T16:05:56.9760427Z ./أحياء/الرياض/الحائر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9760893Z ./أحياء/الرياض/الوشام/
+build	Upload artifact	2026-10-14T16:05:56.9761225Z ./أحياء/الرياض/الوشام/index.html
+build	Upload artifact	2026-10-14T16:05:56.9761568Z ./أحياء/الرياض/الدار-البيضاء/
+build	Upload artifact	2026-10-14T16:05:56.9761942Z ./أحياء/الرياض/الدار-البيضاء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9762310Z ./أحياء/الرياض/الملز/
+build	Upload artifact	2026-10-14T16:05:56.9762616Z ./أحياء/الرياض/الملز/index.html
+build	Upload artifact	2026-10-14T16:05:56.9762945Z ./أحياء/الرياض/ام-سليم/
+build	Upload artifact	2026-10-14T16:05:56.9763264Z ./أحياء/الرياض/ام-سليم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9763609Z ./أحياء/الرياض/الفاخرية/
+build	Upload artifact	2026-10-14T16:05:56.9763944Z ./أحياء/الرياض/الفاخرية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9764292Z ./أحياء/الرياض/النموذجية/
+build	Upload artifact	2026-10-14T16:05:56.9764785Z ./أحياء/الرياض/النموذجية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9765132Z ./أحياء/الرياض/اشبيلية/
+build	Upload artifact	2026-10-14T16:05:56.9765448Z ./أحياء/الرياض/اشبيلية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9765775Z ./أحياء/الرياض/السلى/
+build	Upload artifact	2026-10-14T16:05:56.9766081Z ./أحياء/الرياض/السلى/index.html
+build	Upload artifact	2026-10-14T16:05:56.9766432Z ./أحياء/الرياض/الجرادية/
+build	Upload artifact	2026-10-14T16:05:56.9766757Z ./أحياء/الرياض/الجرادية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9767104Z ./أحياء/الرياض/الرفيعة/
+build	Upload artifact	2026-10-14T16:05:56.9767421Z ./أحياء/الرياض/الرفيعة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9767768Z ./أحياء/الرياض/المنصورة/
+build	Upload artifact	2026-10-14T16:05:56.9768089Z ./أحياء/الرياض/المنصورة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9768436Z ./أحياء/الرياض/الرحمانية/
+build	Upload artifact	2026-10-14T16:05:56.9768766Z ./أحياء/الرياض/الرحمانية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9769104Z ./أحياء/الرياض/العارض/
+build	Upload artifact	2026-10-14T16:05:56.9769411Z ./أحياء/الرياض/العارض/index.html
+build	Upload artifact	2026-10-14T16:05:56.9769741Z ./أحياء/الرياض/النهضة/
+build	Upload artifact	2026-10-14T16:05:56.9770044Z ./أحياء/الرياض/النهضة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9770379Z ./أحياء/الرياض/سلطانة/
+build	Upload artifact	2026-10-14T16:05:56.9770782Z ./أحياء/الرياض/سلطانة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9771105Z ./أحياء/الرياض/الزهرة/
+build	Upload artifact	2026-10-14T16:05:56.9771409Z ./أحياء/الرياض/الزهرة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9771737Z ./أحياء/الرياض/البديعة/
+build	Upload artifact	2026-10-14T16:05:56.9772049Z ./أحياء/الرياض/البديعة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9772412Z ./أحياء/الرياض/الجنادرية/
+build	Upload artifact	2026-10-14T16:05:56.9772739Z ./أحياء/الرياض/الجنادرية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9773078Z ./أحياء/الرياض/الغنامية/
+build	Upload artifact	2026-10-14T16:05:56.9773394Z ./أحياء/الرياض/الغنامية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9773724Z ./أحياء/الرياض/الجزيرة/
+build	Upload artifact	2026-10-14T16:05:56.9774036Z ./أحياء/الرياض/الجزيرة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9774361Z ./أحياء/الرياض/النسيم/
+build	Upload artifact	2026-10-14T16:05:56.9774664Z ./أحياء/الرياض/النسيم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9775005Z ./أحياء/الرياض/التعاون/
+build	Upload artifact	2026-10-14T16:05:56.9775316Z ./أحياء/الرياض/التعاون/index.html
+build	Upload artifact	2026-10-14T16:05:56.9775652Z ./أحياء/الرياض/اليمامة/
+build	Upload artifact	2026-10-14T16:05:56.9775966Z ./أحياء/الرياض/اليمامة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9776319Z ./أحياء/الرياض/الياسمين/
+build	Upload artifact	2026-10-14T16:05:56.9776637Z ./أحياء/الرياض/الياسمين/index.html
+build	Upload artifact	2026-10-14T16:05:56.9776971Z ./أحياء/الرياض/المشاعل/
+build	Upload artifact	2026-10-14T16:05:56.9777288Z ./أحياء/الرياض/المشاعل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9777622Z ./أحياء/الرياض/المروة/
+build	Upload artifact	2026-10-14T16:05:56.9777926Z ./أحياء/الرياض/المروة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9778401Z ./أحياء/الرياض/الحمراء/
+build	Upload artifact	2026-10-14T16:05:56.9778721Z ./أحياء/الرياض/الحمراء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9779058Z ./أحياء/الرياض/الصالحية/
+build	Upload artifact	2026-10-14T16:05:56.9779378Z ./أحياء/الرياض/الصالحية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9779766Z ./أحياء/الرياض/غرناطة/
+build	Upload artifact	2026-10-14T16:05:56.9780079Z ./أحياء/الرياض/غرناطة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9780414Z ./أحياء/الرياض/الرائد/
+build	Upload artifact	2026-10-14T16:05:56.9780833Z ./أحياء/الرياض/الرائد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9781153Z ./أحياء/الرياض/لبن/
+build	Upload artifact	2026-10-14T16:05:56.9781454Z ./أحياء/الرياض/لبن/index.html
+build	Upload artifact	2026-10-14T16:05:56.9781773Z ./أحياء/الرياض/المربع/
+build	Upload artifact	2026-10-14T16:05:56.9782078Z ./أحياء/الرياض/المربع/index.html
+build	Upload artifact	2026-10-14T16:05:56.9782552Z ./أحياء/الرياض/الندوة/
+build	Upload artifact	2026-10-14T16:05:56.9782861Z ./أحياء/الرياض/الندوة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9783189Z ./أحياء/الرياض/العليا/
+build	Upload artifact	2026-10-14T16:05:56.9783489Z ./أحياء/الرياض/العليا/index.html
+build	Upload artifact	2026-10-14T16:05:56.9783818Z ./أحياء/الرياض/المنصورية/
+build	Upload artifact	2026-10-14T16:05:56.9784145Z ./أحياء/الرياض/المنصورية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9784499Z ./أحياء/الرياض/سدرة/
+build	Upload artifact	2026-10-14T16:05:56.9784802Z ./أحياء/الرياض/سدرة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9785129Z ./أحياء/الرياض/المعذر/
+build	Upload artifact	2026-10-14T16:05:56.9785435Z ./أحياء/الرياض/المعذر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9785766Z ./أحياء/الرياض/الملك-فهد/
+build	Upload artifact	2026-10-14T16:05:56.9786106Z ./أحياء/الرياض/الملك-فهد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9786448Z ./أحياء/الرياض/خنشليلة/
+build	Upload artifact	2026-10-14T16:05:56.9786763Z ./أحياء/الرياض/خنشليلة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9787103Z ./أحياء/الرياض/الوسام/
+build	Upload artifact	2026-10-14T16:05:56.9787419Z ./أحياء/الرياض/الوسام/index.html
+build	Upload artifact	2026-10-14T16:05:56.9787760Z ./أحياء/الرياض/الطويلعة/
+build	Upload artifact	2026-10-14T16:05:56.9788089Z ./أحياء/الرياض/الطويلعة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9788444Z ./أحياء/الرياض/منفوحة/
+build	Upload artifact	2026-10-14T16:05:56.9788756Z ./أحياء/الرياض/منفوحة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9789085Z ./أحياء/الرياض/العلا/
+build	Upload artifact	2026-10-14T16:05:56.9789393Z ./أحياء/الرياض/العلا/index.html
+build	Upload artifact	2026-10-14T16:05:56.9789728Z ./أحياء/الرياض/الروضة/
+build	Upload artifact	2026-10-14T16:05:56.9790064Z ./أحياء/الرياض/الروضة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9790390Z ./أحياء/الرياض/الخليج/
+build	Upload artifact	2026-10-14T16:05:56.9790795Z ./أحياء/الرياض/الخليج/index.html
+build	Upload artifact	2026-10-14T16:05:56.9791130Z ./أحياء/الرياض/سكيرينة/
+build	Upload artifact	2026-10-14T16:05:56.9791453Z ./أحياء/الرياض/سكيرينة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9791844Z ./أحياء/الرياض/المدينة-الصناعية-الجديدة/
+build	Upload artifact	2026-10-14T16:05:56.9792300Z ./أحياء/الرياض/المدينة-الصناعية-الجديدة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9792722Z ./أحياء/الرياض/الامانة/
+build	Upload artifact	2026-10-14T16:05:56.9793041Z ./أحياء/الرياض/الامانة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9793374Z ./أحياء/الرياض/البيان/
+build	Upload artifact	2026-10-14T16:05:56.9793676Z ./أحياء/الرياض/البيان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9794011Z ./أحياء/الرياض/الهدا/
+build	Upload artifact	2026-10-14T16:05:56.9794333Z ./أحياء/الرياض/الهدا/index.html
+build	Upload artifact	2026-10-14T16:05:56.9794657Z ./أحياء/مكة-المكرمة/
+build	Upload artifact	2026-10-14T16:05:56.9794963Z ./أحياء/مكة-المكرمة/الشميسي/
+build	Upload artifact	2026-10-14T16:05:56.9795332Z ./أحياء/مكة-المكرمة/الشميسي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9795724Z ./أحياء/مكة-المكرمة/القشاشية-الجديد/
+build	Upload artifact	2026-10-14T16:05:56.9796275Z ./أحياء/مكة-المكرمة/القشاشية-الجديد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9796676Z ./أحياء/مكة-المكرمة/قرطبة/
+build	Upload artifact	2026-10-14T16:05:56.9797013Z ./أحياء/مكة-المكرمة/قرطبة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9797388Z ./أحياء/مكة-المكرمة/ولي-العهد-رقم-4/
+build	Upload artifact	2026-10-14T16:05:56.9797790Z ./أحياء/مكة-المكرمة/ولي-العهد-رقم-4/index.html
+build	Upload artifact	2026-10-14T16:05:56.9798223Z ./أحياء/مكة-المكرمة/شرائع-المجاهدين-رقم-8/
+build	Upload artifact	2026-10-14T16:05:56.9798695Z ./أحياء/مكة-المكرمة/شرائع-المجاهدين-رقم-8/index.html
+build	Upload artifact	2026-10-14T16:05:56.9799169Z ./أحياء/مكة-المكرمة/ولي-العهد-للمنح-رقم-5/
+build	Upload artifact	2026-10-14T16:05:56.9799629Z ./أحياء/مكة-المكرمة/ولي-العهد-للمنح-رقم-5/index.html
+build	Upload artifact	2026-10-14T16:05:56.9800055Z ./أحياء/مكة-المكرمة/الفيحاء/
+build	Upload artifact	2026-10-14T16:05:56.9800649Z ./أحياء/مكة-المكرمة/الفيحاء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9801049Z ./أحياء/مكة-المكرمة/شرائع-المجاهدين-رقم-3/
+build	Upload artifact	2026-10-14T16:05:56.9801501Z ./أحياء/مكة-المكرمة/شرائع-المجاهدين-رقم-3/index.html
+build	Upload artifact	2026-10-14T16:05:56.9801942Z ./أحياء/مكة-المكرمة/شهداء-الوطن-منح/
+build	Upload artifact	2026-10-14T16:05:56.9802352Z ./أحياء/مكة-المكرمة/شهداء-الوطن-منح/index.html
+build	Upload artifact	2026-10-14T16:05:56.9802772Z ./أحياء/مكة-المكرمة/العزيزية/
+build	Upload artifact	2026-10-14T16:05:56.9803138Z ./أحياء/مكة-المكرمة/العزيزية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9803526Z ./أحياء/مكة-المكرمة/ولي-العهد-رقم-3/
+build	Upload artifact	2026-10-14T16:05:56.9803966Z ./أحياء/مكة-المكرمة/ولي-العهد-رقم-3/index.html
+build	Upload artifact	2026-10-14T16:05:56.9804385Z ./أحياء/مكة-المكرمة/الأمير-أحمد-بكدي/
+build	Upload artifact	2026-10-14T16:05:56.9804795Z ./أحياء/مكة-المكرمة/الأمير-أحمد-بكدي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9805211Z ./أحياء/مكة-المكرمة/وادي-إبراهيم/
+build	Upload artifact	2026-10-14T16:05:56.9805591Z ./أحياء/مكة-المكرمة/وادي-إبراهيم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9805972Z ./أحياء/مكة-المكرمة/المقام/
+build	Upload artifact	2026-10-14T16:05:56.9806310Z ./أحياء/مكة-المكرمة/المقام/index.html
+build	Upload artifact	2026-10-14T16:05:56.9806690Z ./أحياء/مكة-المكرمة/جعرانة/
+build	Upload artifact	2026-10-14T16:05:56.9807022Z ./أحياء/مكة-المكرمة/جعرانة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9807411Z ./أحياء/مكة-المكرمة/الشرائع-رقم-11/
+build	Upload artifact	2026-10-14T16:05:56.9807808Z ./أحياء/مكة-المكرمة/الشرائع-رقم-11/index.html
+build	Upload artifact	2026-10-14T16:05:56.9808208Z ./أحياء/مكة-المكرمة/معاد/
+build	Upload artifact	2026-10-14T16:05:56.9808555Z ./أحياء/مكة-المكرمة/معاد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9808925Z ./أحياء/مكة-المكرمة/منح-الراشدية-رقم-2/
+build	Upload artifact	2026-10-14T16:05:56.9809364Z ./أحياء/مكة-المكرمة/منح-الراشدية-رقم-2/index.html
+build	Upload artifact	2026-10-14T16:05:56.9809777Z ./أحياء/مكة-المكرمة/الصفوة/
+build	Upload artifact	2026-10-14T16:05:56.9810126Z ./أحياء/مكة-المكرمة/الصفوة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9810582Z ./أحياء/مكة-المكرمة/العوالي/
+build	Upload artifact	2026-10-14T16:05:56.9810937Z ./أحياء/مكة-المكرمة/العوالي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9811313Z ./أحياء/مكة-المكرمة/بطحاء-قريش/
+build	Upload artifact	2026-10-14T16:05:56.9811682Z ./أحياء/مكة-المكرمة/بطحاء-قريش/index.html
+build	Upload artifact	2026-10-14T16:05:56.9812073Z ./أحياء/مكة-المكرمة/جبل-النور/
+build	Upload artifact	2026-10-14T16:05:56.9812451Z ./أحياء/مكة-المكرمة/جبل-النور/index.html
+build	Upload artifact	2026-10-14T16:05:56.9812866Z ./أحياء/مكة-المكرمة/الشرائع-رقم-12/
+build	Upload artifact	2026-10-14T16:05:56.9813259Z ./أحياء/مكة-المكرمة/الشرائع-رقم-12/index.html
+build	Upload artifact	2026-10-14T16:05:56.9813664Z ./أحياء/مكة-المكرمة/الهدى-التجميعي/
+build	Upload artifact	2026-10-14T16:05:56.9814058Z ./أحياء/مكة-المكرمة/الهدى-التجميعي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9814608Z ./أحياء/مكة-المكرمة/البوابة-رقم-11/
+build	Upload artifact	2026-10-14T16:05:56.9814991Z ./أحياء/مكة-المكرمة/البوابة-رقم-11/index.html
+build	Upload artifact	2026-10-14T16:05:56.9815364Z ./أحياء/مكة-المكرمة/طيبة/
+build	Upload artifact	2026-10-14T16:05:56.9815693Z ./أحياء/مكة-المكرمة/طيبة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9816041Z ./أحياء/مكة-المكرمة/المعابدة/
+build	Upload artifact	2026-10-14T16:05:56.9816405Z ./أحياء/مكة-المكرمة/المعابدة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9816769Z ./أحياء/مكة-المكرمة/طوى/
+build	Upload artifact	2026-10-14T16:05:56.9817094Z ./أحياء/مكة-المكرمة/طوى/index.html
+build	Upload artifact	2026-10-14T16:05:56.9817461Z ./أحياء/مكة-المكرمة/وادي-السلولي/
+build	Upload artifact	2026-10-14T16:05:56.9817844Z ./أحياء/مكة-المكرمة/وادي-السلولي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9818229Z ./أحياء/مكة-المكرمة/الكعكية/
+build	Upload artifact	2026-10-14T16:05:56.9818582Z ./أحياء/مكة-المكرمة/الكعكية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9819086Z ./أحياء/مكة-المكرمة/البساتين/
+build	Upload artifact	2026-10-14T16:05:56.9819449Z ./أحياء/مكة-المكرمة/البساتين/index.html
+build	Upload artifact	2026-10-14T16:05:56.9819834Z ./أحياء/مكة-المكرمة/الهجلة-الجديد/
+build	Upload artifact	2026-10-14T16:05:56.9820233Z ./أحياء/مكة-المكرمة/الهجلة-الجديد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9820757Z ./أحياء/مكة-المكرمة/السنابل/
+build	Upload artifact	2026-10-14T16:05:56.9821120Z ./أحياء/مكة-المكرمة/السنابل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9821497Z ./أحياء/مكة-المكرمة/المسفلة-رقم-11/
+build	Upload artifact	2026-10-14T16:05:56.9821891Z ./أحياء/مكة-المكرمة/المسفلة-رقم-11/index.html
+build	Upload artifact	2026-10-14T16:05:56.9822291Z ./أحياء/مكة-المكرمة/الراشدية-رقم-2/
+build	Upload artifact	2026-10-14T16:05:56.9822680Z ./أحياء/مكة-المكرمة/الراشدية-رقم-2/index.html
+build	Upload artifact	2026-10-14T16:05:56.9823082Z ./أحياء/مكة-المكرمة/شعب-عامر-الجديد/
+build	Upload artifact	2026-10-14T16:05:56.9823484Z ./أحياء/مكة-المكرمة/شعب-عامر-الجديد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9823878Z ./أحياء/مكة-المكرمة/العمرة/
+build	Upload artifact	2026-10-14T16:05:56.9824225Z ./أحياء/مكة-المكرمة/العمرة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9824603Z ./أحياء/مكة-المكرمة/التنعيم-رقم-3/
+build	Upload artifact	2026-10-14T16:05:56.9825010Z ./أحياء/مكة-المكرمة/التنعيم-رقم-3/index.html
+build	Upload artifact	2026-10-14T16:05:56.9825398Z ./أحياء/مكة-المكرمة/النوارية/
+build	Upload artifact	2026-10-14T16:05:56.9825761Z ./أحياء/مكة-المكرمة/النوارية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9826158Z ./أحياء/مكة-المكرمة/بطحاء-قريش-النموذجي/
+build	Upload artifact	2026-10-14T16:05:56.9826623Z ./أحياء/مكة-المكرمة/بطحاء-قريش-النموذجي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9827083Z ./أحياء/مكة-المكرمة/مدينة-بحرة-الجديدة-رقم-2/
+build	Upload artifact	2026-10-14T16:05:56.9827562Z ./أحياء/مكة-المكرمة/مدينة-بحرة-الجديدة-رقم-2/index.html
+build	Upload artifact	2026-10-14T16:05:56.9828035Z ./أحياء/مكة-المكرمة/الضفة-الغربية-تقسيم-4/
+build	Upload artifact	2026-10-14T16:05:56.9828493Z ./أحياء/مكة-المكرمة/الضفة-الغربية-تقسيم-4/index.html
+build	Upload artifact	2026-10-14T16:05:56.9828925Z ./أحياء/مكة-المكرمة/جرول/
+build	Upload artifact	2026-10-14T16:05:56.9829261Z ./أحياء/مكة-المكرمة/جرول/index.html
+build	Upload artifact	2026-10-14T16:05:56.9829613Z ./أحياء/مكة-المكرمة/الحسينية/
+build	Upload artifact	2026-10-14T16:05:56.9829975Z ./أحياء/مكة-المكرمة/الحسينية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9830346Z ./أحياء/مكة-المكرمة/الكوثر/
+build	Upload artifact	2026-10-14T16:05:56.9830781Z ./أحياء/مكة-المكرمة/الكوثر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9831152Z ./أحياء/مكة-المكرمة/بدر/
+build	Upload artifact	2026-10-14T16:05:56.9831479Z ./أحياء/مكة-المكرمة/بدر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9831838Z ./أحياء/مكة-المكرمة/الفلق-الجديد/
+build	Upload artifact	2026-10-14T16:05:56.9832224Z ./أحياء/مكة-المكرمة/الفلق-الجديد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9832657Z ./أحياء/مكة-المكرمة/العزيزية-الضفة-الشمالية-أ/
+build	Upload artifact	2026-10-14T16:05:56.9833311Z ./أحياء/مكة-المكرمة/العزيزية-الضفة-الشمالية-أ/index.html
+build	Upload artifact	2026-10-14T16:05:56.9833755Z ./أحياء/مكة-المكرمة/الشرائع/
+build	Upload artifact	2026-10-14T16:05:56.9834114Z ./أحياء/مكة-المكرمة/الشرائع/index.html
+build	Upload artifact	2026-10-14T16:05:56.9834480Z ./أحياء/مكة-المكرمة/لقيطة/
+build	Upload artifact	2026-10-14T16:05:56.9834811Z ./أحياء/مكة-المكرمة/لقيطة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9835183Z ./أحياء/مكة-المكرمة/العمرة-رقم-11/
+build	Upload artifact	2026-10-14T16:05:56.9835569Z ./أحياء/مكة-المكرمة/العمرة-رقم-11/index.html
+build	Upload artifact	2026-10-14T16:05:56.9835964Z ./أحياء/مكة-المكرمة/ولي-العهد-رقم-5/
+build	Upload artifact	2026-10-14T16:05:56.9836360Z ./أحياء/مكة-المكرمة/ولي-العهد-رقم-5/index.html
+build	Upload artifact	2026-10-14T16:05:56.9836760Z ./أحياء/مكة-المكرمة/وادي-جليل/
+build	Upload artifact	2026-10-14T16:05:56.9837263Z ./أحياء/مكة-المكرمة/وادي-جليل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9837643Z ./أحياء/مكة-المكرمة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9837997Z ./أحياء/مكة-المكرمة/العقبة-الشمالي/
+build	Upload artifact	2026-10-14T16:05:56.9838388Z ./أحياء/مكة-المكرمة/العقبة-الشمالي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9838783Z ./أحياء/مكة-المكرمة/الشرائع-رقم-10/
+build	Upload artifact	2026-10-14T16:05:56.9839185Z ./أحياء/مكة-المكرمة/الشرائع-رقم-10/index.html
+build	Upload artifact	2026-10-14T16:05:56.9839565Z ./أحياء/مكة-المكرمة/الرافة/
+build	Upload artifact	2026-10-14T16:05:56.9839906Z ./أحياء/مكة-المكرمة/الرافة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9840270Z ./أحياء/مكة-المكرمة/الراشدية/
+build	Upload artifact	2026-10-14T16:05:56.9840727Z ./أحياء/مكة-المكرمة/الراشدية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9841101Z ./أحياء/مكة-المكرمة/المرسلات/
+build	Upload artifact	2026-10-14T16:05:56.9841448Z ./أحياء/مكة-المكرمة/المرسلات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9841812Z ./أحياء/مكة-المكرمة/التنعيم/
+build	Upload artifact	2026-10-14T16:05:56.9842164Z ./أحياء/مكة-المكرمة/التنعيم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9842586Z ./أحياء/مكة-المكرمة/مشروع-طريق-الملك-عبدالعزيز/
+build	Upload artifact	2026-10-14T16:05:56.9843106Z ./أحياء/مكة-المكرمة/مشروع-طريق-الملك-عبدالعزيز/index.html
+build	Upload artifact	2026-10-14T16:05:56.9843549Z ./أحياء/مكة-المكرمة/الحجيلي/
+build	Upload artifact	2026-10-14T16:05:56.9843899Z ./أحياء/مكة-المكرمة/الحجيلي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9844263Z ./أحياء/مكة-المكرمة/التخصصي/
+build	Upload artifact	2026-10-14T16:05:56.9844608Z ./أحياء/مكة-المكرمة/التخصصي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9844984Z ./أحياء/مكة-المكرمة/العدل/
+build	Upload artifact	2026-10-14T16:05:56.9845328Z ./أحياء/مكة-المكرمة/العدل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9845682Z ./أحياء/مكة-المكرمة/الشوقية/
+build	Upload artifact	2026-10-14T16:05:56.9846019Z ./أحياء/مكة-المكرمة/الشوقية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9846381Z ./أحياء/مكة-المكرمة/السلام/
+build	Upload artifact	2026-10-14T16:05:56.9846715Z ./أحياء/مكة-المكرمة/السلام/index.html
+build	Upload artifact	2026-10-14T16:05:56.9847071Z ./أحياء/مكة-المكرمة/المحمدية/
+build	Upload artifact	2026-10-14T16:05:56.9847417Z ./أحياء/مكة-المكرمة/المحمدية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9847795Z ./أحياء/مكة-المكرمة/المسيال-الجديد/
+build	Upload artifact	2026-10-14T16:05:56.9848181Z ./أحياء/مكة-المكرمة/المسيال-الجديد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9848566Z ./أحياء/مكة-المكرمة/النزهة/
+build	Upload artifact	2026-10-14T16:05:56.9848913Z ./أحياء/مكة-المكرمة/النزهة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9849277Z ./أحياء/مكة-المكرمة/ربوة-المطلات/
+build	Upload artifact	2026-10-14T16:05:56.9849651Z ./أحياء/مكة-المكرمة/ربوة-المطلات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9850044Z ./أحياء/مكة-المكرمة/القرارة-الجديد/
+build	Upload artifact	2026-10-14T16:05:56.9850431Z ./أحياء/مكة-المكرمة/القرارة-الجديد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9851077Z ./أحياء/مكة-المكرمة/وادي-بني-عمير/
+build	Upload artifact	2026-10-14T16:05:56.9851467Z ./أحياء/مكة-المكرمة/وادي-بني-عمير/index.html
+build	Upload artifact	2026-10-14T16:05:56.9851863Z ./أحياء/مكة-المكرمة/ولي-العهد-رقم-7/
+build	Upload artifact	2026-10-14T16:05:56.9852262Z ./أحياء/مكة-المكرمة/ولي-العهد-رقم-7/index.html
+build	Upload artifact	2026-10-14T16:05:56.9852652Z ./أحياء/مكة-المكرمة/الزهراء/
+build	Upload artifact	2026-10-14T16:05:56.9852999Z ./أحياء/مكة-المكرمة/الزهراء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9853385Z ./أحياء/مكة-المكرمة/ام-الجود/
+build	Upload artifact	2026-10-14T16:05:56.9853739Z ./أحياء/مكة-المكرمة/ام-الجود/index.html
+build	Upload artifact	2026-10-14T16:05:56.9854108Z ./أحياء/مكة-المكرمة/الزاهر/
+build	Upload artifact	2026-10-14T16:05:56.9854448Z ./أحياء/مكة-المكرمة/الزاهر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9854816Z ./أحياء/مكة-المكرمة/الهنداوية/
+build	Upload artifact	2026-10-14T16:05:56.9855306Z ./أحياء/مكة-المكرمة/الهنداوية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9855690Z ./أحياء/مكة-المكرمة/ولي-العهد-رقم-8/
+build	Upload artifact	2026-10-14T16:05:56.9856086Z ./أحياء/مكة-المكرمة/ولي-العهد-رقم-8/index.html
+build	Upload artifact	2026-10-14T16:05:56.9856498Z ./أحياء/مكة-المكرمة/حارة-الباب-الجديد/
+build	Upload artifact	2026-10-14T16:05:56.9856935Z ./أحياء/مكة-المكرمة/حارة-الباب-الجديد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9857343Z ./أحياء/مكة-المكرمة/الخالدية/
+build	Upload artifact	2026-10-14T16:05:56.9857693Z ./أحياء/مكة-المكرمة/الخالدية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9858090Z ./أحياء/مكة-المكرمة/شرائع-المجاهدين-رقم-2/
+build	Upload artifact	2026-10-14T16:05:56.9858536Z ./أحياء/مكة-المكرمة/شرائع-المجاهدين-رقم-2/index.html
+build	Upload artifact	2026-10-14T16:05:56.9858960Z ./أحياء/مكة-المكرمة/الشهداء/
+build	Upload artifact	2026-10-14T16:05:56.9859311Z ./أحياء/مكة-المكرمة/الشهداء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9859676Z ./أحياء/مكة-المكرمة/الجامعة/
+build	Upload artifact	2026-10-14T16:05:56.9860018Z ./أحياء/مكة-المكرمة/الجامعة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9860388Z ./أحياء/مكة-المكرمة/الشبيكة-الجديد/
+build	Upload artifact	2026-10-14T16:05:56.9860874Z ./أحياء/مكة-المكرمة/الشبيكة-الجديد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9861304Z ./أحياء/مكة-المكرمة/بطحاء-قريش-رقم-1/
+build	Upload artifact	2026-10-14T16:05:56.9861704Z ./أحياء/مكة-المكرمة/بطحاء-قريش-رقم-1/index.html
+build	Upload artifact	2026-10-14T16:05:56.9862134Z ./أحياء/مكة-المكرمة/الوسيق-للورش-والمستودعات/
+build	Upload artifact	2026-10-14T16:05:56.9862601Z ./أحياء/مكة-المكرمة/الوسيق-للورش-والمستودعات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9863046Z ./أحياء/مكة-المكرمة/الخضراء/
+build	Upload artifact	2026-10-14T16:05:56.9863395Z ./أحياء/مكة-المكرمة/الخضراء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9863768Z ./أحياء/مكة-المكرمة/شعب-علي-الجديد/
+build	Upload artifact	2026-10-14T16:05:56.9864139Z ./أحياء/مكة-المكرمة/شعب-علي-الجديد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9864545Z ./أحياء/مكة-المكرمة/أراضي-المطلق-والجفري/
+build	Upload artifact	2026-10-14T16:05:56.9864994Z ./أحياء/مكة-المكرمة/أراضي-المطلق-والجفري/index.html
+build	Upload artifact	2026-10-14T16:05:56.9865399Z ./أحياء/مكة-المكرمة/الرصيفة/
+build	Upload artifact	2026-10-14T16:05:56.9865623Z ./أحياء/مكة-المكرمة/الرصيفة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9865942Z ./أحياء/مكة-المكرمة/المسفلة-رقم-4/
+build	Upload artifact	2026-10-14T16:05:56.9866317Z ./أحياء/مكة-المكرمة/المسفلة-رقم-4/index.html
+build	Upload artifact	2026-10-14T16:05:56.9866728Z ./أحياء/مكة-المكرمة/وادي-نعمان/
+build	Upload artifact	2026-10-14T16:05:56.9867102Z ./أحياء/مكة-المكرمة/وادي-نعمان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9867472Z ./أحياء/مكة-المكرمة/العكيشية/
+build	Upload artifact	2026-10-14T16:05:56.9867818Z ./أحياء/مكة-المكرمة/العكيشية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9868178Z ./أحياء/مكة-المكرمة/البحيرات/
+build	Upload artifact	2026-10-14T16:05:56.9868728Z ./أحياء/مكة-المكرمة/البحيرات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9869100Z ./أحياء/مكة-المكرمة/الشرائع-رقم-2/
+build	Upload artifact	2026-10-14T16:05:56.9869481Z ./أحياء/مكة-المكرمة/الشرائع-رقم-2/index.html
+build	Upload artifact	2026-10-14T16:05:56.9869859Z ./أحياء/مكة-المكرمة/البيعة/
+build	Upload artifact	2026-10-14T16:05:56.9870192Z ./أحياء/مكة-المكرمة/البيعة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9870689Z ./أحياء/مكة-المكرمة/شرائع-المجاهدين-رقم-4/
+build	Upload artifact	2026-10-14T16:05:56.9871147Z ./أحياء/مكة-المكرمة/شرائع-المجاهدين-رقم-4/index.html
+build	Upload artifact	2026-10-14T16:05:56.9871582Z ./أحياء/مكة-المكرمة/المحمدية-رقم-11/
+build	Upload artifact	2026-10-14T16:05:56.9871972Z ./أحياء/مكة-المكرمة/المحمدية-رقم-11/index.html
+build	Upload artifact	2026-10-14T16:05:56.9872355Z ./أحياء/مكة-المكرمة/النسيم/
+build	Upload artifact	2026-10-14T16:05:56.9872817Z ./أحياء/مكة-المكرمة/النسيم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9873183Z ./أحياء/مكة-المكرمة/الفهد-بالشرائع/
+build	Upload artifact	2026-10-14T16:05:56.9873571Z ./أحياء/مكة-المكرمة/الفهد-بالشرائع/index.html
+build	Upload artifact	2026-10-14T16:05:56.9873948Z ./أحياء/مكة-المكرمة/جبل-عمر/
+build	Upload artifact	2026-10-14T16:05:56.9888791Z ./أحياء/مكة-المكرمة/جبل-عمر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9889263Z ./أحياء/مكة-المكرمة/القناديل/
+build	Upload artifact	2026-10-14T16:05:56.9889617Z ./أحياء/مكة-المكرمة/القناديل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9889877Z ./أحياء/مكة-المكرمة/الحمراء/
+build	Upload artifact	2026-10-14T16:05:56.9890132Z ./أحياء/مكة-المكرمة/الحمراء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9890444Z ./أحياء/مكة-المكرمة/الشرائع-رقم-4/
+build	Upload artifact	2026-10-14T16:05:56.9891086Z ./أحياء/مكة-المكرمة/الشرائع-رقم-4/index.html
+build	Upload artifact	2026-10-14T16:05:56.9891478Z ./أحياء/مكة-المكرمة/العسيلة/
+build	Upload artifact	2026-10-14T16:05:56.9891837Z ./أحياء/مكة-المكرمة/العسيلة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9892253Z ./أحياء/مكة-المكرمة/ولي-العهد-للمنح-رقم-8/
+build	Upload artifact	2026-10-14T16:05:56.9892709Z ./أحياء/مكة-المكرمة/ولي-العهد-للمنح-رقم-8/index.html
+build	Upload artifact	2026-10-14T16:05:56.9893152Z ./أحياء/مكة-المكرمة/الملك-فهد/
+build	Upload artifact	2026-10-14T16:05:56.9893543Z ./أحياء/مكة-المكرمة/الملك-فهد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9893919Z ./أحياء/مكة-المكرمة/المعيصم/
+build	Upload artifact	2026-10-14T16:05:56.9894268Z ./أحياء/مكة-المكرمة/المعيصم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9894638Z ./أحياء/مكة-المكرمة/السلامة/
+build	Upload artifact	2026-10-14T16:05:56.9894992Z ./أحياء/مكة-المكرمة/السلامة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9895399Z ./أحياء/مكة-المكرمة/المنار-بالشرائع/
+build	Upload artifact	2026-10-14T16:05:56.9895801Z ./أحياء/مكة-المكرمة/المنار-بالشرائع/index.html
+build	Upload artifact	2026-10-14T16:05:56.9896203Z ./أحياء/مكة-المكرمة/محبس-الجن/
+build	Upload artifact	2026-10-14T16:05:56.9896576Z ./أحياء/مكة-المكرمة/محبس-الجن/index.html
+build	Upload artifact	2026-10-14T16:05:56.9896970Z ./أحياء/مكة-المكرمة/الشامية-الجديد/
+build	Upload artifact	2026-10-14T16:05:56.9897367Z ./أحياء/مكة-المكرمة/الشامية-الجديد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9897797Z ./أحياء/مكة-المكرمة/بحرة-طريق-مكة-جدة-القديم/
+build	Upload artifact	2026-10-14T16:05:56.9898279Z ./أحياء/مكة-المكرمة/بحرة-طريق-مكة-جدة-القديم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9898692Z ./أحياء/جدة/
+build	Upload artifact	2026-10-14T16:05:56.9898963Z ./أحياء/جدة/المنارات/
+build	Upload artifact	2026-10-14T16:05:56.9899296Z ./أحياء/جدة/المنارات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9899620Z ./أحياء/جدة/الصفا/
+build	Upload artifact	2026-10-14T16:05:56.9899903Z ./أحياء/جدة/الصفا/index.html
+build	Upload artifact	2026-10-14T16:05:56.9900221Z ./أحياء/جدة/الرياض/
+build	Upload artifact	2026-10-14T16:05:56.9900620Z ./أحياء/جدة/الرياض/index.html
+build	Upload artifact	2026-10-14T16:05:56.9900969Z ./أحياء/جدة/قاعدة-الملك-فيصل-البحرية/
+build	Upload artifact	2026-10-14T16:05:56.9901580Z ./أحياء/جدة/قاعدة-الملك-فيصل-البحرية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9901972Z ./أحياء/جدة/الصواري/
+build	Upload artifact	2026-10-14T16:05:56.9902274Z ./أحياء/جدة/الصواري/index.html
+build	Upload artifact	2026-10-14T16:05:56.9902681Z ./أحياء/جدة/الفردوس/
+build	Upload artifact	2026-10-14T16:05:56.9902980Z ./أحياء/جدة/الفردوس/index.html
+build	Upload artifact	2026-10-14T16:05:56.9903291Z ./أحياء/جدة/الربيع/
+build	Upload artifact	2026-10-14T16:05:56.9903577Z ./أحياء/جدة/الربيع/index.html
+build	Upload artifact	2026-10-14T16:05:56.9903891Z ./أحياء/جدة/السامر/
+build	Upload artifact	2026-10-14T16:05:56.9904188Z ./أحياء/جدة/السامر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9904503Z ./أحياء/جدة/الفيحاء/
+build	Upload artifact	2026-10-14T16:05:56.9904799Z ./أحياء/جدة/الفيحاء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9905119Z ./أحياء/جدة/الازدهار/
+build	Upload artifact	2026-10-14T16:05:56.9905559Z ./أحياء/جدة/الازدهار/index.html
+build	Upload artifact	2026-10-14T16:05:56.9905901Z ./أحياء/جدة/الأمير-عبد-المجيد/
+build	Upload artifact	2026-10-14T16:05:56.9906261Z ./أحياء/جدة/الأمير-عبد-المجيد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9906630Z ./أحياء/جدة/مدائن-الفهد-4/
+build	Upload artifact	2026-10-14T16:05:56.9906955Z ./أحياء/جدة/مدائن-الفهد-4/index.html
+build	Upload artifact	2026-10-14T16:05:56.9907292Z ./أحياء/جدة/الروابي/
+build	Upload artifact	2026-10-14T16:05:56.9907605Z ./أحياء/جدة/الروابي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9907912Z ./أحياء/جدة/بريمان/
+build	Upload artifact	2026-10-14T16:05:56.9908201Z ./أحياء/جدة/بريمان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9908512Z ./أحياء/جدة/الغدير/
+build	Upload artifact	2026-10-14T16:05:56.9908791Z ./أحياء/جدة/الغدير/index.html
+build	Upload artifact	2026-10-14T16:05:56.9909101Z ./أحياء/جدة/العزيزية/
+build	Upload artifact	2026-10-14T16:05:56.9909403Z ./أحياء/جدة/العزيزية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9909721Z ./أحياء/جدة/أم-السلم/
+build	Upload artifact	2026-10-14T16:05:56.9910016Z ./أحياء/جدة/أم-السلم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9910331Z ./أحياء/جدة/المسرة/
+build	Upload artifact	2026-10-14T16:05:56.9910718Z ./أحياء/جدة/المسرة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9911038Z ./أحياء/جدة/السليمانية/
+build	Upload artifact	2026-10-14T16:05:56.9911374Z ./أحياء/جدة/السليمانية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9911700Z ./أحياء/جدة/الشرفية/
+build	Upload artifact	2026-10-14T16:05:56.9911998Z ./أحياء/جدة/الشرفية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9912310Z ./أحياء/جدة/أم-سدرة/
+build	Upload artifact	2026-10-14T16:05:56.9912600Z ./أحياء/جدة/أم-سدرة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9912903Z ./أحياء/جدة/الصفوة/
+build	Upload artifact	2026-10-14T16:05:56.9913200Z ./أحياء/جدة/الصفوة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9913510Z ./أحياء/جدة/الفيصلية/
+build	Upload artifact	2026-10-14T16:05:56.9913810Z ./أحياء/جدة/الفيصلية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9914138Z ./أحياء/جدة/جوهرة-العروس/
+build	Upload artifact	2026-10-14T16:05:56.9914478Z ./أحياء/جدة/جوهرة-العروس/index.html
+build	Upload artifact	2026-10-14T16:05:56.9914807Z ./أحياء/جدة/طيبة/
+build	Upload artifact	2026-10-14T16:05:56.9915089Z ./أحياء/جدة/طيبة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9915395Z ./أحياء/جدة/الورود/
+build	Upload artifact	2026-10-14T16:05:56.9915678Z ./أحياء/جدة/الورود/index.html
+build	Upload artifact	2026-10-14T16:05:56.9915987Z ./أحياء/جدة/الاندلس/
+build	Upload artifact	2026-10-14T16:05:56.9916274Z ./أحياء/جدة/الاندلس/index.html
+build	Upload artifact	2026-10-14T16:05:56.9916599Z ./أحياء/جدة/البغدادية-الغربية/
+build	Upload artifact	2026-10-14T16:05:56.9916957Z ./أحياء/جدة/البغدادية-الغربية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9917341Z ./أحياء/جدة/أم-حبلين/
+build	Upload artifact	2026-10-14T16:05:56.9917644Z ./أحياء/جدة/أم-حبلين/index.html
+build	Upload artifact	2026-10-14T16:05:56.9917968Z ./أحياء/جدة/البساتين/
+build	Upload artifact	2026-10-14T16:05:56.9918263Z ./أحياء/جدة/البساتين/index.html
+build	Upload artifact	2026-10-14T16:05:56.9918570Z ./أحياء/جدة/البوادي/
+build	Upload artifact	2026-10-14T16:05:56.9919012Z ./أحياء/جدة/البوادي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9919326Z ./أحياء/جدة/المرجان/
+build	Upload artifact	2026-10-14T16:05:56.9919623Z ./أحياء/جدة/المرجان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9919932Z ./أحياء/جدة/السنابل/
+build	Upload artifact	2026-10-14T16:05:56.9920218Z ./أحياء/جدة/السنابل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9920648Z ./أحياء/جدة/ام-حبلين-الغربية/
+build	Upload artifact	2026-10-14T16:05:56.9921004Z ./أحياء/جدة/ام-حبلين-الغربية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9921356Z ./أحياء/جدة/الزمرد/
+build	Upload artifact	2026-10-14T16:05:56.9921651Z ./أحياء/جدة/الزمرد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9921975Z ./أحياء/جدة/مدائن-الفهد/
+build	Upload artifact	2026-10-14T16:05:56.9922298Z ./أحياء/جدة/مدائن-الفهد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9922621Z ./أحياء/جدة/الشاطئ/
+build	Upload artifact	2026-10-14T16:05:56.9922909Z ./أحياء/جدة/الشاطئ/index.html
+build	Upload artifact	2026-10-14T16:05:56.9923351Z ./أحياء/جدة/الوداد/
+build	Upload artifact	2026-10-14T16:05:56.9923638Z ./أحياء/جدة/الوداد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9923942Z ./أحياء/جدة/المحجر/
+build	Upload artifact	2026-10-14T16:05:56.9924223Z ./أحياء/جدة/المحجر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9924529Z ./أحياء/جدة/الساحل/
+build	Upload artifact	2026-10-14T16:05:56.9924804Z ./أحياء/جدة/الساحل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9925130Z ./أحياء/جدة/مريخ/
+build	Upload artifact	2026-10-14T16:05:56.9925415Z ./أحياء/جدة/مريخ/index.html
+build	Upload artifact	2026-10-14T16:05:56.9925731Z ./أحياء/جدة/النزلة-الشرقية/
+build	Upload artifact	2026-10-14T16:05:56.9926061Z ./أحياء/جدة/النزلة-الشرقية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9926400Z ./أحياء/جدة/المنار/
+build	Upload artifact	2026-10-14T16:05:56.9926686Z ./أحياء/جدة/المنار/index.html
+build	Upload artifact	2026-10-14T16:05:56.9926994Z ./أحياء/جدة/الفرقان/
+build	Upload artifact	2026-10-14T16:05:56.9927284Z ./أحياء/جدة/الفرقان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9927585Z ./أحياء/جدة/الربوة/
+build	Upload artifact	2026-10-14T16:05:56.9927874Z ./أحياء/جدة/الربوة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9928175Z ./أحياء/جدة/الريان/
+build	Upload artifact	2026-10-14T16:05:56.9928472Z ./أحياء/جدة/الريان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9928797Z ./أحياء/جدة/العقيق/
+build	Upload artifact	2026-10-14T16:05:56.9929075Z ./أحياء/جدة/العقيق/index.html
+build	Upload artifact	2026-10-14T16:05:56.9929376Z ./أحياء/جدة/الثغر/
+build	Upload artifact	2026-10-14T16:05:56.9929659Z ./أحياء/جدة/الثغر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9929961Z ./أحياء/جدة/البوادر/
+build	Upload artifact	2026-10-14T16:05:56.9930253Z ./أحياء/جدة/البوادر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9930688Z ./أحياء/جدة/المروج/
+build	Upload artifact	2026-10-14T16:05:56.9930972Z ./أحياء/جدة/المروج/index.html
+build	Upload artifact	2026-10-14T16:05:56.9931285Z ./أحياء/جدة/الزهراء-2/
+build	Upload artifact	2026-10-14T16:05:56.9931585Z ./أحياء/جدة/الزهراء-2/index.html
+build	Upload artifact	2026-10-14T16:05:56.9931917Z ./أحياء/جدة/أبحر-الشمالية/
+build	Upload artifact	2026-10-14T16:05:56.9932247Z ./أحياء/جدة/أبحر-الشمالية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9932593Z ./أحياء/جدة/الكوثر/
+build	Upload artifact	2026-10-14T16:05:56.9932878Z ./أحياء/جدة/الكوثر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9933196Z ./أحياء/جدة/الأمواج/
+build	Upload artifact	2026-10-14T16:05:56.9933490Z ./أحياء/جدة/الأمواج/index.html
+build	Upload artifact	2026-10-14T16:05:56.9933798Z ./أحياء/جدة/الرحاب/
+build	Upload artifact	2026-10-14T16:05:56.9934082Z ./أحياء/جدة/الرحاب/index.html
+build	Upload artifact	2026-10-14T16:05:56.9934405Z ./أحياء/جدة/النزلة-اليمانية/
+build	Upload artifact	2026-10-14T16:05:56.9934776Z ./أحياء/جدة/النزلة-اليمانية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9935134Z ./أحياء/جدة/خليج-سلمان/
+build	Upload artifact	2026-10-14T16:05:56.9935447Z ./أحياء/جدة/خليج-سلمان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9935769Z ./أحياء/جدة/النخيل/
+build	Upload artifact	2026-10-14T16:05:56.9936057Z ./أحياء/جدة/النخيل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9936507Z ./أحياء/جدة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9936807Z ./أحياء/جدة/أبحر-الجنوبية/
+build	Upload artifact	2026-10-14T16:05:56.9937133Z ./أحياء/جدة/أبحر-الجنوبية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9937469Z ./أحياء/جدة/الفضيلة/
+build	Upload artifact	2026-10-14T16:05:56.9937759Z ./أحياء/جدة/الفضيلة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9938060Z ./أحياء/جدة/غليل/
+build	Upload artifact	2026-10-14T16:05:56.9938338Z ./أحياء/جدة/غليل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9938643Z ./أحياء/جدة/مشرفة/
+build	Upload artifact	2026-10-14T16:05:56.9938919Z ./أحياء/جدة/مشرفة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9939231Z ./أحياء/جدة/الأمير-فواز/
+build	Upload artifact	2026-10-14T16:05:56.9939561Z ./أحياء/جدة/الأمير-فواز/index.html
+build	Upload artifact	2026-10-14T16:05:56.9939897Z ./أحياء/جدة/القرينية/
+build	Upload artifact	2026-10-14T16:05:56.9940200Z ./أحياء/جدة/القرينية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9940744Z ./أحياء/جدة/الوفاء/
+build	Upload artifact	2026-10-14T16:05:56.9941023Z ./أحياء/جدة/الوفاء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9941322Z ./أحياء/جدة/اليسر/
+build	Upload artifact	2026-10-14T16:05:56.9941606Z ./أحياء/جدة/اليسر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9941909Z ./أحياء/جدة/الأجاويد/
+build	Upload artifact	2026-10-14T16:05:56.9942197Z ./أحياء/جدة/الأجاويد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9942529Z ./أحياء/جدة/البغدادية/
+build	Upload artifact	2026-10-14T16:05:56.9942833Z ./أحياء/جدة/البغدادية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9943150Z ./أحياء/جدة/العدل/
+build	Upload artifact	2026-10-14T16:05:56.9943424Z ./أحياء/جدة/العدل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9943724Z ./أحياء/جدة/النور/
+build	Upload artifact	2026-10-14T16:05:56.9944007Z ./أحياء/جدة/النور/index.html
+build	Upload artifact	2026-10-14T16:05:56.9944311Z ./أحياء/جدة/المحمدية/
+build	Upload artifact	2026-10-14T16:05:56.9944607Z ./أحياء/جدة/المحمدية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9944915Z ./أحياء/جدة/قباء/
+build	Upload artifact	2026-10-14T16:05:56.9945192Z ./أحياء/جدة/قباء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9945500Z ./أحياء/جدة/المروة-1/
+build	Upload artifact	2026-10-14T16:05:56.9945733Z ./أحياء/جدة/المروة-1/index.html
+build	Upload artifact	2026-10-14T16:05:56.9946043Z ./أحياء/جدة/الشراع/
+build	Upload artifact	2026-10-14T16:05:56.9946340Z ./أحياء/جدة/الشراع/index.html
+build	Upload artifact	2026-10-14T16:05:56.9946650Z ./أحياء/جدة/السروات/
+build	Upload artifact	2026-10-14T16:05:56.9946941Z ./أحياء/جدة/السروات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9947271Z ./أحياء/جدة/المنتزهات/
+build	Upload artifact	2026-10-14T16:05:56.9947472Z ./أحياء/جدة/المنتزهات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9947779Z ./أحياء/جدة/النزهة/
+build	Upload artifact	2026-10-14T16:05:56.9948075Z ./أحياء/جدة/النزهة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9948380Z ./أحياء/جدة/الوادي/
+build	Upload artifact	2026-10-14T16:05:56.9948618Z ./أحياء/جدة/الوادي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9948897Z ./أحياء/جدة/الزهراء/
+build	Upload artifact	2026-10-14T16:05:56.9949186Z ./أحياء/جدة/الزهراء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9949492Z ./أحياء/جدة/الهنداوية/
+build	Upload artifact	2026-10-14T16:05:56.9949791Z ./أحياء/جدة/الهنداوية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9950104Z ./أحياء/جدة/الفلاح/
+build	Upload artifact	2026-10-14T16:05:56.9950285Z ./أحياء/جدة/الفلاح/index.html
+build	Upload artifact	2026-10-14T16:05:56.9950644Z ./أحياء/جدة/الرويس/
+build	Upload artifact	2026-10-14T16:05:56.9950927Z ./أحياء/جدة/الرويس/index.html
+build	Upload artifact	2026-10-14T16:05:56.9951229Z ./أحياء/جدة/الخالدية/
+build	Upload artifact	2026-10-14T16:05:56.9951511Z ./أحياء/جدة/الخالدية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9951723Z ./أحياء/جدة/الندى/
+build	Upload artifact	2026-10-14T16:05:56.9951909Z ./أحياء/جدة/الندى/index.html
+build	Upload artifact	2026-10-14T16:05:56.9952103Z ./أحياء/جدة/القريات/
+build	Upload artifact	2026-10-14T16:05:56.9952292Z ./أحياء/جدة/القريات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9952487Z ./أحياء/جدة/الواحة/
+build	Upload artifact	2026-10-14T16:05:56.9952807Z ./أحياء/جدة/الواحة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9953003Z ./أحياء/جدة/الجامعة/
+build	Upload artifact	2026-10-14T16:05:56.9953195Z ./أحياء/جدة/الجامعة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9953395Z ./أحياء/جدة/الدرة/
+build	Upload artifact	2026-10-14T16:05:56.9953576Z ./أحياء/جدة/الدرة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9953766Z ./أحياء/جدة/النعيم/
+build	Upload artifact	2026-10-14T16:05:56.9953945Z ./أحياء/جدة/النعيم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9954201Z ./أحياء/جدة/الرحمانية/
+build	Upload artifact	2026-10-14T16:05:56.9954502Z ./أحياء/جدة/الرحمانية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9954863Z ./أحياء/جدة/النجمة/
+build	Upload artifact	2026-10-14T16:05:56.9955159Z ./أحياء/جدة/النجمة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9955459Z ./أحياء/جدة/الأجواد/
+build	Upload artifact	2026-10-14T16:05:56.9955703Z ./أحياء/جدة/الأجواد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9956135Z ./أحياء/جدة/مطار-جدة-القديم/
+build	Upload artifact	2026-10-14T16:05:56.9956366Z ./أحياء/جدة/مطار-جدة-القديم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9956596Z ./أحياء/جدة/النهضة/
+build	Upload artifact	2026-10-14T16:05:56.9956782Z ./أحياء/جدة/النهضة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9956978Z ./أحياء/جدة/العبير/
+build	Upload artifact	2026-10-14T16:05:56.9957163Z ./أحياء/جدة/العبير/index.html
+build	Upload artifact	2026-10-14T16:05:56.9957377Z ./أحياء/جدة/البحيرات/
+build	Upload artifact	2026-10-14T16:05:56.9957570Z ./أحياء/جدة/البحيرات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9957775Z ./أحياء/جدة/الجزيرة/
+build	Upload artifact	2026-10-14T16:05:56.9957964Z ./أحياء/جدة/الجزيرة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9958159Z ./أحياء/جدة/النسيم/
+build	Upload artifact	2026-10-14T16:05:56.9958343Z ./أحياء/جدة/النسيم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9958544Z ./أحياء/جدة/التعاون/
+build	Upload artifact	2026-10-14T16:05:56.9958732Z ./أحياء/جدة/التعاون/index.html
+build	Upload artifact	2026-10-14T16:05:56.9958926Z ./أحياء/جدة/الزهور/
+build	Upload artifact	2026-10-14T16:05:56.9959110Z ./أحياء/جدة/الزهور/index.html
+build	Upload artifact	2026-10-14T16:05:56.9959311Z ./أحياء/جدة/بني-مالك/
+build	Upload artifact	2026-10-14T16:05:56.9959504Z ./أحياء/جدة/بني-مالك/index.html
+build	Upload artifact	2026-10-14T16:05:56.9959704Z ./أحياء/جدة/المروة/
+build	Upload artifact	2026-10-14T16:05:56.9959900Z ./أحياء/جدة/المروة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9960098Z ./أحياء/جدة/الحمراء/
+build	Upload artifact	2026-10-14T16:05:56.9960286Z ./أحياء/جدة/الحمراء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9960574Z ./أحياء/جدة/الصالحية/
+build	Upload artifact	2026-10-14T16:05:56.9960866Z ./أحياء/جدة/الصالحية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9961078Z ./أحياء/جدة/الفروسية/
+build	Upload artifact	2026-10-14T16:05:56.9961268Z ./أحياء/جدة/الفروسية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9961469Z ./أحياء/جدة/الرغامة/
+build	Upload artifact	2026-10-14T16:05:56.9961656Z ./أحياء/جدة/الرغامة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9961871Z ./أحياء/جدة/الأمير-فواز-الجنوبي/
+build	Upload artifact	2026-10-14T16:05:56.9962112Z ./أحياء/جدة/الأمير-فواز-الجنوبي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9962352Z ./أحياء/جدة/السرورية/
+build	Upload artifact	2026-10-14T16:05:56.9962542Z ./أحياء/جدة/السرورية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9962742Z ./أحياء/جدة/اللؤلؤ/
+build	Upload artifact	2026-10-14T16:05:56.9962922Z ./أحياء/جدة/اللؤلؤ/index.html
+build	Upload artifact	2026-10-14T16:05:56.9963124Z ./أحياء/جدة/العشيرية/
+build	Upload artifact	2026-10-14T16:05:56.9963314Z ./أحياء/جدة/العشيرية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9963510Z ./أحياء/جدة/الجوهرة/
+build	Upload artifact	2026-10-14T16:05:56.9963713Z ./أحياء/جدة/الجوهرة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9963909Z ./أحياء/جدة/السلامة/
+build	Upload artifact	2026-10-14T16:05:56.9964098Z ./أحياء/جدة/السلامة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9964292Z ./أحياء/جدة/الوسام/
+build	Upload artifact	2026-10-14T16:05:56.9964477Z ./أحياء/جدة/الوسام/index.html
+build	Upload artifact	2026-10-14T16:05:56.9964669Z ./أحياء/جدة/الياقوت/
+build	Upload artifact	2026-10-14T16:05:56.9964984Z ./أحياء/جدة/الياقوت/index.html
+build	Upload artifact	2026-10-14T16:05:56.9965191Z ./أحياء/جدة/الحمدانية/
+build	Upload artifact	2026-10-14T16:05:56.9965396Z ./أحياء/جدة/الحمدانية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9965598Z ./أحياء/جدة/الروضة/
+build	Upload artifact	2026-10-14T16:05:56.9965778Z ./أحياء/جدة/الروضة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9965972Z ./أحياء/جدة/الخليج/
+build	Upload artifact	2026-10-14T16:05:56.9966153Z ./أحياء/جدة/الخليج/index.html
+build	Upload artifact	2026-10-14T16:05:56.9966349Z ./أحياء/جدة/الخمرة/
+build	Upload artifact	2026-10-14T16:05:56.9966533Z ./أحياء/جدة/الخمرة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9966728Z ./أحياء/جدة/الأصالة/
+build	Upload artifact	2026-10-14T16:05:56.9966917Z ./أحياء/جدة/الأصالة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9967112Z ./أحياء/جدة/الفنار/
+build	Upload artifact	2026-10-14T16:05:56.9967294Z ./أحياء/جدة/الفنار/index.html
+build	Upload artifact	2026-10-14T16:05:56.9967624Z ./أحياء/جدة/بحرة-طريق-مكة-جدة-القديم/
+build	Upload artifact	2026-10-14T16:05:56.9967899Z ./أحياء/جدة/بحرة-طريق-مكة-جدة-القديم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9968153Z ./أحياء/جدة/البيان/
+build	Upload artifact	2026-10-14T16:05:56.9968335Z ./أحياء/جدة/البيان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9968532Z ./أحياء/جدة/البشائر/
+build	Upload artifact	2026-10-14T16:05:56.9968730Z ./أحياء/جدة/البشائر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9968927Z ./أحياء/جدة/الهدا/
+build	Upload artifact	2026-10-14T16:05:56.9969108Z ./أحياء/جدة/الهدا/index.html
+build	Upload artifact	2026-10-14T16:05:56.9969316Z ./أحياء/المدينة-المنورة/
+build	Upload artifact	2026-10-14T16:05:56.9969518Z ./أحياء/المدينة-المنورة/عروة/
+build	Upload artifact	2026-10-14T16:05:56.9969754Z ./أحياء/المدينة-المنورة/عروة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9970001Z ./أحياء/المدينة-المنورة/ابو-مرخة/
+build	Upload artifact	2026-10-14T16:05:56.9970249Z ./أحياء/المدينة-المنورة/ابو-مرخة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9970601Z ./أحياء/المدينة-المنورة/حمراء-الاسد-و/
+build	Upload artifact	2026-10-14T16:05:56.9970878Z ./أحياء/المدينة-المنورة/حمراء-الاسد-و/index.html
+build	Upload artifact	2026-10-14T16:05:56.9971137Z ./أحياء/المدينة-المنورة/الجمعة/
+build	Upload artifact	2026-10-14T16:05:56.9971387Z ./أحياء/المدينة-المنورة/الجمعة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9971634Z ./أحياء/المدينة-المنورة/شوران-ن/
+build	Upload artifact	2026-10-14T16:05:56.9971871Z ./أحياء/المدينة-المنورة/شوران-ن/index.html
+build	Upload artifact	2026-10-14T16:05:56.9972120Z ./أحياء/المدينة-المنورة/جزع-العيون/
+build	Upload artifact	2026-10-14T16:05:56.9972371Z ./أحياء/المدينة-المنورة/جزع-العيون/index.html
+build	Upload artifact	2026-10-14T16:05:56.9972636Z ./أحياء/المدينة-المنورة/العاقول/
+build	Upload artifact	2026-10-14T16:05:56.9972869Z ./أحياء/المدينة-المنورة/العاقول/index.html
+build	Upload artifact	2026-10-14T16:05:56.9973114Z ./أحياء/المدينة-المنورة/شوران-ه/
+build	Upload artifact	2026-10-14T16:05:56.9973339Z ./أحياء/المدينة-المنورة/شوران-ه/index.html
+build	Upload artifact	2026-10-14T16:05:56.9973580Z ./أحياء/المدينة-المنورة/البطان/
+build	Upload artifact	2026-10-14T16:05:56.9973811Z ./أحياء/المدينة-المنورة/البطان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9974048Z ./أحياء/المدينة-المنورة/الروابي/
+build	Upload artifact	2026-10-14T16:05:56.9974277Z ./أحياء/المدينة-المنورة/الروابي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9974518Z ./أحياء/المدينة-المنورة/جزع-الجرف/
+build	Upload artifact	2026-10-14T16:05:56.9974765Z ./أحياء/المدينة-المنورة/جزع-الجرف/index.html
+build	Upload artifact	2026-10-14T16:05:56.9975040Z ./أحياء/المدينة-المنورة/العزيزية/
+build	Upload artifact	2026-10-14T16:05:56.9975280Z ./أحياء/المدينة-المنورة/العزيزية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9975531Z ./أحياء/المدينة-المنورة/الشريبات/
+build	Upload artifact	2026-10-14T16:05:56.9975767Z ./أحياء/المدينة-المنورة/الشريبات/index.html
+build	Upload artifact	2026-10-14T16:05:56.9976011Z ./أحياء/المدينة-المنورة/شوران-ل/
+build	Upload artifact	2026-10-14T16:05:56.9976375Z ./أحياء/المدينة-المنورة/شوران-ل/index.html
+build	Upload artifact	2026-10-14T16:05:56.9976617Z ./أحياء/المدينة-المنورة/القبلتين/
+build	Upload artifact	2026-10-14T16:05:56.9976849Z ./أحياء/المدينة-المنورة/القبلتين/index.html
+build	Upload artifact	2026-10-14T16:05:56.9977086Z ./أحياء/المدينة-المنورة/بني-ظفر/
+build	Upload artifact	2026-10-14T16:05:56.9977314Z ./أحياء/المدينة-المنورة/بني-ظفر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9977554Z ./أحياء/المدينة-المنورة/ورقان-ب/
+build	Upload artifact	2026-10-14T16:05:56.9977784Z ./أحياء/المدينة-المنورة/ورقان-ب/index.html
+build	Upload artifact	2026-10-14T16:05:56.9978045Z ./أحياء/المدينة-المنورة/ابو-مرخة-10-ت/
+build	Upload artifact	2026-10-14T16:05:56.9978313Z ./أحياء/المدينة-المنورة/ابو-مرخة-10-ت/index.html
+build	Upload artifact	2026-10-14T16:05:56.9978584Z ./أحياء/المدينة-المنورة/حمراء-الاسد-د/
+build	Upload artifact	2026-10-14T16:05:56.9978957Z ./أحياء/المدينة-المنورة/حمراء-الاسد-د/index.html
+build	Upload artifact	2026-10-14T16:05:56.9979226Z ./أحياء/المدينة-المنورة/الحديقة/
+build	Upload artifact	2026-10-14T16:05:56.9979462Z ./أحياء/المدينة-المنورة/الحديقة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9979755Z ./أحياء/المدينة-المنورة/الحرة-الغربية/
+build	Upload artifact	2026-10-14T16:05:56.9980020Z ./أحياء/المدينة-المنورة/الحرة-الغربية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9980291Z ./أحياء/المدينة-المنورة/شظاة/
+build	Upload artifact	2026-10-14T16:05:56.9980680Z ./أحياء/المدينة-المنورة/شظاة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9980951Z ./أحياء/المدينة-المنورة/العنابس/
+build	Upload artifact	2026-10-14T16:05:56.9981185Z ./أحياء/المدينة-المنورة/العنابس/index.html
+build	Upload artifact	2026-10-14T16:05:56.9981440Z ./أحياء/المدينة-المنورة/السكب-والشهباء/
+build	Upload artifact	2026-10-14T16:05:56.9981708Z ./أحياء/المدينة-المنورة/السكب-والشهباء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9981972Z ./أحياء/المدينة-المنورة/نبلاء/
+build	Upload artifact	2026-10-14T16:05:56.9982211Z ./أحياء/المدينة-المنورة/نبلاء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9982461Z ./أحياء/المدينة-المنورة/طريق-العيون/
+build	Upload artifact	2026-10-14T16:05:56.9982717Z ./أحياء/المدينة-المنورة/طريق-العيون/index.html
+build	Upload artifact	2026-10-14T16:05:56.9982993Z ./أحياء/المدينة-المنورة/العوالي/
+build	Upload artifact	2026-10-14T16:05:56.9983228Z ./أحياء/المدينة-المنورة/العوالي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9983471Z ./أحياء/المدينة-المنورة/الزهرة-ب/
+build	Upload artifact	2026-10-14T16:05:56.9983714Z ./أحياء/المدينة-المنورة/الزهرة-ب/index.html
+build	Upload artifact	2026-10-14T16:05:56.9983963Z ./أحياء/المدينة-المنورة/الروابي-ق/
+build	Upload artifact	2026-10-14T16:05:56.9984226Z ./أحياء/المدينة-المنورة/الروابي-ق/index.html
+build	Upload artifact	2026-10-14T16:05:56.9984480Z ./أحياء/المدينة-المنورة/طريق-المطار/
+build	Upload artifact	2026-10-14T16:05:56.9984738Z ./أحياء/المدينة-المنورة/طريق-المطار/index.html
+build	Upload artifact	2026-10-14T16:05:56.9985003Z ./أحياء/المدينة-المنورة/حمراء-الاسد-ى/
+build	Upload artifact	2026-10-14T16:05:56.9985265Z ./أحياء/المدينة-المنورة/حمراء-الاسد-ى/index.html
+build	Upload artifact	2026-10-14T16:05:56.9985533Z ./أحياء/المدينة-المنورة/حمراء-الاسد-ط/
+build	Upload artifact	2026-10-14T16:05:56.9985789Z ./أحياء/المدينة-المنورة/حمراء-الاسد-ط/index.html
+build	Upload artifact	2026-10-14T16:05:56.9986046Z ./أحياء/المدينة-المنورة/الخاتم/
+build	Upload artifact	2026-10-14T16:05:56.9986286Z ./أحياء/المدينة-المنورة/الخاتم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9986552Z ./أحياء/المدينة-المنورة/شوران-و/
+build	Upload artifact	2026-10-14T16:05:56.9986801Z ./أحياء/المدينة-المنورة/شوران-و/index.html
+build	Upload artifact	2026-10-14T16:05:56.9987043Z ./أحياء/المدينة-المنورة/طيبة/
+build	Upload artifact	2026-10-14T16:05:56.9987274Z ./أحياء/المدينة-المنورة/طيبة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9987519Z ./أحياء/المدينة-المنورة/السكة-الحديد/
+build	Upload artifact	2026-10-14T16:05:56.9987780Z ./أحياء/المدينة-المنورة/السكة-الحديد/index.html
+build	Upload artifact	2026-10-14T16:05:56.9988174Z ./أحياء/المدينة-المنورة/الصناعية/
+build	Upload artifact	2026-10-14T16:05:56.9988415Z ./أحياء/المدينة-المنورة/الصناعية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9988660Z ./أحياء/المدينة-المنورة/العصبة/
+build	Upload artifact	2026-10-14T16:05:56.9988893Z ./أحياء/المدينة-المنورة/العصبة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9989131Z ./أحياء/المدينة-المنورة/شوران-ش/
+build	Upload artifact	2026-10-14T16:05:56.9989360Z ./أحياء/المدينة-المنورة/شوران-ش/index.html
+build	Upload artifact	2026-10-14T16:05:56.9989605Z ./أحياء/المدينة-المنورة/حرة-جبل-عير/
+build	Upload artifact	2026-10-14T16:05:56.9989854Z ./أحياء/المدينة-المنورة/حرة-جبل-عير/index.html
+build	Upload artifact	2026-10-14T16:05:56.9990098Z ./أحياء/المدينة-المنورة/شوران-ر/
+build	Upload artifact	2026-10-14T16:05:56.9990324Z ./أحياء/المدينة-المنورة/شوران-ر/index.html
+build	Upload artifact	2026-10-14T16:05:56.9990797Z ./أحياء/المدينة-المنورة/مذينب/
+build	Upload artifact	2026-10-14T16:05:56.9991029Z ./أحياء/المدينة-المنورة/مذينب/index.html
+build	Upload artifact	2026-10-14T16:05:56.9991273Z ./أحياء/المدينة-المنورة/الصويدرة/
+build	Upload artifact	2026-10-14T16:05:56.9991527Z ./أحياء/المدينة-المنورة/الصويدرة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9991863Z ./أحياء/المدينة-المنورة/وزارة-الدفاع-والطيران-بطريق-تبوك-القديم/
+build	Upload artifact	2026-10-14T16:05:56.9992318Z ./أحياء/المدينة-المنورة/وزارة-الدفاع-والطيران-بطريق-تبوك-القديم/index.html
+build	Upload artifact	2026-10-14T16:05:56.9992677Z ./أحياء/المدينة-المنورة/وادي-البطان/
+build	Upload artifact	2026-10-14T16:05:56.9992930Z ./أحياء/المدينة-المنورة/وادي-البطان/index.html
+build	Upload artifact	2026-10-14T16:05:56.9993188Z ./أحياء/المدينة-المنورة/نزلة-الجبور/
+build	Upload artifact	2026-10-14T16:05:56.9993436Z ./أحياء/المدينة-المنورة/نزلة-الجبور/index.html
+build	Upload artifact	2026-10-14T16:05:56.9993700Z ./أحياء/المدينة-المنورة/الحرة-الشرقية/
+build	Upload artifact	2026-10-14T16:05:56.9993962Z ./أحياء/المدينة-المنورة/الحرة-الشرقية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9994224Z ./أحياء/المدينة-المنورة/الزبير/
+build	Upload artifact	2026-10-14T16:05:56.9994464Z ./أحياء/المدينة-المنورة/الزبير/index.html
+build	Upload artifact	2026-10-14T16:05:56.9994716Z ./أحياء/المدينة-المنورة/السقيا/
+build	Upload artifact	2026-10-14T16:05:56.9994945Z ./أحياء/المدينة-المنورة/السقيا/index.html
+build	Upload artifact	2026-10-14T16:05:56.9995177Z ./أحياء/المدينة-المنورة/التلعة/
+build	Upload artifact	2026-10-14T16:05:56.9995405Z ./أحياء/المدينة-المنورة/التلعة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9995635Z ./أحياء/المدينة-المنورة/العريض/
+build	Upload artifact	2026-10-14T16:05:56.9995873Z ./أحياء/المدينة-المنورة/العريض/index.html
+build	Upload artifact	2026-10-14T16:05:56.9996110Z ./أحياء/المدينة-المنورة/شوران-ج/
+build	Upload artifact	2026-10-14T16:05:56.9996343Z ./أحياء/المدينة-المنورة/شوران-ج/index.html
+build	Upload artifact	2026-10-14T16:05:56.9996590Z ./أحياء/المدينة-المنورة/الرانوناء/
+build	Upload artifact	2026-10-14T16:05:56.9996844Z ./أحياء/المدينة-المنورة/الرانوناء/index.html
+build	Upload artifact	2026-10-14T16:05:56.9997117Z ./أحياء/المدينة-المنورة/المنح-بالحرة-الشرقية/
+build	Upload artifact	2026-10-14T16:05:56.9997420Z ./أحياء/المدينة-المنورة/المنح-بالحرة-الشرقية/index.html
+build	Upload artifact	2026-10-14T16:05:56.9997700Z ./أحياء/المدينة-المنورة/الدويمة/
+build	Upload artifact	2026-10-14T16:05:56.9997935Z ./أحياء/المدينة-المنورة/الدويمة/index.html
+build	Upload artifact	2026-10-14T16:05:56.9998176Z ./أحياء/المدينة-المنورة/جزع-العوالي/
+build	Upload artifact	2026-10-14T16:05:56.9998437Z ./أحياء/المدينة-المنورة/جزع-العوالي/index.html
+build	Upload artifact	2026-10-14T16:05:56.9998693Z ./أحياء/المدينة-المنورة/الزهرة-أ/
+build	Upload artifact	2026-10-14T16:05:56.9998932Z ./أحياء/المدينة-المنورة/الزهرة-أ/index.html
+build	Upload artifact	2026-10-14T16:05:56.9999171Z ./أحياء/المدينة-المنورة/الدفاع/
+build	Upload artifact	2026-10-14T16:05:56.9999554Z ./أحياء/المدينة-المنورة/الدفاع/index.html
+build	Upload artifact	2026-10-14T16:05:56.9999808Z ./أحياء/المدينة-المنورة/طلعة-الرمرام/
+build	Upload artifact	2026-10-14T16:05:57.0000068Z ./أحياء/المدينة-المنورة/طلعة-الرمرام/index.html
+build	Upload artifact	2026-10-14T16:05:57.0000324Z ./أحياء/المدينة-المنورة/الحفيرة/
+build	Upload artifact	2026-10-14T16:05:57.0000639Z ./أحياء/المدينة-المنورة/الحفيرة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0000877Z ./أحياء/المدينة-المنورة/السيح/
+build	Upload artifact	2026-10-14T16:05:57.0001103Z ./أحياء/المدينة-المنورة/السيح/index.html
+build	Upload artifact	2026-10-14T16:05:57.0001349Z ./أحياء/المدينة-المنورة/البلقاء/
+build	Upload artifact	2026-10-14T16:05:57.0001577Z ./أحياء/المدينة-المنورة/البلقاء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0001813Z ./أحياء/المدينة-المنورة/شوران-ص/
+build	Upload artifact	2026-10-14T16:05:57.0002046Z ./أحياء/المدينة-المنورة/شوران-ص/index.html
+build	Upload artifact	2026-10-14T16:05:57.0002400Z ./أحياء/المدينة-المنورة/الربوة/
+build	Upload artifact	2026-10-14T16:05:57.0002630Z ./أحياء/المدينة-المنورة/الربوة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0002864Z ./أحياء/المدينة-المنورة/الخدري/
+build	Upload artifact	2026-10-14T16:05:57.0003093Z ./أحياء/المدينة-المنورة/الخدري/index.html
+build	Upload artifact	2026-10-14T16:05:57.0003190Z ./أحياء/المدينة-المنورة/العهن/
+build	Upload artifact	2026-10-14T16:05:57.0003313Z ./أحياء/المدينة-المنورة/العهن/index.html
+build	Upload artifact	2026-10-14T16:05:57.0003432Z ./أحياء/المدينة-المنورة/العزيزية-5-ت-2/
+build	Upload artifact	2026-10-14T16:05:57.0003559Z ./أحياء/المدينة-المنورة/العزيزية-5-ت-2/index.html
+build	Upload artifact	2026-10-14T16:05:57.0003674Z ./أحياء/المدينة-المنورة/حمراء-الاسد-ج/
+build	Upload artifact	2026-10-14T16:05:57.0003797Z ./أحياء/المدينة-المنورة/حمراء-الاسد-ج/index.html
+build	Upload artifact	2026-10-14T16:05:57.0003905Z ./أحياء/المدينة-المنورة/سلع-العنابس/
+build	Upload artifact	2026-10-14T16:05:57.0004023Z ./أحياء/المدينة-المنورة/سلع-العنابس/index.html
+build	Upload artifact	2026-10-14T16:05:57.0004130Z ./أحياء/المدينة-المنورة/عين-الخيف/
+build	Upload artifact	2026-10-14T16:05:57.0004244Z ./أحياء/المدينة-المنورة/عين-الخيف/index.html
+build	Upload artifact	2026-10-14T16:05:57.0004343Z ./أحياء/المدينة-المنورة/شوران-ف/
+build	Upload artifact	2026-10-14T16:05:57.0004472Z ./أحياء/المدينة-المنورة/شوران-ف/index.html
+build	Upload artifact	2026-10-14T16:05:57.0004569Z ./أحياء/المدينة-المنورة/ابيار-علي/
+build	Upload artifact	2026-10-14T16:05:57.0004687Z ./أحياء/المدينة-المنورة/ابيار-علي/index.html
+build	Upload artifact	2026-10-14T16:05:57.0004834Z ./أحياء/المدينة-المنورة/الاسكان-العام-بالحرة-الشرقية/
+build	Upload artifact	2026-10-14T16:05:57.0005028Z ./أحياء/المدينة-المنورة/الاسكان-العام-بالحرة-الشرقية/index.html
+build	Upload artifact	2026-10-14T16:05:57.0005135Z ./أحياء/المدينة-المنورة/بني-معاوية/
+build	Upload artifact	2026-10-14T16:05:57.0005258Z ./أحياء/المدينة-المنورة/بني-معاوية/index.html
+build	Upload artifact	2026-10-14T16:05:57.0005371Z ./أحياء/المدينة-المنورة/الدفاع-بالبيداء/
+build	Upload artifact	2026-10-14T16:05:57.0005498Z ./أحياء/المدينة-المنورة/الدفاع-بالبيداء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0005613Z ./أحياء/المدينة-المنورة/حمراء-الاسد-ح/
+build	Upload artifact	2026-10-14T16:05:57.0005735Z ./أحياء/المدينة-المنورة/حمراء-الاسد-ح/index.html
+build	Upload artifact	2026-10-14T16:05:57.0005845Z ./أحياء/المدينة-المنورة/العزيزية-8-ت/
+build	Upload artifact	2026-10-14T16:05:57.0005967Z ./أحياء/المدينة-المنورة/العزيزية-8-ت/index.html
+build	Upload artifact	2026-10-14T16:05:57.0006066Z ./أحياء/المدينة-المنورة/الغراء/
+build	Upload artifact	2026-10-14T16:05:57.0006193Z ./أحياء/المدينة-المنورة/الغراء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0006288Z ./أحياء/المدينة-المنورة/الظاهرة/
+build	Upload artifact	2026-10-14T16:05:57.0006398Z ./أحياء/المدينة-المنورة/الظاهرة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0006495Z ./أحياء/المدينة-المنورة/تلعة-الهبوب/
+build	Upload artifact	2026-10-14T16:05:57.0006740Z ./أحياء/المدينة-المنورة/تلعة-الهبوب/index.html
+build	Upload artifact	2026-10-14T16:05:57.0006856Z ./أحياء/المدينة-المنورة/الحرة-الشرقية-القبلية/
+build	Upload artifact	2026-10-14T16:05:57.0007016Z ./أحياء/المدينة-المنورة/الحرة-الشرقية-القبلية/index.html
+build	Upload artifact	2026-10-14T16:05:57.0007117Z ./أحياء/المدينة-المنورة/الزهرة-د/
+build	Upload artifact	2026-10-14T16:05:57.0007228Z ./أحياء/المدينة-المنورة/الزهرة-د/index.html
+build	Upload artifact	2026-10-14T16:05:57.0007329Z ./أحياء/المدينة-المنورة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0007423Z ./أحياء/المدينة-المنورة/العصمة/
+build	Upload artifact	2026-10-14T16:05:57.0007539Z ./أحياء/المدينة-المنورة/العصمة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0007635Z ./أحياء/المدينة-المنورة/شوران/
+build	Upload artifact	2026-10-14T16:05:57.0007747Z ./أحياء/المدينة-المنورة/شوران/index.html
+build	Upload artifact	2026-10-14T16:05:57.0007947Z ./أحياء/المدينة-المنورة/الهدراء/
+build	Upload artifact	2026-10-14T16:05:57.0008060Z ./أحياء/المدينة-المنورة/الهدراء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0008160Z ./أحياء/المدينة-المنورة/الجابرة/
+build	Upload artifact	2026-10-14T16:05:57.0008266Z ./أحياء/المدينة-المنورة/الجابرة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0008367Z ./أحياء/المدينة-المنورة/العيون/
+build	Upload artifact	2026-10-14T16:05:57.0008487Z ./أحياء/المدينة-المنورة/العيون/index.html
+build	Upload artifact	2026-10-14T16:05:57.0008619Z ./أحياء/المدينة-المنورة/وادي-مهزور/
+build	Upload artifact	2026-10-14T16:05:57.0008738Z ./أحياء/المدينة-المنورة/وادي-مهزور/index.html
+build	Upload artifact	2026-10-14T16:05:57.0008861Z ./أحياء/المدينة-المنورة/الحرة-الشرقية-حرة-قريضة/
+build	Upload artifact	2026-10-14T16:05:57.0009025Z ./أحياء/المدينة-المنورة/الحرة-الشرقية-حرة-قريضة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0009129Z ./أحياء/المدينة-المنورة/قريضة/
+build	Upload artifact	2026-10-14T16:05:57.0009234Z ./أحياء/المدينة-المنورة/قريضة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0009334Z ./أحياء/المدينة-المنورة/السلام/
+build	Upload artifact	2026-10-14T16:05:57.0009441Z ./أحياء/المدينة-المنورة/السلام/index.html
+build	Upload artifact	2026-10-14T16:05:57.0009543Z ./أحياء/المدينة-المنورة/قباء/
+build	Upload artifact	2026-10-14T16:05:57.0009662Z ./أحياء/المدينة-المنورة/قباء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0009779Z ./أحياء/المدينة-المنورة/امتداد-العزيزية/
+build	Upload artifact	2026-10-14T16:05:57.0009912Z ./أحياء/المدينة-المنورة/امتداد-العزيزية/index.html
+build	Upload artifact	2026-10-14T16:05:57.0010005Z ./أحياء/المدينة-المنورة/الحساء/
+build	Upload artifact	2026-10-14T16:05:57.0010118Z ./أحياء/المدينة-المنورة/الحساء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0010226Z ./أحياء/المدينة-المنورة/العاقول-ب/
+build	Upload artifact	2026-10-14T16:05:57.0010352Z ./أحياء/المدينة-المنورة/العاقول-ب/index.html
+build	Upload artifact	2026-10-14T16:05:57.0010448Z ./أحياء/المدينة-المنورة/قربان/
+build	Upload artifact	2026-10-14T16:05:57.0010800Z ./أحياء/المدينة-المنورة/قربان/index.html
+build	Upload artifact	2026-10-14T16:05:57.0010936Z ./أحياء/المدينة-المنورة/حمراء-الاسد-أ/
+build	Upload artifact	2026-10-14T16:05:57.0011056Z ./أحياء/المدينة-المنورة/حمراء-الاسد-أ/index.html
+build	Upload artifact	2026-10-14T16:05:57.0011155Z ./أحياء/المدينة-المنورة/حضوضاء/
+build	Upload artifact	2026-10-14T16:05:57.0011263Z ./أحياء/المدينة-المنورة/حضوضاء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0011364Z ./أحياء/المدينة-المنورة/المندسة/
+build	Upload artifact	2026-10-14T16:05:57.0011471Z ./أحياء/المدينة-المنورة/المندسة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0011700Z ./أحياء/المدينة-المنورة/رهط/
+build	Upload artifact	2026-10-14T16:05:57.0011806Z ./أحياء/المدينة-المنورة/رهط/index.html
+build	Upload artifact	2026-10-14T16:05:57.0011918Z ./أحياء/المدينة-المنورة/بني-عبدالأشهل/
+build	Upload artifact	2026-10-14T16:05:57.0012043Z ./أحياء/المدينة-المنورة/بني-عبدالأشهل/index.html
+build	Upload artifact	2026-10-14T16:05:57.0012140Z ./أحياء/المدينة-المنورة/شوران-س/
+build	Upload artifact	2026-10-14T16:05:57.0012365Z ./أحياء/المدينة-المنورة/شوران-س/index.html
+build	Upload artifact	2026-10-14T16:05:57.0012464Z ./أحياء/المدينة-المنورة/المصانع/
+build	Upload artifact	2026-10-14T16:05:57.0012578Z ./أحياء/المدينة-المنورة/المصانع/index.html
+build	Upload artifact	2026-10-14T16:05:57.0012675Z ./أحياء/المدينة-المنورة/حرة-عروة/
+build	Upload artifact	2026-10-14T16:05:57.0012792Z ./أحياء/المدينة-المنورة/حرة-عروة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0012893Z ./أحياء/المدينة-المنورة/المطار/
+build	Upload artifact	2026-10-14T16:05:57.0013003Z ./أحياء/المدينة-المنورة/المطار/index.html
+build	Upload artifact	2026-10-14T16:05:57.0013106Z ./أحياء/المدينة-المنورة/القصواء/
+build	Upload artifact	2026-10-14T16:05:57.0013213Z ./أحياء/المدينة-المنورة/القصواء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0013313Z ./أحياء/المدينة-المنورة/الخالدية/
+build	Upload artifact	2026-10-14T16:05:57.0013422Z ./أحياء/المدينة-المنورة/الخالدية/index.html
+build	Upload artifact	2026-10-14T16:05:57.0013551Z ./أحياء/المدينة-المنورة/امتداد-العاقول/
+build	Upload artifact	2026-10-14T16:05:57.0013679Z ./أحياء/المدينة-المنورة/امتداد-العاقول/index.html
+build	Upload artifact	2026-10-14T16:05:57.0013781Z ./أحياء/المدينة-المنورة/شوران-ى/
+build	Upload artifact	2026-10-14T16:05:57.0013895Z ./أحياء/المدينة-المنورة/شوران-ى/index.html
+build	Upload artifact	2026-10-14T16:05:57.0014009Z ./أحياء/المدينة-المنورة/شوران-أ/
+build	Upload artifact	2026-10-14T16:05:57.0014123Z ./أحياء/المدينة-المنورة/شوران-أ/index.html
+build	Upload artifact	2026-10-14T16:05:57.0014218Z ./أحياء/المدينة-المنورة/الشيبية/
+build	Upload artifact	2026-10-14T16:05:57.0014332Z ./أحياء/المدينة-المنورة/الشيبية/index.html
+build	Upload artifact	2026-10-14T16:05:57.0014427Z ./أحياء/المدينة-المنورة/الشهداء/
+build	Upload artifact	2026-10-14T16:05:57.0014541Z ./أحياء/المدينة-المنورة/الشهداء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0014644Z ./أحياء/المدينة-المنورة/خط-عروة/
+build	Upload artifact	2026-10-14T16:05:57.0014757Z ./أحياء/المدينة-المنورة/خط-عروة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0014855Z ./أحياء/المدينة-المنورة/مخيط/
+build	Upload artifact	2026-10-14T16:05:57.0014961Z ./أحياء/المدينة-المنورة/مخيط/index.html
+build	Upload artifact	2026-10-14T16:05:57.0015067Z ./أحياء/المدينة-المنورة/حرة-الوبرة/
+build	Upload artifact	2026-10-14T16:05:57.0015195Z ./أحياء/المدينة-المنورة/حرة-الوبرة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0015296Z ./أحياء/المدينة-المنورة/الراية/
+build	Upload artifact	2026-10-14T16:05:57.0015403Z ./أحياء/المدينة-المنورة/الراية/index.html
+build	Upload artifact	2026-10-14T16:05:57.0015508Z ./أحياء/المدينة-المنورة/الجامعة/
+build	Upload artifact	2026-10-14T16:05:57.0015632Z ./أحياء/المدينة-المنورة/الجامعة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0015724Z ./أحياء/المدينة-المنورة/السد/
+build	Upload artifact	2026-10-14T16:05:57.0015835Z ./أحياء/المدينة-المنورة/السد/index.html
+build	Upload artifact	2026-10-14T16:05:57.0015929Z ./أحياء/المدينة-المنورة/القيعة/
+build	Upload artifact	2026-10-14T16:05:57.0016040Z ./أحياء/المدينة-المنورة/القيعة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0016140Z ./أحياء/المدينة-المنورة/أبو-بريقاء/
+build	Upload artifact	2026-10-14T16:05:57.0016257Z ./أحياء/المدينة-المنورة/أبو-بريقاء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0016363Z ./أحياء/المدينة-المنورة/كنانة-الخليل/
+build	Upload artifact	2026-10-14T16:05:57.0016482Z ./أحياء/المدينة-المنورة/كنانة-الخليل/index.html
+build	Upload artifact	2026-10-14T16:05:57.0016585Z ./أحياء/المدينة-المنورة/الرمانة/
+build	Upload artifact	2026-10-14T16:05:57.0016692Z ./أحياء/المدينة-المنورة/الرمانة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0016885Z ./أحياء/المدينة-المنورة/الصهوة/
+build	Upload artifact	2026-10-14T16:05:57.0016992Z ./أحياء/المدينة-المنورة/الصهوة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0017121Z ./أحياء/المدينة-المنورة/وادي-مذينب-وعين-الخيف/
+build	Upload artifact	2026-10-14T16:05:57.0017279Z ./أحياء/المدينة-المنورة/وادي-مذينب-وعين-الخيف/index.html
+build	Upload artifact	2026-10-14T16:05:57.0017453Z ./أحياء/المدينة-المنورة/وعيره/
+build	Upload artifact	2026-10-14T16:05:57.0017565Z ./أحياء/المدينة-المنورة/وعيره/index.html
+build	Upload artifact	2026-10-14T16:05:57.0017661Z ./أحياء/المدينة-المنورة/شوران-م/
+build	Upload artifact	2026-10-14T16:05:57.0017777Z ./أحياء/المدينة-المنورة/شوران-م/index.html
+build	Upload artifact	2026-10-14T16:05:57.0017884Z ./أحياء/المدينة-المنورة/طريق-تبوك-القديم/
+build	Upload artifact	2026-10-14T16:05:57.0018019Z ./أحياء/المدينة-المنورة/طريق-تبوك-القديم/index.html
+build	Upload artifact	2026-10-14T16:05:57.0018169Z ./أحياء/المدينة-المنورة/أرض-الحرس-الوطني-بطريق-المطار/
+build	Upload artifact	2026-10-14T16:05:57.0018350Z ./أحياء/المدينة-المنورة/أرض-الحرس-الوطني-بطريق-المطار/index.html
+build	Upload artifact	2026-10-14T16:05:57.0018449Z ./أحياء/المدينة-المنورة/الخضراء/
+build	Upload artifact	2026-10-14T16:05:57.0018556Z ./أحياء/المدينة-المنورة/الخضراء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0018673Z ./أحياء/المدينة-المنورة/أبو-كبير/
+build	Upload artifact	2026-10-14T16:05:57.0018783Z ./أحياء/المدينة-المنورة/أبو-كبير/index.html
+build	Upload artifact	2026-10-14T16:05:57.0018887Z ./أحياء/المدينة-المنورة/سفح-جبل-احد/
+build	Upload artifact	2026-10-14T16:05:57.0019003Z ./أحياء/المدينة-المنورة/سفح-جبل-احد/index.html
+build	Upload artifact	2026-10-14T16:05:57.0019113Z ./أحياء/المدينة-المنورة/المقر/
+build	Upload artifact	2026-10-14T16:05:57.0019226Z ./أحياء/المدينة-المنورة/المقر/index.html
+build	Upload artifact	2026-10-14T16:05:57.0019326Z ./أحياء/المدينة-المنورة/وادي-العقيق/
+build	Upload artifact	2026-10-14T16:05:57.0019445Z ./أحياء/المدينة-المنورة/وادي-العقيق/index.html
+build	Upload artifact	2026-10-14T16:05:57.0019538Z ./أحياء/المدينة-المنورة/المبعوث/
+build	Upload artifact	2026-10-14T16:05:57.0019651Z ./أحياء/المدينة-المنورة/المبعوث/index.html
+build	Upload artifact	2026-10-14T16:05:57.0019744Z ./أحياء/المدينة-المنورة/شوران-د/
+build	Upload artifact	2026-10-14T16:05:57.0019864Z ./أحياء/المدينة-المنورة/شوران-د/index.html
+build	Upload artifact	2026-10-14T16:05:57.0019966Z ./أحياء/المدينة-المنورة/جزع-قباء/
+build	Upload artifact	2026-10-14T16:05:57.0020076Z ./أحياء/المدينة-المنورة/جزع-قباء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0020186Z ./أحياء/المدينة-المنورة/العزيزية-5-ت-1/
+build	Upload artifact	2026-10-14T16:05:57.0020325Z ./أحياء/المدينة-المنورة/العزيزية-5-ت-1/index.html
+build	Upload artifact	2026-10-14T16:05:57.0020433Z ./أحياء/المدينة-المنورة/سيد-الشهداء/
+build	Upload artifact	2026-10-14T16:05:57.0020634Z ./أحياء/المدينة-المنورة/سيد-الشهداء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0020748Z ./أحياء/المدينة-المنورة/ضاحية-المندسة/
+build	Upload artifact	2026-10-14T16:05:57.0020982Z ./أحياء/المدينة-المنورة/ضاحية-المندسة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0021082Z ./أحياء/المدينة-المنورة/سلطانة/
+build	Upload artifact	2026-10-14T16:05:57.0021193Z ./أحياء/المدينة-المنورة/سلطانة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0021287Z ./أحياء/المدينة-المنورة/المستراح/
+build	Upload artifact	2026-10-14T16:05:57.0021403Z ./أحياء/المدينة-المنورة/المستراح/index.html
+build	Upload artifact	2026-10-14T16:05:57.0021501Z ./أحياء/المدينة-المنورة/العاقول-د/
+build	Upload artifact	2026-10-14T16:05:57.0021621Z ./أحياء/المدينة-المنورة/العاقول-د/index.html
+build	Upload artifact	2026-10-14T16:05:57.0021714Z ./أحياء/المدينة-المنورة/الزهرة/
+build	Upload artifact	2026-10-14T16:05:57.0021828Z ./أحياء/المدينة-المنورة/الزهرة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0021937Z ./أحياء/المدينة-المنورة/العميرة-شجوى/
+build	Upload artifact	2026-10-14T16:05:57.0022057Z ./أحياء/المدينة-المنورة/العميرة-شجوى/index.html
+build	Upload artifact	2026-10-14T16:05:57.0022263Z ./أحياء/المدينة-المنورة/الأناهي/
+build	Upload artifact	2026-10-14T16:05:57.0022372Z ./أحياء/المدينة-المنورة/الأناهي/index.html
+build	Upload artifact	2026-10-14T16:05:57.0022474Z ./أحياء/المدينة-المنورة/الإسكان/
+build	Upload artifact	2026-10-14T16:05:57.0022587Z ./أحياء/المدينة-المنورة/الإسكان/index.html
+build	Upload artifact	2026-10-14T16:05:57.0022709Z ./أحياء/المدينة-المنورة/المضيبيعات/
+build	Upload artifact	2026-10-14T16:05:57.0022825Z ./أحياء/المدينة-المنورة/المضيبيعات/index.html
+build	Upload artifact	2026-10-14T16:05:57.0022927Z ./أحياء/المدينة-المنورة/البركة/
+build	Upload artifact	2026-10-14T16:05:57.0023037Z ./أحياء/المدينة-المنورة/البركة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0023143Z ./أحياء/المدينة-المنورة/البيداء-السلام/
+build	Upload artifact	2026-10-14T16:05:57.0023273Z ./أحياء/المدينة-المنورة/البيداء-السلام/index.html
+build	Upload artifact	2026-10-14T16:05:57.0023366Z ./أحياء/المدينة-المنورة/السكب/
+build	Upload artifact	2026-10-14T16:05:57.0023485Z ./أحياء/المدينة-المنورة/السكب/index.html
+build	Upload artifact	2026-10-14T16:05:57.0023582Z ./أحياء/المدينة-المنورة/ذو-الحليفة/
+build	Upload artifact	2026-10-14T16:05:57.0023703Z ./أحياء/المدينة-المنورة/ذو-الحليفة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0023830Z ./أحياء/المدينة-المنورة/ابيار-الماشي/
+build	Upload artifact	2026-10-14T16:05:57.0023961Z ./أحياء/المدينة-المنورة/ابيار-الماشي/index.html
+build	Upload artifact	2026-10-14T16:05:57.0024068Z ./أحياء/المدينة-المنورة/العزيزية-5-ت/
+build	Upload artifact	2026-10-14T16:05:57.0024188Z ./أحياء/المدينة-المنورة/العزيزية-5-ت/index.html
+build	Upload artifact	2026-10-14T16:05:57.0024312Z ./أحياء/المدينة-المنورة/الحرة-الشرقية-الشمالية/
+build	Upload artifact	2026-10-14T16:05:57.0024480Z ./أحياء/المدينة-المنورة/الحرة-الشرقية-الشمالية/index.html
+build	Upload artifact	2026-10-14T16:05:57.0024586Z ./أحياء/المدينة-المنورة/الدويخلة/
+build	Upload artifact	2026-10-14T16:05:57.0024705Z ./أحياء/المدينة-المنورة/الدويخلة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0024804Z ./أحياء/المدينة-المنورة/بني-بياضة/
+build	Upload artifact	2026-10-14T16:05:57.0024923Z ./أحياء/المدينة-المنورة/بني-بياضة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0025030Z ./أحياء/المدينة-المنورة/حمراء-الاسد-ه/
+build	Upload artifact	2026-10-14T16:05:57.0025158Z ./أحياء/المدينة-المنورة/حمراء-الاسد-ه/index.html
+build	Upload artifact	2026-10-14T16:05:57.0025256Z ./أحياء/المدينة-المنورة/المليليح/
+build	Upload artifact	2026-10-14T16:05:57.0025374Z ./أحياء/المدينة-المنورة/المليليح/index.html
+build	Upload artifact	2026-10-14T16:05:57.0025474Z ./أحياء/المدينة-المنورة/الاصيفرين/
+build	Upload artifact	2026-10-14T16:05:57.0025611Z ./أحياء/المدينة-المنورة/الاصيفرين/index.html
+build	Upload artifact	2026-10-14T16:05:57.0025714Z ./أحياء/المدينة-المنورة/الملك-فهد/
+build	Upload artifact	2026-10-14T16:05:57.0025825Z ./أحياء/المدينة-المنورة/الملك-فهد/index.html
+build	Upload artifact	2026-10-14T16:05:57.0025927Z ./أحياء/المدينة-المنورة/المغيسلة/
+build	Upload artifact	2026-10-14T16:05:57.0026123Z ./أحياء/المدينة-المنورة/المغيسلة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0026224Z ./أحياء/المدينة-المنورة/شجوى/
+build	Upload artifact	2026-10-14T16:05:57.0026330Z ./أحياء/المدينة-المنورة/شجوى/index.html
+build	Upload artifact	2026-10-14T16:05:57.0026453Z ./أحياء/المدينة-المنورة/ضاحية-ابيار-الماشي/
+build	Upload artifact	2026-10-14T16:05:57.0026604Z ./أحياء/المدينة-المنورة/ضاحية-ابيار-الماشي/index.html
+build	Upload artifact	2026-10-14T16:05:57.0026702Z ./أحياء/المدينة-المنورة/مسجد-الدرع/
+build	Upload artifact	2026-10-14T16:05:57.0026817Z ./أحياء/المدينة-المنورة/مسجد-الدرع/index.html
+build	Upload artifact	2026-10-14T16:05:57.0026910Z ./أحياء/المدينة-المنورة/الجماوات/
+build	Upload artifact	2026-10-14T16:05:57.0027028Z ./أحياء/المدينة-المنورة/الجماوات/index.html
+build	Upload artifact	2026-10-14T16:05:57.0027140Z ./أحياء/المدينة-المنورة/نزلة-الجبور-العليا/
+build	Upload artifact	2026-10-14T16:05:57.0027380Z ./أحياء/المدينة-المنورة/نزلة-الجبور-العليا/index.html
+build	Upload artifact	2026-10-14T16:05:57.0027479Z ./أحياء/المدينة-المنورة/جشم/
+build	Upload artifact	2026-10-14T16:05:57.0027585Z ./أحياء/المدينة-المنورة/جشم/index.html
+build	Upload artifact	2026-10-14T16:05:57.0027689Z ./أحياء/المدينة-المنورة/الشافية/
+build	Upload artifact	2026-10-14T16:05:57.0027796Z ./أحياء/المدينة-المنورة/الشافية/index.html
+build	Upload artifact	2026-10-14T16:05:57.0027909Z ./أحياء/المدينة-المنورة/الفتح/
+build	Upload artifact	2026-10-14T16:05:57.0028020Z ./أحياء/المدينة-المنورة/الفتح/index.html
+build	Upload artifact	2026-10-14T16:05:57.0028192Z ./أحياء/المدينة-المنورة/الدفاع-والطيران-بغرب-مطار-المدينة/
+build	Upload artifact	2026-10-14T16:05:57.0028394Z ./أحياء/المدينة-المنورة/الدفاع-والطيران-بغرب-مطار-المدينة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0028498Z ./أحياء/المدينة-المنورة/الروضة/
+build	Upload artifact	2026-10-14T16:05:57.0028611Z ./أحياء/المدينة-المنورة/الروضة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0028708Z ./أحياء/المدينة-المنورة/بني-حارثة/
+build	Upload artifact	2026-10-14T16:05:57.0028828Z ./أحياء/المدينة-المنورة/بني-حارثة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0028926Z ./أحياء/المدينة-المنورة/وادي-مذينب/
+build	Upload artifact	2026-10-14T16:05:57.0029050Z ./أحياء/المدينة-المنورة/وادي-مذينب/index.html
+build	Upload artifact	2026-10-14T16:05:57.0029162Z ./أحياء/المدينة-المنورة/ورقان/
+build	Upload artifact	2026-10-14T16:05:57.0029275Z ./أحياء/المدينة-المنورة/ورقان/index.html
+build	Upload artifact	2026-10-14T16:05:57.0029371Z ./أحياء/المدينة-المنورة/الجصة/
+build	Upload artifact	2026-10-14T16:05:57.0029477Z ./أحياء/المدينة-المنورة/الجصة/index.html
+build	Upload artifact	2026-10-14T16:05:57.0029569Z ./أحياء/index.html
+build	Upload artifact	2026-10-14T16:05:57.0029671Z ./أحياء/.manifest.json
+build	Upload artifact	2026-10-14T16:05:57.0029745Z ./valuation.html
+build	Upload artifact	2026-10-14T16:05:57.0029809Z ./robots.txt
+build	Upload artifact	2026-10-14T16:05:57.0029876Z ./admin.html
+build	Upload artifact	2026-10-14T16:05:57.0029937Z ./sw.js
+build	Upload artifact	2026-10-14T16:05:57.0030006Z ./faq.html
+build	Upload artifact	2026-10-14T16:05:57.0030083Z ./Himmat-Almedina.png
+build	Upload artifact	2026-10-14T16:05:57.0030145Z ./404.html
+build	Upload artifact	2026-10-14T16:05:57.0030216Z ./sitemap.xml
+build	Upload artifact	2026-10-14T16:05:57.0030287Z ./sitemap-offers.xml
+build	Upload artifact	2026-10-14T16:05:57.0030363Z ./contracts.html
+build	Upload artifact	2026-10-14T16:05:57.0030435Z ./add-property.html
+build	Upload artifact	2026-10-14T16:05:57.0030873Z ##[endgroup]
+build	Upload artifact	2026-10-14T16:05:57.0043558Z ##[end-action id=__actions_upload-pages-artifact.__run;outcome=success;conclusion=success;duration_ms=60]
+build	Upload artifact	2026-10-14T16:05:57.0046810Z ##[start-action display=Archive artifact;id=__actions_upload-pages-artifact.__run_2]
+build	Upload artifact	2026-10-14T16:05:57.0051078Z ##[end-action id=__actions_upload-pages-artifact.__run_2;outcome=skipped;conclusion=skipped;duration_ms=0]
+build	Upload artifact	2026-10-14T16:05:57.0053070Z ##[start-action display=Archive artifact;id=__actions_upload-pages-artifact.__run_3]
+build	Upload artifact	2026-10-14T16:05:57.0055919Z ##[end-action id=__actions_upload-pages-artifact.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]
+build	Upload artifact	2026-10-14T16:05:57.0057191Z ##[start-action display=Upload artifact;id=__actions_upload-pages-artifact.upload-artifact]
+build	Upload artifact	2026-10-14T16:05:57.0113190Z ##[group]Run actions/upload-artifact@v4
+build	Upload artifact	2026-10-14T16:05:57.0113270Z with:
+build	Upload artifact	2026-10-14T16:05:57.0113360Z   name: github-pages
+build	Upload artifact	2026-10-14T16:05:57.0113463Z   path: /home/runner/work/_temp/artifact.tar
+build	Upload artifact	2026-10-14T16:05:57.0113545Z   retention-days: 1
+build	Upload artifact	2026-10-14T16:05:57.0113622Z   if-no-files-found: error
+build	Upload artifact	2026-10-14T16:05:57.0113702Z   compression-level: 6
+build	Upload artifact	2026-10-14T16:05:57.0113933Z   overwrite: false
+build	Upload artifact	2026-10-14T16:05:57.0114008Z   include-hidden-files: false
+build	Upload artifact	2026-10-14T16:05:57.0114086Z ##[endgroup]
+build	Upload artifact	2026-10-14T16:05:57.1415992Z (node:2276) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+build	Upload artifact	2026-10-14T16:05:57.1416708Z (Use `node --trace-deprecation ...` to show where the warning was created)
+build	Upload artifact	2026-10-14T16:05:57.1452838Z With the provided path, there will be 1 file uploaded
+build	Upload artifact	2026-10-14T16:05:57.1470960Z Artifact name is valid!
+build	Upload artifact	2026-10-14T16:05:57.1471273Z Root directory input is valid!
+build	Upload artifact	2026-10-14T16:05:57.4832215Z Beginning upload of artifact content to blob storage
+build	Upload artifact	2026-10-14T16:05:57.6636218Z (node:2276) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+build	Upload artifact	2026-10-14T16:05:58.2887519Z Uploaded bytes 2559200
+build	Upload artifact	2026-10-14T16:05:58.4371148Z Finished uploading artifact content to blob storage!
+build	Upload artifact	2026-10-14T16:05:58.4371997Z SHA256 digest of uploaded artifact zip is 91ab0f9613056a190cb8b9c99146ea2e41f9826bc014f4d3bd254570a4e758bf
+build	Upload artifact	2026-10-14T16:05:58.4373018Z Finalizing artifact upload
+build	Upload artifact	2026-10-14T16:05:58.7329059Z Artifact github-pages.zip successfully finalized. Artifact ID 11908384558
+build	Upload artifact	2026-10-14T16:05:58.7330005Z Artifact github-pages has been successfully uploaded! Final size is 2559200 bytes. Artifact ID is 11908384558
+build	Upload artifact	2026-10-14T16:05:58.7335335Z Artifact download URL: https://github.com/AHMEDVALL70/himmat.sa/actions/runs/38595122368/artifacts/11908384558
+build	Upload artifact	2026-10-14T16:05:58.7435942Z ##[end-action id=__actions_upload-pages-artifact.upload-artifact;outcome=success;conclusion=success;duration_ms=1737]
+build	Post Checkout	﻿2026-10-14T16:05:58.7533952Z Post job cleanup.
+build	Post Checkout	2026-10-14T16:05:58.8211199Z [command]/usr/bin/git version
+build	Post Checkout	2026-10-14T16:05:58.8246299Z git version 2.55.0
+build	Post Checkout	2026-10-14T16:05:58.8279283Z Temporarily overriding HOME='/home/runner/work/_temp/2a5db9d5-be66-4ac4-af8d-92a43defb3a5' before making global git config changes
+build	Post Checkout	2026-10-14T16:05:58.8280411Z Adding repository directory to the temporary git global config as a safe directory
+build	Post Checkout	2026-10-14T16:05:58.8283381Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/himmat.sa/himmat.sa
+build	Post Checkout	2026-10-14T16:05:58.8308753Z Removing SSH command configuration
+build	Post Checkout	2026-10-14T16:05:58.8313859Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+build	Post Checkout	2026-10-14T16:05:58.8343154Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+build	Post Checkout	2026-10-14T16:05:58.8551764Z Removing HTTP extra header
+build	Post Checkout	2026-10-14T16:05:58.8559398Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+build	Post Checkout	2026-10-14T16:05:58.8588284Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+build	Post Checkout	2026-10-14T16:05:58.8806368Z Removing includeIf entries pointing to credentials config files
+build	Post Checkout	2026-10-14T16:05:58.8813060Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+build	Post Checkout	2026-10-14T16:05:58.8838268Z includeif.gitdir:/home/runner/work/himmat.sa/himmat.sa/.git.path
+build	Post Checkout	2026-10-14T16:05:58.8839127Z includeif.gitdir:/home/runner/work/himmat.sa/himmat.sa/.git/worktrees/*.path
+build	Post Checkout	2026-10-14T16:05:58.8840006Z includeif.gitdir:/github/workspace/.git.path
+build	Post Checkout	2026-10-14T16:05:58.8840694Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+build	Post Checkout	2026-10-14T16:05:58.8846097Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/himmat.sa/himmat.sa/.git.path
+build	Post Checkout	2026-10-14T16:05:58.8869719Z /home/runner/work/_temp/git-credentials-780e3fbc-2f25-4f71-92ce-4b93567a2858.config
+build	Post Checkout	2026-10-14T16:05:58.8878365Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/himmat.sa/himmat.sa/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-780e3fbc\-2f25\-4f71\-92ce\-4b93567a2858\.config
+build	Post Checkout	2026-10-14T16:05:58.8913356Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/himmat.sa/himmat.sa/.git/worktrees/*.path
+build	Post Checkout	2026-10-14T16:05:58.8948869Z /home/runner/work/_temp/git-credentials-780e3fbc-2f25-4f71-92ce-4b93567a2858.config
+build	Post Checkout	2026-10-14T16:05:58.8956407Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/himmat.sa/himmat.sa/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-780e3fbc\-2f25\-4f71\-92ce\-4b93567a2858\.config
+build	Post Checkout	2026-10-14T16:05:58.8988933Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+build	Post Checkout	2026-10-14T16:05:58.9011186Z /github/runner_temp/git-credentials-780e3fbc-2f25-4f71-92ce-4b93567a2858.config
+build	Post Checkout	2026-10-14T16:05:58.9017562Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-780e3fbc\-2f25\-4f71\-92ce\-4b93567a2858\.config
+build	Post Checkout	2026-10-14T16:05:58.9049274Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+build	Post Checkout	2026-10-14T16:05:58.9071307Z /github/runner_temp/git-credentials-780e3fbc-2f25-4f71-92ce-4b93567a2858.config
+build	Post Checkout	2026-10-14T16:05:58.9077595Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-780e3fbc\-2f25\-4f71\-92ce\-4b93567a2858\.config
+build	Post Checkout	2026-10-14T16:05:58.9110809Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+build	Post Checkout	2026-10-14T16:05:58.9295566Z Removing credentials config '/home/runner/work/_temp/git-credentials-780e3fbc-2f25-4f71-92ce-4b93567a2858.config'
+build	Complete job	﻿2026-10-14T16:05:58.9416870Z Cleaning up orphan processes
+build	Complete job	2026-10-14T16:05:58.9649177Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/upload-artifact@v4. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/
+report-build-status	Set up job	﻿2026-10-14T16:06:03.8382216Z Current runner version: '2.337.0'
+report-build-status	Set up job	2026-10-14T16:06:03.8410676Z ##[group]Runner Image Provisioner
+report-build-status	Set up job	2026-10-14T16:06:03.8411628Z Hosted Compute Agent
+report-build-status	Set up job	2026-10-14T16:06:03.8412261Z Version: 20261002.596
+report-build-status	Set up job	2026-10-14T16:06:03.8412923Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+report-build-status	Set up job	2026-10-14T16:06:03.8413726Z Build Date: 2026-10-02T22:28:27Z
+report-build-status	Set up job	2026-10-14T16:06:03.8414426Z Worker ID: {33f5ea10-e5da-4bc2-91dd-f81451c207b2}
+report-build-status	Set up job	2026-10-14T16:06:03.8415188Z Region: eastus
+report-build-status	Set up job	2026-10-14T16:06:03.8415731Z Cloud: Azure
+report-build-status	Set up job	2026-10-14T16:06:03.8416247Z ##[endgroup]
+report-build-status	Set up job	2026-10-14T16:06:03.8418085Z ##[group]Operating System
+report-build-status	Set up job	2026-10-14T16:06:03.8418766Z Ubuntu
+report-build-status	Set up job	2026-10-14T16:06:03.8419357Z 24.04.5
+report-build-status	Set up job	2026-10-14T16:06:03.8419924Z LTS
+report-build-status	Set up job	2026-10-14T16:06:03.8420420Z ##[endgroup]
+report-build-status	Set up job	2026-10-14T16:06:03.8421072Z ##[group]Runner Image
+report-build-status	Set up job	2026-10-14T16:06:03.8421673Z Image: ubuntu-24.04
+report-build-status	Set up job	2026-10-14T16:06:03.8422268Z Version: 20261004.327.1
+report-build-status	Set up job	2026-10-14T16:06:03.8423403Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+report-build-status	Set up job	2026-10-14T16:06:03.8425239Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+report-build-status	Set up job	2026-10-14T16:06:03.8426221Z ##[endgroup]
+report-build-status	Set up job	2026-10-14T16:06:03.8427831Z ##[group]GITHUB_TOKEN Permissions
+report-build-status	Set up job	2026-10-14T16:06:03.8430197Z Contents: read
+report-build-status	Set up job	2026-10-14T16:06:03.8430926Z Metadata: read
+report-build-status	Set up job	2026-10-14T16:06:03.8431513Z Pages: write
+report-build-status	Set up job	2026-10-14T16:06:03.8432048Z ##[endgroup]
+report-build-status	Set up job	2026-10-14T16:06:03.8434564Z Secret source: Actions
+report-build-status	Set up job	2026-10-14T16:06:03.8435597Z Cache mode: read
+report-build-status	Set up job	2026-10-14T16:06:03.8436611Z Prepare workflow directory
+report-build-status	Set up job	2026-10-14T16:06:03.8773950Z Prepare all required actions
+report-build-status	Set up job	2026-10-14T16:06:03.8878661Z Complete job name: report-build-status
+report-build-status	Report Build Status	﻿2026-10-14T16:06:04.5102313Z ##[group]Run gh api -X POST "repos/$GITHUB_REPOSITORY/pages/telemetry" \
+report-build-status	Report Build Status	2026-10-14T16:06:04.5103699Z ^[[36;1mgh api -X POST "repos/$GITHUB_REPOSITORY/pages/telemetry" \^[[0m
+report-build-status	Report Build Status	2026-10-14T16:06:04.5104717Z ^[[36;1m  -F github_run_id="$GITHUB_RUN_ID" \^[[0m
+report-build-status	Report Build Status	2026-10-14T16:06:04.5105500Z ^[[36;1m  -F conclusion="$CONCLUSION"^[[0m
+report-build-status	Report Build Status	2026-10-14T16:06:04.6301249Z shell: /usr/bin/bash -e {0}
+report-build-status	Report Build Status	2026-10-14T16:06:04.6302480Z env:
+report-build-status	Report Build Status	2026-10-14T16:06:04.6308394Z   GITHUB_TOKEN: ***
+report-build-status	Report Build Status	2026-10-14T16:06:04.6309235Z   CONCLUSION: success
+report-build-status	Report Build Status	2026-10-14T16:06:04.6309956Z ##[endgroup]
+report-build-status	Report Build Status	2026-10-14T16:06:09.1324112Z {}
+report-build-status	Complete job	﻿2026-10-14T16:06:09.1486711Z Cleaning up orphan processes
+deploy	Set up job	﻿2026-10-14T16:06:05.3081318Z Current runner version: '2.337.0'
+deploy	Set up job	2026-10-14T16:06:05.3100121Z ##[group]Runner Image Provisioner
+deploy	Set up job	2026-10-14T16:06:05.3100680Z Hosted Compute Agent
+deploy	Set up job	2026-10-14T16:06:05.3101030Z Version: 20261002.596
+deploy	Set up job	2026-10-14T16:06:05.3101470Z Commit: c3d12f3313a95f25162a1503be624f3b0617f8c0
+deploy	Set up job	2026-10-14T16:06:05.3101909Z Build Date: 2026-10-02T22:28:27Z
+deploy	Set up job	2026-10-14T16:06:05.3102391Z Worker ID: {2a091e61-76af-490d-8337-4b810c971bc4}
+deploy	Set up job	2026-10-14T16:06:05.3102856Z Region: westus3
+deploy	Set up job	2026-10-14T16:06:05.3103185Z Cloud: Azure
+deploy	Set up job	2026-10-14T16:06:05.3103565Z ##[endgroup]
+deploy	Set up job	2026-10-14T16:06:05.3104361Z ##[group]Operating System
+deploy	Set up job	2026-10-14T16:06:05.3104765Z Ubuntu
+deploy	Set up job	2026-10-14T16:06:05.3105098Z 24.04.5
+deploy	Set up job	2026-10-14T16:06:05.3105418Z LTS
+deploy	Set up job	2026-10-14T16:06:05.3105770Z ##[endgroup]
+deploy	Set up job	2026-10-14T16:06:05.3106110Z ##[group]Runner Image
+deploy	Set up job	2026-10-14T16:06:05.3106553Z Image: ubuntu-24.04
+deploy	Set up job	2026-10-14T16:06:05.3106912Z Version: 20261004.327.1
+deploy	Set up job	2026-10-14T16:06:05.3107628Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261004.327/images/ubuntu/Ubuntu2404-Readme.md
+deploy	Set up job	2026-10-14T16:06:05.3108728Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261004.327
+deploy	Set up job	2026-10-14T16:06:05.3109649Z ##[endgroup]
+deploy	Set up job	2026-10-14T16:06:05.3110379Z ##[group]GITHUB_TOKEN Permissions
+deploy	Set up job	2026-10-14T16:06:05.3111856Z Contents: read
+deploy	Set up job	2026-10-14T16:06:05.3112224Z Metadata: read
+deploy	Set up job	2026-10-14T16:06:05.3112600Z Pages: write
+deploy	Set up job	2026-10-14T16:06:05.3112979Z ##[endgroup]
+deploy	Set up job	2026-10-14T16:06:05.3114314Z Secret source: Actions
+deploy	Set up job	2026-10-14T16:06:05.3114927Z Cache mode: read
+deploy	Set up job	2026-10-14T16:06:05.3115603Z Prepare workflow directory
+deploy	Set up job	2026-10-14T16:06:05.3326654Z Prepare all required actions
+deploy	Set up job	2026-10-14T16:06:05.3357749Z Getting action download info
+deploy	Set up job	2026-10-14T16:06:05.6325754Z Download action repository 'actions/deploy-pages@v5' (SHA:368f82528645a54fb793d4d04e342629a3f51346)
+deploy	Set up job	2026-10-14T16:06:06.6473290Z Complete job name: deploy
+deploy	Deploy to GitHub Pages	﻿2026-10-14T16:06:06.7083104Z ##[group]Run actions/deploy-pages@v5
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:06.7084074Z with:
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:06.7090106Z   token: ***
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:06.7090680Z   timeout: 600000
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:06.7091243Z   error_count: 10
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:06.7091828Z   reporting_interval: 5000
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:06.7092499Z   artifact_name: github-pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:06.7093181Z   preview: false
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:06.7093823Z ##[endgroup]
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:06.8430871Z (node:1982) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:06.8432832Z (Use `node --trace-deprecation ...` to show where the warning was created)
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:07.0933257Z Fetching artifact metadata for "github-pages" in this workflow run
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:07.3249147Z Found 1 artifact(s)
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:07.3258206Z Creating Pages deployment with payload:
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:07.3258449Z {
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:07.3258630Z 	"artifact_id": 11908384558,
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:07.3259142Z 	"pages_build_version": "55614a6007e6146039504282c85a502b11135445",
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:07.3278466Z 	"oidc_token": "***"
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:07.3278712Z }
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:09.7076776Z Created deployment for 55614a6007e6146039504282c85a502b11135445, ID: 55614a6007e6146039504282c85a502b11135445
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:14.3025759Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:14.4833734Z Current status: deployment_queued
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:20.5946238Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:20.9019017Z Current status: syncing_files
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:32.4875576Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:32.8657322Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:47.8287257Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:06:48.1368197Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:07:12.3781297Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:07:12.8357913Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:07:38.1464070Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:07:38.9102260Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:08:08.4856533Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:08:09.4255947Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:08:36.3819749Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:08:36.7874177Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:09:12.7805214Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:09:13.1136884Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:09:47.7431157Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:09:48.0400889Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:10:13.8953858Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:10:14.4184783Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:10:49.1039610Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:10:50.8060390Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:11:21.6870453Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:11:22.0542875Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:11:57.2347398Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:11:57.6022821Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:12:32.8716541Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:12:33.2313675Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:13:02.2115773Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:13:02.5066623Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:13:35.0046762Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:13:35.3285952Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:14:05.5392151Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:14:05.8521782Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:14:38.7958658Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:14:39.1348276Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:15:09.9023494Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:15:10.5565123Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:15:44.0905887Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:15:45.0241190Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:16:12.7984404Z Getting Pages deployment status...
+deploy	Deploy to GitHub Pages	2026-10-14T16:16:13.1254280Z Current status: updating_pages
+deploy	Deploy to GitHub Pages	2026-10-14T16:16:13.1272042Z ##[error]Timeout reached, aborting!
+deploy	Deploy to GitHub Pages	2026-10-14T16:16:13.1276977Z ##[error]Timeout reached, aborting!
+deploy	Deploy to GitHub Pages	2026-10-14T16:16:13.1277386Z Canceling Pages deployment...
+deploy	Deploy to GitHub Pages	2026-10-14T16:16:14.3810441Z Canceled deployment with ID 55614a6007e6146039504282c85a502b11135445
+deploy	Complete job	﻿2026-10-14T16:16:14.4013400Z Evaluate and set environment url
+deploy	Complete job	2026-10-14T16:16:14.4016780Z Evaluated environment url: https://himmat.sa/
+deploy	Complete job	2026-10-14T16:16:14.4017246Z Cleaning up orphan processes
