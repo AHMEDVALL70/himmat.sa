@@ -166,6 +166,9 @@ function buildOfferHtml(template, offer) {
   const url = `${SITE_ORIGIN}/offer/${offer.id}/`;
 
   let html = template;
+  // صفحة العرض لا تعرض صورة الغلاف (hero) فلا داعي لتحميلها مسبقاً — القالب (index.html)
+  // يحمّلها preload للرئيسية، فنحذفها هنا (2026-10-14: تحذير preload بالكونسول + توفير تحميل).
+  html = html.replace(/<link rel="preload" as="image" href="\/assets\/images\/hero-madinah-[^"]*"[^>]*>\n?/g, "");
   // الصفحة منسوخة داخل مجلد فرعي (offer/<id>/)، فالروابط النسبية
   // بالملف الأصلي (style.css, js/site.js...) تنكسر بدون هذا السطر —
   // <base> يخلي المتصفح يقرأها دايماً من جذر الموقع (2026-09-23،
