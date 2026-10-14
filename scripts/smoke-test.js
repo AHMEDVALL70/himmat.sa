@@ -1085,6 +1085,28 @@ const CHECKS = [
     if (back.Sheets["العقود"]["P2"].t !== "n" || back.Sheets["العقود"]["P2"].v !== 24000) return "خلية الإيجار يجب أن تكون رقماً";
     return true;
   }],
+  // #50 (2026-10-14) تنظيف الصور اليتيمة صار مجدولاً أسبوعياً (jobid 10، الأحد 01:30 UTC):
+  // لا يُعرض «غير مجدولة»، ومهلته 9 أيام مثل باقي الأسبوعيات حتى تظهر ⚠️ لو توقّف، وملخصه سليم
+  ["لوحة الإدارة: تنظيف الصور اليتيمة مجدول أسبوعياً (لا «غير مجدولة»، مهلة 9 أيام، رسالة تأخر، ملخص الحذف/التجربة)", async () => {
+    const js = fs.readFileSync(path.join(ROOT, "js", "admin.js"), "utf8");
+    const a = js.indexOf("const JOB_LABELS"), b = js.indexOf("async function loadJobStatus");
+    if (a < 0 || b < a) return "JOB_LABELS غير موجودة";
+    const dom = new JSDOM("<div></div>", { runScripts: "outside-only" });
+    dom.window.eval(js.slice(a, b) + "; window.__J = JOB_LABELS;");
+    const j = dom.window.__J["purge-orphan-images"];
+    if (!j) return "purge-orphan-images غير مدرج بـJOB_LABELS";
+    if (j.unscheduled) return "ما زالت معلَّمة unscheduled — اللوحة تعرض «غير مجدولة» ولن تنبّه لو توقفت";
+    if (j.maxAgeHours !== 24 * 9) return "المهلة يجب أن تكون 9 أيام: " + j.maxAgeHours;
+    if (!/أسبوع/.test(j.lateNote || "")) return "رسالة التأخر الأسبوعية غير موجودة";
+    if (!/أسبوعياً/.test(j.label)) return "العنوان يجب أن يذكر أنها أسبوعية: " + j.label;
+    const applied = j.extra({ mode: "apply", deleted: 1, orphans: 1, total_files: 7 });
+    if (!/حُذف 1 من 7 ملف/.test(applied)) return "ملخص الحذف خاطئ: " + applied;
+    const dry = j.extra({ mode: "dry", orphans: 0, total_files: 6 });
+    if (!/تجربة: 0 يتيمة من 6 ملف/.test(dry)) return "ملخص التجربة خاطئ: " + dry;
+    if (j.extra(null) !== "" || j.extra({}) !== "") return "extra يجب أن يرجع نصاً فارغاً بلا ملخص";
+    if (/undefined|NaN/.test(applied + dry)) return "ظهور undefined/NaN";
+    return true;
+  }],
 ];
 
 (async () => {
