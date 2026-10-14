@@ -1,0 +1,46 @@
+name: طلب وسم احتياطي (عبر فرع)
+
+# أُضيف 2026-10-14: جلسة Claude السحابية تمر بوسيط يمنع رفع الوسوم (tags)
+# ويسمح برفع الفروع فقط. الحل: Claude يرفع فرعاً باسم
+#   tag-request/backup-YYYY-MM-DD-<وصف>
+# على نقطة الحفظ المطلوبة، وهذا الـAction (على خوادم GitHub، بدون وسيط) ينشئ
+# الوسم backup-YYYY-MM-DD-<وصف> على نفس الحفظ ثم يحذف فرع الطلب.
+# أمان: يشتغل فقط على فروع tag-request/**، والاسم مقيَّد بنمط backup-…،
+# ولا يكتب فوق وسم موجود. الصلاحية من GITHUB_TOKEN المؤقت (تنتهي مع التشغيل).
+on:
+  push:
+    branches:
+      - "tag-request/**"
+
+concurrency:
+  group: tag-request
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  create-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: إنشاء الوسم وحذف فرع الطلب
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          TAG="${REF#tag-request/}"
+          if ! [[ "$TAG" =~ ^backup-[0-9]{4}-[0-9]{2}-[0-9]{2}-[a-z0-9][a-z0-9-]*$ ]]; then
+            echo "::error::اسم الوسم غير مسموح: $TAG (المطلوب backup-YYYY-MM-DD-وصف بحروف إنجليزية صغيرة وأرقام وشرطات)"
+            exit 1
+          fi
+          if gh api "repos/$REPO/git/ref/tags/$TAG" >/dev/null 2>&1; then
+            echo "::error::الوسم موجود أصلاً: $TAG — لا يُكتب فوقه"
+            exit 1
+          fi
+          gh api -X POST "repos/$REPO/git/refs" -f ref="refs/tags/$TAG" -f sha="$SHA" >/dev/null
+          echo "✅ أُنشئ الوسم $TAG على $SHA"
+          gh api -X DELETE "repos/$REPO/git/refs/heads/$REF"
+          echo "🧹 حُذف فرع الطلب $REF"

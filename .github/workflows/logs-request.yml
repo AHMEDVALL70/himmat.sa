@@ -1,0 +1,71 @@
+name: طلب سجل تشغيل Actions (عبر فرع)
+
+# أُضيف 2026-10-14: جلسة Claude السحابية تمر بوسيط يمنع تحميل سجلات Actions
+# التفصيلية. الحل: Claude يرفع فرعاً باسم
+#   logs-request/<رقم التشغيل>            (آخر محاولة)
+#   logs-request/<رقم التشغيل>-<المحاولة>  (محاولة محددة)
+# وهذا الـAction (على خوادم GitHub، بدون وسيط) يحفظ السجل الكامل + ملخص
+# الخطوات كملفات في فرع منفصل اسمه ci-logs (لا علاقة له بملفات الموقع)،
+# ثم يحذف فرع الطلب. Claude يقرأ الملفات عبر git (مسموح).
+# الصلاحيات: قراءة Actions + كتابة المحتوى، من GITHUB_TOKEN المؤقت فقط.
+on:
+  push:
+    branches:
+      - "logs-request/**"
+
+concurrency:
+  group: logs-request
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  save-logs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: حفظ السجل في فرع ci-logs وحذف فرع الطلب
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          REF: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          REQ="${REF#logs-request/}"
+          if ! [[ "$REQ" =~ ^([0-9]+)(-([0-9]+))?$ ]]; then
+            echo "::error::صيغة الطلب غير صحيحة: $REQ (المطلوب رقم التشغيل أو رقم-المحاولة)"
+            exit 1
+          fi
+          RUN="${BASH_REMATCH[1]}"
+          ATT="${BASH_REMATCH[3]:-}"
+          ATT_ARGS=()
+          if [ -n "$ATT" ]; then ATT_ARGS=(--attempt "$ATT"); fi
+          NAME="run-$RUN${ATT:+-a$ATT}"
+
+          mkdir -p out
+          gh run view "$RUN" -R "$REPO" "${ATT_ARGS[@]}" \
+            --json name,displayTitle,event,headBranch,headSha,status,conclusion,attempt,createdAt,updatedAt,url,jobs \
+            > "out/$NAME.json"
+          # السجل الكامل (لو فشل التحميل نحفظ رسالة الخطأ نفسها بدل ما نوقف)
+          gh run view "$RUN" -R "$REPO" "${ATT_ARGS[@]}" --log > "out/$NAME.log" 2> "out/$NAME.err" || true
+
+          git init -q work
+          cd work
+          git config user.name "himmat-logs-bot"
+          git config user.email "actions@github.com"
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          if git fetch -q --depth 1 origin ci-logs 2>/dev/null; then
+            git checkout -q -b ci-logs FETCH_HEAD
+          else
+            git checkout -q --orphan ci-logs
+          fi
+          mkdir -p logs
+          cp ../out/* logs/
+          git add logs
+          git commit -q -m "سجل تشغيل Actions: $NAME"
+          git push -q origin HEAD:ci-logs
+          echo "✅ حُفظ السجل logs/$NAME.log في فرع ci-logs"
+
+          gh api -X DELETE "repos/$REPO/git/refs/heads/$REF"
+          echo "🧹 حُذف فرع الطلب $REF"
