@@ -429,7 +429,8 @@ nav.links a.active::after{content:"";position:absolute;right:0;left:0;bottom:-16
 /* Services */
 .service-card{padding:24px}
 .service-card .ic{width:46px;height:46px;border-radius:12px;background:var(--gold-100);display:flex;align-items:center;justify-content:center;color:var(--navy-900);margin-bottom:14px}
-.service-card h4{margin:0 0 6px}
+.service-card h3,.service-card h4{margin:0 0 6px}
+.service-card h3{font-size:1em;font-family:inherit}
 .service-card p{color:var(--text-600);font-size:14px;margin:0}
 
 /* Tabs */
@@ -611,7 +612,11 @@ nav.links a.active::after{content:"";position:absolute;right:0;left:0;bottom:-16
 .assist-input button:hover{background:var(--navy-700)}
 
 footer.site{background:#101827;color:var(--text-600);padding:48px 0 100px;margin-top:40px}
-footer.site h4{color:#fff;margin:0 0 10px}
+footer.site h3,footer.site h4{color:#fff;margin:0 0 10px}
+/* 2026-10-14: عناوين التذييل و«رحلتك معنا» و«من نحن» و«المؤشر» وبطاقات الخدمات صارت h3 (ترتيب عناوين صحيح لقارئ الشاشة بعد h2)
+   بنفس شكل h4 السابق تماماً: حجم 1em، خط النص العادي، وهوامش h4 الافتراضية لعناوين الرحلة. */
+footer.site h3{font-size:1em;font-family:inherit}
+.as-h4{font-size:1em;font-family:inherit;margin-block:1.33em}
 footer.site a{color:var(--text-600);transition:color .15s ease}
 footer.site a:hover{color:var(--gold-500)}
 footer.site .bottom{border-top:1px solid rgba(255,255,255,.12);margin-top:26px;padding-top:16px;font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
@@ -898,22 +903,22 @@ footer.site .bottom span{overflow-wrap:break-word;word-break:break-word;min-widt
     <div class="grid grid-4">
       <div class="card about-card fade-up" style="padding:22px;text-align:center">
         <div class="about-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16" y2="16"/></svg></div>
-        <h4 data-i18n="journey1_title">تصفّح</h4>
+        <h3 class="as-h4" data-i18n="journey1_title">تصفّح</h3>
         <p style="color:var(--text-600);font-size:13.5px" data-i18n="journey1_text">عقارات حقيقية بأسعار شفافة، محدَّثة أولاً بأول.</p>
       </div>
       <div class="card about-card fade-up" style="padding:22px;text-align:center">
         <div class="about-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
-        <h4 data-i18n="journey2_title">تواصل بثقة</h4>
+        <h3 class="as-h4" data-i18n="journey2_title">تواصل بثقة</h3>
         <p style="color:var(--text-600);font-size:13.5px" data-i18n="journey2_text">فريق محلي يجاوبك بوضوح، بدون ضغط أو تسرّع.</p>
       </div>
       <div class="card about-card fade-up" style="padding:22px;text-align:center">
         <div class="about-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
-        <h4 data-i18n="journey3_title">عقد موثّق</h4>
+        <h3 class="as-h4" data-i18n="journey3_title">عقد موثّق</h3>
         <p style="color:var(--text-600);font-size:13.5px" data-i18n="journey3_text">كل بند واضح ومكتوب قبل ما توقّع — بدون تعقيد.</p>
       </div>
       <div class="card about-card fade-up" style="padding:22px;text-align:center">
         <div class="about-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="5"/><path d="M10.5 11.5L21 22M18 19l3-3M15 16l3-3"/></svg></div>
-        <h4 data-i18n="journey4_title">مفتاحك بيدك</h4>
+        <h3 class="as-h4" data-i18n="journey4_title">مفتاحك بيدك</h3>
         <p style="color:var(--text-600);font-size:13.5px" data-i18n="journey4_text">نرافقك للخطوة الأخيرة، بثقة من البداية للنهاية.</p>
       </div>
     </div>
@@ -1018,7 +1023,7 @@ footer.site .bottom span{overflow-wrap:break-word;word-break:break-word;min-widt
 
     <div class="card" style="margin-top:32px;padding:22px">
       <h3 style="margin:0 0 10px" data-i18n="map_title">الخريطة العقارية</h3>
-      <iframe src="https://www.google.com/maps?q=24.8047853,46.6833618&output=embed" width="100%" height="320" style="border:0;border-radius:12px" loading="lazy"></iframe>
+      <iframe title="خريطة المدينة المنورة" src="https://www.google.com/maps?q=%D8%A7%D9%84%D9%85%D8%AF%D9%8A%D9%86%D8%A9%20%D8%A7%D9%84%D9%85%D9%86%D9%88%D8%B1%D8%A9&z=11&output=embed" width="100%" height="320" style="border:0;border-radius:12px" loading="lazy"></iframe>
     </div>
   </div>
 </section>
@@ -1274,7 +1279,7 @@ footer.site .bottom span{overflow-wrap:break-word;word-break:break-word;min-widt
         </table>
       </div>
       <div class="card" style="padding:18px">
-        <h4 style="margin:0 0 16px" data-i18n="analytics_chart_title">متوسط سعر المتر حسب المدينة</h4>
+        <h3 class="as-h4" style="margin:0 0 16px" data-i18n="analytics_chart_title">متوسط سعر المتر حسب المدينة</h3>
         <div id="analytics-chart"></div>
       </div>
     </div>
@@ -1379,17 +1384,17 @@ footer.site .bottom span{overflow-wrap:break-word;word-break:break-word;min-widt
     <div class="grid grid-3">
       <div class="card about-card fade-up" style="padding:22px;text-align:center">
         <div class="about-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
-        <h4 data-i18n="mission_title">رسالتنا</h4>
+        <h3 class="as-h4" data-i18n="mission_title">رسالتنا</h3>
         <p style="color:var(--text-600);font-size:14px" data-i18n="mission_text">أن نجعل التعامل العقاري أوضح وأسهل وأكثر ثقة، من خلال فهم احتياج العميل، ودراسة الخيارات بعناية، وتقديم خدمات عقارية احترافية في التسويق وإدارة الأملاك وكتابة العقود.</p>
       </div>
       <div class="card about-card fade-up" style="padding:22px;text-align:center">
         <div class="about-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
-        <h4 data-i18n="vision_title">رؤيتنا</h4>
+        <h3 class="as-h4" data-i18n="vision_title">رؤيتنا</h3>
         <p style="color:var(--text-600);font-size:14px" data-i18n="vision_text">أن نكون مرجعاً عقارياً موثوقاً في المدينة المنورة، نختصر على العميل طريق البحث والحيرة، ونضع أمامه المعلومة الواضحة والفرصة المناسبة.</p>
       </div>
       <div class="card about-card fade-up" style="padding:22px;text-align:center">
         <div class="about-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></div>
-        <h4 data-i18n="goal_title">هدفنا</h4>
+        <h3 class="as-h4" data-i18n="goal_title">هدفنا</h3>
         <p style="color:var(--text-600);font-size:14px" data-i18n="goal_text">هدفنا ليس إتمام صفقة فحسب، بل بناء علاقة تبدأ بالثقة وتستمر بجودة الخدمة.</p>
       </div>
     </div>
@@ -1397,7 +1402,7 @@ footer.site .bottom span{overflow-wrap:break-word;word-break:break-word;min-widt
     <div class="card" style="padding:22px;margin-top:24px;border-color:var(--gold-500);display:flex;align-items:center;gap:16px;flex-wrap:wrap">
       <div class="about-icon" style="margin:0"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
       <div>
-        <h4 style="margin:0 0 4px" data-i18n="license_title">الترخيص والاعتماد</h4>
+        <h3 class="as-h4" style="margin:0 0 4px" data-i18n="license_title">الترخيص والاعتماد</h3>
         <p style="color:var(--text-600);font-size:14px;margin:0" data-i18n="license_text">همة المدينة العقارية مرخّصة رسمياً من الهيئة العامة للعقار بالمملكة العربية السعودية — رقم رخصة فال العقارية: 1200030428، وسجل تجاري رقم: 7042103650.</p>
       </div>
     </div>
@@ -1460,7 +1465,7 @@ footer.site .bottom span{overflow-wrap:break-word;word-break:break-word;min-widt
         <p style="margin-top:14px;font-size:13.5px;color:var(--text-600)"><b data-i18n="hours_label">ساعات العمل: </b><span data-i18n="hours_value">الأحد – الخميس: 9ص – 6م · الجمعة والسبت: مغلق</span></p>
         <p><a href="https://wa.me/966530500906" class="btn btn-primary" style="margin-top:8px" target="_blank" rel="noopener" data-i18n="whatsapp_word">واتساب</a></p>
         <div style="margin-top:20px;border-radius:12px;overflow:hidden">
-          <iframe src="https://www.google.com/maps?q=24.4672,39.6111&output=embed" width="100%" height="220" style="border:0" loading="lazy"></iframe>
+          <iframe title="موقع مكتب همة المدينة العقارية على الخريطة" src="https://www.google.com/maps?q=%D8%B7%D8%B1%D9%8A%D9%82%20%D8%A7%D9%84%D9%85%D9%84%D9%83%20%D8%B9%D8%A8%D8%AF%D8%A7%D9%84%D9%84%D9%87%20%D8%A7%D9%84%D9%81%D8%B1%D8%B9%D9%8A%D8%8C%2042321%D8%8C%20%D8%A7%D9%84%D9%85%D8%AF%D9%8A%D9%86%D8%A9%20%D8%A7%D9%84%D9%85%D9%86%D9%88%D8%B1%D8%A9&output=embed" width="100%" height="220" style="border:0" loading="lazy"></iframe>
         </div>
       </div>
       <div class="card" style="padding:22px">
@@ -1491,7 +1496,7 @@ footer.site .bottom span{overflow-wrap:break-word;word-break:break-word;min-widt
   <div class="container">
     <div class="grid grid-4">
       <div>
-        <h4 data-i18n="brand">همة المدينة العقارية</h4>
+        <h3 data-i18n="brand">همة المدينة العقارية</h3>
         <p style="font-size:13px" data-i18n="footer_tag">🕌 شريكك العقاري الموثوق في المدينة المنورة</p>
         <div class="footer-social-row">
           <a href="https://www.tiktok.com/@fadhel_133" target="_blank" rel="noopener" aria-label="TikTok" class="footer-social-icon">
@@ -1519,7 +1524,7 @@ footer.site .bottom span{overflow-wrap:break-word;word-break:break-word;min-widt
         </div>
       </div>
       <div>
-        <h4 data-i18n="footer_quicklinks_title">روابط سريعة</h4>
+        <h3 data-i18n="footer_quicklinks_title">روابط سريعة</h3>
         <p style="font-size:13px"><a href="/" data-i18n="nav_home">الرئيسية</a></p>
         <p style="font-size:13px"><a href="/offers" data-i18n="nav_offers">العروض</a></p>
         <p style="font-size:13px"><a href="/valuation" data-i18n="nav_valuation">المؤشر</a></p>
@@ -1527,14 +1532,14 @@ footer.site .bottom span{overflow-wrap:break-word;word-break:break-word;min-widt
         <p style="font-size:13px"><a href="/contracts" data-i18n="nav_contracts">العقود</a></p>
       </div>
       <div>
-        <h4 data-i18n="footer_services_title">الخدمات</h4>
+        <h3 data-i18n="footer_services_title">الخدمات</h3>
         <p style="font-size:13px"><a href="/offers" data-i18n="footer_svc_1">البيع والشراء</a></p>
         <p style="font-size:13px"><a href="/valuation" data-i18n="footer_svc_2">مؤشر الأسعار العقارية</a></p>
         <p style="font-size:13px"><a href="/contracts" data-i18n="footer_svc_3">كتابة العقود</a></p>
         <p style="font-size:13px"><a href="/services" data-i18n="footer_svc_4">إدارة الأملاك</a></p>
       </div>
       <div>
-        <h4 data-i18n="footer_contact_title">تواصل سريع</h4>
+        <h3 data-i18n="footer_contact_title">تواصل سريع</h3>
         <p style="font-size:13px"><a href="tel:+966530500906">+966 530 500 906</a></p>
         <p style="font-size:13px"><a href="mailto:Fadhel-906@hotmail.com">Fadhel-906@hotmail.com</a></p>
         <p style="font-size:13px"><a href="/privacy" data-i18n="footer_privacy">سياسة الخصوصية</a></p>
@@ -1622,7 +1627,7 @@ footer.site .bottom span{overflow-wrap:break-word;word-break:break-word;min-widt
   <div id="turnstile-container" style="display:none"></div>
 </div>
 
-<script src="js/site.js?v=20261013a"></script>
+<script src="js/site.js?v=20261014a"></script>
 <div id="contract-print-view" class="hide">
   <div class="print-header">
     <picture>
