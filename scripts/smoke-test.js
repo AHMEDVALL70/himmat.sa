@@ -1131,6 +1131,24 @@ const CHECKS = [
       if (!css.includes(rule)) return "قاعدة CSS للحفاظ على الشكل مفقودة: " + rule;
     return true;
   }],
+  // #52 (2026-10-15) PageSpeed الحي 96: عنوان بطاقة العرض h4 بعد h2 (يُبنى من بيانات حية فلم يظهر بالفحص المحلي)،
+  // وغياب معلم <main>. الآن: بطاقة العرض h3 بنفس الشكل، و<main> واحد يلف المحتوى بين الهيدر والتذييل.
+  ["سهولة الاستخدام: <main> واحد بين الهيدر والتذييل يحتوي #home، وعنوان بطاقة العرض h3 بنفس الشكل", async (P) => {
+    const html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
+    const opens = (html.match(/<main[\s>]/g) || []).length, closes = (html.match(/<\/main>/g) || []).length;
+    if (opens !== 1 || closes !== 1) return `المتوقع <main> واحد: فتح ${opens} إغلاق ${closes}`;
+    const iH = html.indexOf("</header>"), iM = html.indexOf("<main"), iHome = html.indexOf('<div id="home">'), iEnd = html.indexOf("</main>"), iF = html.indexOf('<footer class="site">');
+    if (!(iH < iM && iM < iHome && iHome < iEnd && iEnd < iF)) return "ترتيب الهيدر/main/#home/التذييل غير صحيح";
+    const w = P.home.w;
+    const main = w.document.querySelector("main");
+    if (!main || !main.contains(w.document.getElementById("home")) || !main.contains(w.document.getElementById("offers"))) return "main لا يحتوي الأقسام بعد التحميل";
+    const card = w.document.querySelector(".offer-card .offer-body h3, .offer-card .offer-body h4");
+    if (!card) return "بطاقة العرض لم تُبنَ من البيانات التجريبية";
+    if (card.tagName !== "H3") return "عنوان بطاقة العرض ما زال " + card.tagName;
+    const css = fs.readFileSync(path.join(ROOT, "css", "site.css"), "utf8");
+    if (!css.includes(".offer-body h3{font-size:1em;font-family:inherit}") || !css.includes(".offer-card:hover .offer-body h3")) return "قواعد CSS للحفاظ على شكل عنوان البطاقة مفقودة";
+    return true;
+  }],
 ];
 
 (async () => {

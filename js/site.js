@@ -1080,7 +1080,7 @@ function offerCardHtml(o, matchScore){
     <div class="offer-body">
       ${matchBadge}
       ${licenseBadge}
-      <h4>${typeLabel(o.property_type)} · ${districtLabel(o.district)}</h4>
+      <h3>${typeLabel(o.property_type)} · ${districtLabel(o.district)}</h3>
       <div class="loc">${o.city} — ${o.area_sqm} م² · ${o.rooms} ${t.rooms_suffix}</div>
       ${priceHtml}
       <button type="button" class="offer-details-btn" data-offer-key="${key}">${t.detail_view_btn}</button>
