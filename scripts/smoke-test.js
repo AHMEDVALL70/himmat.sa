@@ -1170,8 +1170,7 @@ const CHECKS = [
     if (ids.join() !== "1") return `«عقارات في المدينة المنورة»: المتوقع [1] (فيلا العيون فقط، لا جدة) والنتيجة [${ids}]`;
     ids = await ask("عندكم عقارات في الرياض؟");
     if (ids.length) return `الرياض: ما عندنا عروض لكن طلعت [${ids}]`;
-    ids = await ask("ابغي فيلا تحت 2مليون");
-    if (ids.length) return `فيلا تحت 2 مليون: المفروض لا نتائج والنتيجة [${ids}]`;
+    // (#54 يغطي «فيلا تحت 2 مليون» = أقرب المتاح)
     ids = await ask("فيلا في الرياض");
     if (ids.length) return `فيلا في الرياض: المفروض لا نتائج والنتيجة [${ids}]`;
     // Gemini يصنّفه «قسم العروض» والسؤال فيه مدينة لكن بلا كلمة عقار عامة ← البطاقات تظهر تحت الرد الثابت
@@ -1184,6 +1183,45 @@ const CHECKS = [
     aiReply = "الأسعار ...";
     ids = await ask("أسعار العقار بالمدينة المنورة");
     if (ids.length) return `سؤال أسعار تحول لبطاقات عروض: [${ids}]`;
+    return true;
+  }],
+  // #54 (2026-10-16، قرار المالك «أ»): لا تطابق بسبب السعر ← أقرب عرضين سعراً بنفس النوع والمكان، برسالة صريحة.
+  // لا تساهل بالمكان ولا بالنوع.
+  ["المساعد: بلا تطابق بالسعر يعرض أقرب عرضين سعراً (نفس النوع والمدينة/الحي)، ولا يتساهل بالمكان", async () => {
+    const pg = await loadPage("index.html", "/");
+    const mk = (n, type, district, city, price) => ({ id: `dddddddd-0000-0000-0000-00000000000${n}`, title: "t", property_type: type, district, city,
+      area_sqm: 500, rooms: 5, price_final: price, price_original: price, is_published: true, is_sold: false, is_pinned: false, created_at: `2026-09-0${n}T00:00:00Z` });
+    pg.T.offers = [
+      mk(1, "فيلا", "العيون", "المدينة المنورة", 3100000), mk(2, "فيلا", "العيون", "المدينة المنورة", 2400000),
+      mk(3, "فيلا", "العوالي", "المدينة المنورة", 5000000), mk(4, "شقة في عمارة", "العيون", "المدينة المنورة", 800000),
+      mk(5, "فيلا", "الروضة", "جدة", 1900000),
+    ];
+    const w = pg.w;
+    w.fetch = async () => ({ ok: true, status: 200, json: async () => ({ reply: "ذكاء" }), text: async () => "" });
+    const ask = async (q) => {
+      const body = w.document.getElementById("assist-body"); body.innerHTML = "";
+      w.document.getElementById("assist-input").value = q;
+      w.document.getElementById("assist-send").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+      await new Promise(r => setTimeout(r, 1200));
+      const msgs = [...body.querySelectorAll(".assist-row:not(.user) .assist-msg")];
+      return { ids: [...body.querySelectorAll("a[href^='/offer/']")].map(a => a.getAttribute("href").replace(/.*0{11}/, "").replace("/", "")),
+               text: msgs.length ? msgs[msgs.length - 1].textContent : "" };
+    };
+    let r = await ask("ابغي فيلا في المدينة المنورة تحت 2مليون");
+    if (r.ids.join() !== "2,1") return `فيلا بالمدينة تحت 2 مليون: المتوقع أقرب عرضين [2,1] (2.4 ثم 3.1، لا جدة ولا الشقة) والنتيجة [${r.ids}]`;
+    if (!r.text.includes("أقرب المتاح")) return `بلا رسالة «أقرب المتاح»: ${r.text}`;
+    r = await ask("ابغي فيلا في العيون تحت مليون");
+    if (r.ids.join() !== "2,1") return `فيلا العيون تحت مليون: المتوقع [2,1] (العيون فقط) والنتيجة [${r.ids}]`;
+    r = await ask("ابغي فيلا فوق 6 مليون");
+    if (r.ids[0] !== "3") return `فيلا فوق 6 مليون: المتوقع الأقرب [3] أولاً والنتيجة [${r.ids}]`;
+    r = await ask("ابغي فيلا في الرياض تحت 2 مليون");
+    if (r.ids.length) return `الرياض: لا تساهل بالمدينة لكن طلعت [${r.ids}]`;
+    r = await ask("ابغي فيلا في قباء تحت 2 مليون");
+    if (r.ids.length) return `قباء (حي بلا عروض): لا تساهل بالحي لكن طلعت [${r.ids}]`;
+    r = await ask("ابغي فيلا في جدة تحت 2 مليون");
+    if (r.ids.join() !== "5" || r.text.includes("أقرب المتاح")) return `تطابق تام بجدة: المتوقع [5] بلا «أقرب» والنتيجة [${r.ids}] ${r.text}`;
+    r = await ask("ابغي فيلا في الرياض");
+    if (r.ids.length || !/ما لقيت نتائج/.test(r.text)) return `بلا سعر وبلا تطابق: المفروض «ما لقيت نتائج» بلا بطاقات [${r.ids}] ${r.text}`;
     return true;
   }],
 ];

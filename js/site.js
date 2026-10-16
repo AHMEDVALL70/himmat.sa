@@ -3903,6 +3903,7 @@ const ASSIST_I18N = {
     fallback:"أقدر أساعدك بالتنقل بين أقسام الموقع: المؤشر، العقود، إضافة عقار، العروض، أو التواصل معنا. أو صف لي العقار اللي تدور عليه (المدينة، النوع، الميزانية) وأبحث لك عنه.",
     noResults:"ما لقيت نتائج مطابقة تماماً، جرّب توسيع النطاق أو تصفح كل العروض.",
     resultsIntro: n => `لقيت لك ${n} نتيجة مطابقة تقريباً:`,
+    nearestIntro: "ما لقيت عرضاً ضمن السعر المطلوب. أقرب المتاح عندنا:",
     rules: [
       { kw:['تقييم','تقدير','مؤشر'], reply:"يمكنك استخدام قسم «المؤشر» لحساب مؤشر استرشادي فوري.", goto:'valuation' },
       { kw:['عقد'], reply:"من قسم «العقود» تقدر تولّد عقد سكني أو تجاري ويُحفظ جدول دفعاته تلقائياً.", goto:'contracts' },
@@ -3916,6 +3917,7 @@ const ASSIST_I18N = {
     fallback:"I can help you navigate: Valuation, Contracts, List Property, Offers, or Contact. Or describe the property you're after (city, type, budget) and I'll search for it.",
     noResults:"I couldn't find an exact match — try broadening your search or browse all offers.",
     resultsIntro: n => `Found ${n} roughly matching result(s):`,
+    nearestIntro: "Nothing within that price — here's the closest we have:",
     rules: [
       { kw:['valuation','estimate'], reply:"Use the “Valuation” section to get an instant guided indicator.", goto:'valuation' },
       { kw:['contract'], reply:"The “Contracts” section generates a residential or commercial contract with its payment schedule saved automatically.", goto:'contracts' },
@@ -4401,7 +4403,7 @@ const assistSameType = (a, b) => a === b || (String(a).startsWith('شقة') && S
 // properties (عقارات الزوار المعتمدة — ما كلها عروض منشورة)، ويفلتر بالحي المذكور. حي معروف
 // مذكور وما عندنا فيه عروض = نتيجة فاضية (ما نرجع عروض من أحياء ثانية). ترتيب: المثبّتة
 // ثم الأحدث، وحد أقصى 5.
-async function searchOffers(q, text){
+async function searchOffers(q, text, limit = 5){
   const rows = await fetchPublishedOffersForAssistant();
   if (!rows.length) return [];
   const norm = normalizeArabicForMatch(text);
@@ -4424,7 +4426,19 @@ async function searchOffers(q, text){
   }
   return pool
     .sort((x, y) => (Number(!!y.is_pinned) - Number(!!x.is_pinned)) || String(y.created_at || '').localeCompare(String(x.created_at || '')))
-    .slice(0, 5);
+    .slice(0, limit);
+}
+// أقرب العروض سعراً لما يكون السعر هو سبب غياب التطابق: نفس فلاتر searchOffers بدون السعر، مرتبة بالبعد عن حد الميزانية.
+async function nearestByPrice(q, text){
+  const pool = await searchOffers({ ...q, minPrice: null, maxPrice: null }, text, Infinity); // كل المرشحين، لا أول 5 فقط
+  const gap = (o) => {
+    const p = o.price_final ?? o.price_original;
+    if (p == null) return Infinity;
+    if (q.maxPrice && p > q.maxPrice) return p - q.maxPrice;
+    if (q.minPrice && p < q.minPrice) return q.minPrice - p;
+    return 0;
+  };
+  return pool.filter(o => gap(o) !== Infinity).sort((a, b) => gap(a) - gap(b)).slice(0, 2);
 }
 function promoBrowseLinkHtml(){
   return `<a href="/offers" style="display:block;margin-top:6px;font-weight:700;color:inherit;text-decoration:underline">${currentLang==='ar' ? 'تصفّح كل العروض ←' : 'Browse all offers →'}</a>`;
@@ -4591,7 +4605,12 @@ async function handleAssistSend(textOverride, isPredefinedChip){
     const results = await searchOffers(q, text);
     await sleep(350);
     hideTyping();
-    if (!results.length){
+    // 2026-10-16 (قرار المالك «أ»): لا تطابق بسبب السعر ← أقرب عرضين سعراً بنفس النوع والمدينة/الحي والغرف
+    // (لا نتساهل بالمكان ولا بالنوع). حي مذكور بلا عروض أو مدينة بلا عروض = لا شي كما كان.
+    const nearest = (!results.length && (q.minPrice || q.maxPrice)) ? await nearestByPrice(q, text) : [];
+    if (nearest.length){
+      addAssistMsg(t.nearestIntro, 'bot', promoCardsHtml(nearest));
+    } else if (!results.length){
       addAssistMsg(t.noResults, 'bot', promoBrowseLinkHtml());
     } else {
       addAssistMsg(t.resultsIntro(results.length), 'bot', promoCardsHtml(results));
