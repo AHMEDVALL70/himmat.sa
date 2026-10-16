@@ -4391,6 +4391,11 @@ async function findPromoOffers(text){
   if (type) pool = pool.filter(o => assistSameType(o.property_type, type));
   return pool.slice(0, 3);
 }
+// حي معروف مذكور بالاسم (نفس قاعدة searchOffers: بعد التطبيع، 3 أحرف على الأقل)
+function offerDistrictNamed(text){
+  const norm = normalizeArabicForMatch(text);
+  return Object.values(CITY_DISTRICTS).some(list => list.some(name => { const d = normalizeArabicForMatch(name); return d.length >= 3 && norm.includes(d); }));
+}
 const assistSameType = (a, b) => a === b || (String(a).startsWith('شقة') && String(b).startsWith('شقة'));
 // 2026-10-01: بحث العقارات بالمساعد صار يقرأ جدول offers (نفس صفحة العروض العامة) بدل
 // properties (عقارات الزوار المعتمدة — ما كلها عروض منشورة)، ويفلتر بالحي المذكور. حي معروف
@@ -4559,7 +4564,14 @@ async function handleAssistSend(textOverride, isPredefinedChip){
   // فيه كلمة نوع عقار أو سعر بنفس الرسالة، ويترك السؤال يوصل لـGemini
   // (يفهم السياق فعلياً، بدل مطابقة كلمات محلية بسيطة).
   const isAdvisoryQuestion = /كيف\s+(?:أ|ا)شتري|كيفية\s+الشراء|خطوات\s+الشراء|طريقة\s+الشراء|أيهما\s+أفضل|ايهما\s+أفضل|وش\s+(?:الأفضل|أفضل|احسن|أحسن)|إيش\s+(?:الأفضل|أفضل|احسن|أحسن)|هل\s+(?:يفضل|الأفضل|من\s+الأفضل)|متى\s+(?:أ|ا)شتري|ليش\s+(?:أ|ا)شتري|لماذا\s+(?:أ|ا)شتري|نصيحة|رايك|رأيك|شنو\s+رايك/i.test(text);
-  const isSearch = !isAdvisoryQuestion && !!(q.type || q.maxPrice || q.minPrice || q.rooms);
+  const isSearchSpecific = !isAdvisoryQuestion && !!(q.type || q.maxPrice || q.minPrice || q.rooms);
+  // 2026-10-16: «عندكم عقارات في المدينة المنورة؟» — كلمة عقار عامة + مدينة (بدون نوع/سعر/غرف وبدون حي
+  // بالاسم) كانت تروح لـGemini فيرجع رد «قسم العروض» الثابت بلا أي بحث، رغم وجود عرض فعلي بنفس المدينة.
+  // الآن تُعامل كبحث بالمدينة. لا نلمس: أسئلة الأسعار (ملاحظة «العزيزية» أعلاه)، والأسئلة الاستشارية،
+  // والحي المذكور بالاسم (مساره الحالي مع Gemini + بطاقات findPromoOffers يعمل).
+  const isGenericSearch = !isAdvisoryQuestion && !isSearchSpecific && !!q.city
+    && /عقار|املاك|أملاك|\bpropert(?:y|ies)\b/i.test(text) && !looksLikePriceQuestion(text) && !offerDistrictNamed(text);
+  const isSearch = isSearchSpecific || isGenericSearch;
 
   // لو الرسالة المكتوبة يدوياً تطابق أحد أقسام الموقع المعروفة (تقييم/عقد/
   // إضافة/عرض/تواصل) وما هي سؤال أسعار، نرجّع لها نفس الرد الثابت الدقيق
@@ -4647,7 +4659,14 @@ async function handleAssistSend(textOverride, isPredefinedChip){
       const sectionMatch = /SITE_SECTION:(valuation|contracts|add-property|offers|contact)/.exec(aiReply.reply || '');
       const sectionRule = sectionMatch && t.rules.find(r => r.goto === sectionMatch[1]);
       if (sectionRule){
-        addAssistMsg(sectionRule.reply, 'bot');
+        // 2026-10-16: لو صنّف Gemini السؤال «قسم العروض» وفيه مدينة أو حي، نعرض عروضنا المطابقة تحت الرد
+        // (نفس searchOffers: حي معروف بلا عروض = لا شي؛ لا عروض من مدينة/حي ثاني)؛ بدون مكان = الرد الثابت كما هو.
+        let extra = '';
+        if (sectionRule.goto === 'offers' && (q.city || offerDistrictNamed(text))){
+          const found = await searchOffers(q, text);
+          if (found.length) extra = promoCardsHtml(found);
+        }
+        addAssistMsg(sectionRule.reply, 'bot', extra);
         showPage(sectionRule.goto);
       } else {
         addAssistMsg(aiReply.reply, 'bot', promoCardsHtml(promo));

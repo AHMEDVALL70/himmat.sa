@@ -1149,6 +1149,43 @@ const CHECKS = [
     if (!css.includes(".offer-body h3{font-size:1em;font-family:inherit}") || !css.includes(".offer-card:hover .offer-body h3")) return "قواعد CSS للحفاظ على شكل عنوان البطاقة مفقودة";
     return true;
   }],
+  // #53 (2026-10-16) «عندكم عقارات في المدينة المنورة» رجّع رد «قسم العروض» الثابت بلا أي بطاقة رغم وجود عرض بالمدينة
+  // (كلمة عقار عامة + مدينة بدون نوع/سعر = ما يُعتبر بحث، وGemini يرجّع SITE_SECTION:offers).
+  ["المساعد: «عقارات» + مدينة يعرض عروض المدينة (والحالات المقيّدة تبقى بلا نتائج)", async () => {
+    const pg = await loadPage("index.html", "/");
+    const mk = (n, type, district, city, price) => ({ id: `cccccccc-0000-0000-0000-00000000000${n}`, title: "t", property_type: type, district, city,
+      area_sqm: 733, rooms: 15, price_final: price, price_original: price, is_published: true, is_sold: false, is_pinned: false, created_at: `2026-09-0${n}T00:00:00Z` });
+    pg.T.offers = [mk(1, "فيلا", "العيون", "المدينة المنورة", 3100000), mk(2, "شقة في عمارة", "الروضة", "جدة", 700000)];
+    const w = pg.w;
+    let aiReply = "SITE_SECTION:offers"; // ما يرجّعه Gemini فعلاً لهذا النوع من الأسئلة
+    w.fetch = async () => ({ ok: true, status: 200, json: async () => ({ reply: aiReply }), text: async () => "" });
+    const ask = async (q) => {
+      const body = w.document.getElementById("assist-body"); body.innerHTML = "";
+      w.document.getElementById("assist-input").value = q;
+      w.document.getElementById("assist-send").dispatchEvent(new w.MouseEvent("click", { bubbles: true }));
+      await new Promise(r => setTimeout(r, 1200));
+      return [...body.querySelectorAll("a[href^='/offer/']")].map(a => a.getAttribute("href").replace(/.*0{11}/, "").replace("/", ""));
+    };
+    let ids = await ask("عندكم عقارات في المدينة المنورة");
+    if (ids.join() !== "1") return `«عقارات في المدينة المنورة»: المتوقع [1] (فيلا العيون فقط، لا جدة) والنتيجة [${ids}]`;
+    ids = await ask("عندكم عقارات في الرياض؟");
+    if (ids.length) return `الرياض: ما عندنا عروض لكن طلعت [${ids}]`;
+    ids = await ask("ابغي فيلا تحت 2مليون");
+    if (ids.length) return `فيلا تحت 2 مليون: المفروض لا نتائج والنتيجة [${ids}]`;
+    ids = await ask("فيلا في الرياض");
+    if (ids.length) return `فيلا في الرياض: المفروض لا نتائج والنتيجة [${ids}]`;
+    // Gemini يصنّفه «قسم العروض» والسؤال فيه مدينة لكن بلا كلمة عقار عامة ← البطاقات تظهر تحت الرد الثابت
+    ids = await ask("وش المتاح عندكم في المدينة المنورة");
+    if (ids.join() !== "1") return `رد «قسم العروض» مع مدينة: المتوقع بطاقة [1] والنتيجة [${ids}]`;
+    // بلا مكان: الرد الثابت وحده بلا بطاقات
+    ids = await ask("وش المتاح عندكم");
+    if (ids.length) return `بلا مدينة/حي: المفروض الرد الثابت بلا بطاقات والنتيجة [${ids}]`;
+    // سؤال أسعار مع كلمة عقار + مدينة: لا يتحول لبحث عروض
+    aiReply = "الأسعار ...";
+    ids = await ask("أسعار العقار بالمدينة المنورة");
+    if (ids.length) return `سؤال أسعار تحول لبطاقات عروض: [${ids}]`;
+    return true;
+  }],
 ];
 
 (async () => {
